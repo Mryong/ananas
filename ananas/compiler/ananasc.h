@@ -8,15 +8,17 @@
 
 #ifndef ananasc_h
 #define ananasc_h
-#import "nac_ast.h"
+#import "anc_ast.h"
+
+
 
 /*create.m*/
 void anc_open_string_literal_buf(void);
 void anc_append_string_literal(int letter);
 NSMutableString *anc_end_string_literal(void);
 NSString *anc_create_identifier(char *str);
-NACExpression *anc_create_expression(NACExpressionKind kind);
-NACStatement *anc_create_statement(NACStatementKind kind);
-NACStructDeclare *nac_create_definition(NSString *structName ,NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
+ANCExpression *anc_create_expression(ANCExpressionKind kind);
+ANCStatement *anc_create_statement(ANCStatementKind kind);
+ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
 
 #endif /* ananasc_h */

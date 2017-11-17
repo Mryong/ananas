@@ -1,5 +1,5 @@
 //
-//  NACFunctionDefinition.h
+//  ANCFunctionDefinition.h
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/11/16.
@@ -7,18 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NACTypeSpecifier.h"
+#import "ANCTypeSpecifier.h"
 
-@interface NACParameter:NSObject
-@property (strong, nonatomic) NACTypeSpecifier *type;
+@interface ANCParameter:NSObject
+@property (strong, nonatomic) ANCTypeSpecifier *type;
 @property (copy, nonatomic) NSString *name;
 @end
 
 
-@interface NACFunctionDefinition: NSObject
+@interface ANCFunctionDefinition: NSObject
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (copy, nonatomic) NSString *name;//or selecor
-@property (strong, nonatomic) NSMutableArray<NACParameter *> *params;
+@property (strong, nonatomic) NSMutableArray<ANCParameter *> *params;
 
 
 @end

@@ -9,11 +9,11 @@
 #ifndef nac_ast_h
 #define nac_ast_h
 
-#import "NACTypeSpecifier.h"
-#import "NACExpression.h"
-#import "NACClassDefinition.h"
-#import "NACFunctionDefinition.h"
-#import "NACStatement.h"
-#import "NACStructDeclare.h"
+#import "ANCTypeSpecifier.h"
+#import "ANCExpression.h"
+#import "ANCClassDefinition.h"
+#import "ANCFunctionDefinition.h"
+#import "ANCStatement.h"
+#import "ANCStructDeclare.h"
 
 #endif /* nac_ast_h */

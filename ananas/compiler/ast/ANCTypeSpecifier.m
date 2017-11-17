@@ -6,11 +6,11 @@
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "NACTypeSpecifier.h"
+#import "ANCTypeSpecifier.h"
 
 
 
-@implementation NACTypeSpecifier
+@implementation ANCTypeSpecifier
 
 
 @end

@@ -2,7 +2,8 @@
 	#define YYDEBUG 1
 	#define YYERROR_VERBOSE
 	#import <Foundation/Foundation.h>
-	#import "nac_ast.h"
+	#import "ananasc.h"
+	#import "anc_ast.h"
 
 int yyerror(char const *str);
 int yylex(void);
@@ -67,7 +68,7 @@ break_statement continue_statement return_statement declaration_statement
 %type <type_specifier> type_specifier non_block_type_specifier base_type_specifier oc_type_specifier struct_type_specifier custom_type_specifier block_type_specifier
 %type <block_statement> block_statement default_opt
 %type <type_specifier_list> type_specifier_list
-
+%type <declare_struct> declare_struct
 
 
 %%
@@ -88,7 +89,7 @@ definition:  class_definition
 struct_name: IDENTIFIER
 			| struct_type_specifier
 			{
-				NACTypeSpecifier *type = (__bridge_transfer NACTypeSpecifier *)$1;
+				ANCTypeSpecifier *type = (__bridge_transfer ANCTypeSpecifier *)$1;
 				$$ = (__bridge_retained void *)type.identifer;
 			}
 			;
@@ -103,7 +104,7 @@ declare_struct: DECLARE STRUCT struct_name LC
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$7;
 				NSString *keysKey = (__bridge_transfer NSString *)$9;
 				NSArray *keysValue = (__bridge_transfer NSArray *)$11;
-				NACStructDeclare *structDeclare = nac_create_struct_declare(structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
+				ANCStructDeclare *structDeclare = anc_create_struct_declare(structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -117,7 +118,7 @@ declare_struct: DECLARE STRUCT struct_name LC
 				NSArray *keysValue = (__bridge_transfer NSArray *)$7;
 				NSString *typeEncodingKey = (__bridge_transfer NSString *)$9;
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$11;
-				NACStructDeclare *structDeclare = nac_create_struct_declare(structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
+				ANCStructDeclare *structDeclare = anc_create_struct_declare(structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -366,25 +367,28 @@ dic: AT LC  dic_entry_list RC {
 
 primary_expression: IDENTIFIER
 			{
-				NACIdentifierExpression *expr = (NACIdentifierExpression *)anc_create_expression(NAC_IDENTIFIER_EXPRESSION);
+				ANCIdentifierExpression *expr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
 				NSString *identifier = (__bridge_transfer NSString *)$1;;
 				expr.identifier = identifier;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| primary_expression DOT IDENTIFIER
 			{
-				NACMemberExpression *expr = (NACMemberExpression *)anc_create_expression(NAC_MEMBER_EXPRESSION);
-				expr.expr = (__bridge_transfer NACExpression *)$1;
+				ANCMemberExpression *expr = (ANCMemberExpression *)anc_create_expression(ANC_MEMBER_EXPRESSION);
+				expr.expr = (__bridge_transfer ANCExpression *)$1;
 				expr.memberName = (__bridge_transfer NSString *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| primary_expression DOT selector LP RP
 			{
-				NACFunctonCallExpression *expr = (NACFunctonCallExpression *)anc_create_expression(NAC_FUNCTION_CALL_EXPRESSION);
-				expr.expr = (__bridge_transfer NACExpression *)$1;
+				ANCFunctonCallExpression *expr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				expr.expr = (__bridge_transfer ANCExpression *)$1;
 				expr.args;
 			}
 			| primary_expression DOT selector LP expression_list RP
+			{
+				
+			}
 			| IDENTIFIER LP RP
 		    | IDENTIFIER LP expression_list RP
 			| IDENTIFIER LB expression RB

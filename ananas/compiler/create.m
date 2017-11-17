@@ -8,9 +8,9 @@
 
 #include <stdio.h>
 #include "ananasc.h"
-#import "NACExpression.h"
-#import "NACStatement.h"
-#import "NACStructDeclare.h"
+#import "ANCExpression.h"
+#import "ANCStatement.h"
+#import "ANCStructDeclare.h"
 
 int line_number = 1;
 
@@ -51,7 +51,7 @@ void anc_append_string_literal(int letter){
 	st_string_literal_buffer_size++;
 }
 
-void nac_rest_string_literal_buffer(void){
+void anc_rest_string_literal_buffer(void){
 	free(st_string_literal_buffer);
 	st_string_literal_buffer = NULL;
 	st_string_literal_buffer_size = 0;
@@ -62,113 +62,111 @@ void nac_rest_string_literal_buffer(void){
 NSMutableString *anc_end_string_literal(){
 	anc_append_string_literal('\0');
 	NSMutableString *str = [NSMutableString stringWithUTF8String:st_string_literal_buffer];
-	nac_rest_string_literal_buffer();
+	anc_rest_string_literal_buffer();
 	return str;
 }
 
-Class anc_expression_class_of_kind(NACExpressionKind kind){
+Class anc_expression_class_of_kind(ANCExpressionKind kind){
 	switch (kind) {
-		case NAC_BOOLEAN_EXPRESSION:
-		case NAC_INT_EXPRESSION:
-		case NAC_U_INT_EXPRESSION:
-		case NAC_FLOAT_EXPRESSION:
-		case NAC_DOUBLE_EXPRESSION:
-		case NAC_STRING_EXPRESSION:
-		case NAC_SELF_EXPRESSION:
-		case NAC_SUPER_EXPRESSION:
-		case NAC_NIL_EXPRESSION:
-			return [NACExpression class];
-		case NAC_IDENTIFIER_EXPRESSION:
-			return [NACIdentifierExpression class];
-		case NAC_ASSIGN_EXPRESSION:
-			return [NACAssignExpression class];
-		case NAC_PLUS_EXPRESSION:
-		case NAC_MINUS_EXPRESSION:
-		case NAC_MUL_EXPRESSION:
-		case NAC_DIV_EXPRESSION:
-		case NAC_MOD_EXPRESSION:
-		case NAC_EQ_EXPRESSION:
-		case NAC_NE_EXPRESSION:
-		case NAC_GT_EXPRESSION:
-		case NAC_GE_EXPRESSION:
-		case NAC_LT_EXPRESSION:
-		case NAC_LE_EXPRESSION:
-		case NAC_LOGICAL_AND_EXPRESSION:
-		case NAC_LOGICAL_OR_EXPRESSION:
-			return [NACBinaryExpression class];
-		case NAC_LOGICAL_NOT_EXPRESSION:
-		case NAC_INCREMENT_EXPRESSION:
-		case NAC_DECREMENT_EXPRESSION:
+		case ANC_BOOLEAN_EXPRESSION:
+		case ANC_INT_EXPRESSION:
+		case ANC_U_INT_EXPRESSION:
+		case ANC_FLOAT_EXPRESSION:
+		case ANC_DOUBLE_EXPRESSION:
+		case ANC_STRING_EXPRESSION:
+		case ANC_SELF_EXPRESSION:
+		case ANC_SUPER_EXPRESSION:
+		case ANC_NIL_EXPRESSION:
+			return [ANCExpression class];
+		case ANC_IDENTIFIER_EXPRESSION:
+			return [ANCIdentifierExpression class];
+		case ANC_ASSIGN_EXPRESSION:
+			return [ANCAssignExpression class];
+		case ANC_PLUS_EXPRESSION:
+		case ANC_MINUS_EXPRESSION:
+		case ANC_MUL_EXPRESSION:
+		case ANC_DIV_EXPRESSION:
+		case ANC_MOD_EXPRESSION:
+		case ANC_EQ_EXPRESSION:
+		case ANC_NE_EXPRESSION:
+		case ANC_GT_EXPRESSION:
+		case ANC_GE_EXPRESSION:
+		case ANC_LT_EXPRESSION:
+		case ANC_LE_EXPRESSION:
+		case ANC_LOGICAL_AND_EXPRESSION:
+		case ANC_LOGICAL_OR_EXPRESSION:
+			return [ANCBinaryExpression class];
+		case ANC_LOGICAL_NOT_EXPRESSION:
+		case ANC_INCREMENT_EXPRESSION:
+		case ANC_DECREMENT_EXPRESSION:
 		case NSC_NEGATIVE_EXPRESSION:
-			return [NACUnaryExpression class];
-		case NAC_INDEX_EXPRESSION:
-			return [NACIndexExpression class];
-		case NAC_MEMBER_EXPRESSION:
-			return [NACMemberExpression class];
-		case NAC_FUNCTION_CALL_EXPRESSION:
-			return [NACFunctonCallExpression class];
-		case NAC_DIC_LITERAL_EXPRESSION:
-			return [NACDictionaryExpression class];
-		case NAC_STRUCT_LITERAL_EXPRESSION:
-			return [NACStructpression class];
-		case NAC_ARRAY_LITERAL_EXPRESSION:
-			return [NACArrayExpression class];
+			return [ANCUnaryExpression class];
+		case ANC_INDEX_EXPRESSION:
+			return [ANCIndexExpression class];
+		case ANC_MEMBER_EXPRESSION:
+			return [ANCMemberExpression class];
+		case ANC_FUNCTION_CALL_EXPRESSION:
+			return [ANCFunctonCallExpression class];
+		case ANC_DIC_LITERAL_EXPRESSION:
+			return [ANCDictionaryExpression class];
+		case ANC_STRUCT_LITERAL_EXPRESSION:
+			return [ANCStructpression class];
+		case ANC_ARRAY_LITERAL_EXPRESSION:
+			return [ANCArrayExpression class];
 		default:
-			return [NACExpression class];
+			return [ANCExpression class];
 	}
 	
 }
 
-NACExpression* anc_create_expression(NACExpressionKind kind){
+ANCExpression* anc_create_expression(ANCExpressionKind kind){
 	Class clazz = anc_expression_class_of_kind(kind);
-	NACExpression *expr = [[clazz alloc] init];
+	ANCExpression *expr = [[clazz alloc] init];
 	expr.expressionKind = kind;
 	return expr;
 }
 
-Class anc_statement_class_of_kind(NACStatementKind kind){
+Class anc_statement_class_of_kind(ANCStatementKind kind){
 	switch (kind) {
-		case NACStatementKindExpression:
-			return [NACExpressionStatement class];
-		case NACStatementKindDeclaration:
-			return [NACDeclarationStatement class];
-		case NACStatementKindIf:
-			return [NACIfStatement class];
-		case NACStatementKindSwitch:
-			return [NACSwitchStatement class];
-		case NACStatementKindFor:
-			return [NACForStatement class];
-		case NACStatementKindForEach:
-			return [NACForEachStatement class];
-		case NACStatementKindWhile:
-			return [NACWhileStatement class];
-		case NACStatementKindDoWhile:
-			return [NACDoWhileStatement class];
-		case NACStatementKindContinue:
-			return [NACContinueStatement class];
-		case NACStatementKindBreak:
-			return [NACContinueStatement class];
-		case NACStatementKindReturn:
-			return [NACReturnStatement class];
+		case ANCStatementKindExpression:
+			return [ANCExpressionStatement class];
+		case ANCStatementKindDeclaration:
+			return [ANCDeclarationStatement class];
+		case ANCStatementKindIf:
+			return [ANCIfStatement class];
+		case ANCStatementKindSwitch:
+			return [ANCSwitchStatement class];
+		case ANCStatementKindFor:
+			return [ANCForStatement class];
+		case ANCStatementKindForEach:
+			return [ANCForEachStatement class];
+		case ANCStatementKindWhile:
+			return [ANCWhileStatement class];
+		case ANCStatementKindDoWhile:
+			return [ANCDoWhileStatement class];
+		case ANCStatementKindContinue:
+			return [ANCContinueStatement class];
+		case ANCStatementKindBreak:
+			return [ANCContinueStatement class];
+		case ANCStatementKindReturn:
+			return [ANCReturnStatement class];
 		default:
-			return [NACStatement class];
+			return [ANCStatement class];
 	}
 	
 }
 
-NACStatement *anc_create_statement(NACStatementKind kind){
+ANCStatement *anc_create_statement(ANCStatementKind kind){
 	Class clazz = anc_statement_class_of_kind(kind);
-	NACStatement *statement = [[clazz alloc] init];
+	ANCStatement *statement = [[clazz alloc] init];
 	statement.kind = kind;
 	return statement;
 }
 
 
-NACStructDeclare *nac_create_struct_declare(NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
+ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
 	if (![typeEncodingKey isEqualToString:@"typeEncoding"]) {
-		NACFunctonCallExpression *expr = (NACFunctonCallExpression *)anc_create_expression(NAC_FUNCTION_CALL_EXPRESSION);
-		expr.expr;
-		expr.args;
+		
 		
 	}
 	
@@ -176,7 +174,7 @@ NACStructDeclare *nac_create_struct_declare(NSString *structName, NSString *type
 		
 	}
 	
-	NACStructDeclare *structDeclare = [[NACStructDeclare alloc] init];
+	ANCStructDeclare *structDeclare = [[ANCStructDeclare alloc] init];
 	structDeclare.typeEncoding = typeEncodingValue;
 	structDeclare.keys = keysValue;
 	

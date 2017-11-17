@@ -2,7 +2,7 @@
 	#include <Foundation/Foundation.h>
 	#include "ananasc.h"
 	#include "y.tab.h"
-	#import "NACExpression.h"
+	#import "ANCExpression.h"
 	
 	extern int line_number;
 
@@ -133,7 +133,7 @@ int yywrap(){
 
 
 <INITIAL>[1-9][0-9]* {
-	NACExpression *expression = anc_create_expression(NAC_INT_EXPRESSION);
+	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
 	NSInteger val;
 	sscanf(yytext,"%lx",&val);
 	expression.integer_value = val;
@@ -144,7 +144,7 @@ int yywrap(){
 
 
 <INITIAL>"0"[xX][0-9a-fA-F]+ {
-	NACExpression *expression = anc_create_expression(NAC_INT_EXPRESSION);
+	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
 	NSInteger val;
 	sscanf(yytext,"%lx",&val);
 	expression.integer_value = val;
@@ -154,7 +154,7 @@ int yywrap(){
 
 
 <INITIAL>"0" {
-	NACExpression *expression = anc_create_expression(NAC_INT_EXPRESSION);
+	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
 	expression.integer_value = 0;
 	yylval.expression = (__bridge_retained void *)expression;
 	return INTETER_LITERAL;
@@ -162,7 +162,7 @@ int yywrap(){
 
 
 <INITIAL>[0-9]\.[0-9]+ {
-	NACExpression *expression = anc_create_expression(NAC_DOUBLE_EXPRESSION);
+	ANCExpression *expression = anc_create_expression(ANC_DOUBLE_EXPRESSION);
 	double val;
 	sscanf(yytext,"%lf",&val);
 	expression.double_value = val;
@@ -177,7 +177,7 @@ int yywrap(){
 
 
 <STRING_LITERAL_STATE>\" {
-	NACExpression *expression = anc_create_expression(NAC_STRING_EXPRESSION);
+	ANCExpression *expression = anc_create_expression(ANC_STRING_EXPRESSION);
 	expression.string_value = anc_end_string_literal();
 	yylval.expression = (__bridge_retained void *)expression;
 	BEGIN  INITIAL;
