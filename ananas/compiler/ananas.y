@@ -151,7 +151,19 @@ class_definition: CLASS IDENTIFIER COLON IDENTIFIER LC RC
 			;
 
 protocol_list: IDENTIFIER
+			{
+				NSMutableArray *list = [NSMutableArray array];
+				NSString *identifier = (__bridge_transfer NSString *)$1;
+				[list addObject:identifier];
+				$$ = (__bridge_retained void *)list;
+			}
 			| protocol_list COMMA IDENTIFIER
+			{
+				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
+				NSString *identifier = (__bridge_transfer NSString *)$3;
+				[list addObject:identifier];
+				$$ = (__bridge_retained void *)list;
+			}
 			;
 
 
@@ -211,25 +223,82 @@ base_type_specifier: BOOL_
 			| DOUBLE
 			;
 
-struct_type_specifier: CG_RECT 
-			| CG_SIZE 
-			| CG_POINT 
-			| CG_AFFINE_TRANSFORM 
+struct_type_specifier: CG_RECT
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGRect",@"{CGRect={CGPoint=dd}{CGSize=dd}}");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| CG_SIZE
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGSzie",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| CG_POINT
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGPointer",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| CG_AFFINE_TRANSFORM
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGAffineTransform",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
 			| NS_RANGE
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGRange",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
 			;
 
 oc_type_specifier: NS_STRING ASTERISK
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"NSString",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
 			| NS_NUMBER ASTERISK
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"NSNumber",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
 			| NS_ARRAY ASTERISK
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"NSArray",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;r;
+			}
 			| NS_MUTABLE_ARRAY ASTERISK
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"NSMutableArray",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;r;
+			}
 			| NS_DICTIONARY ASTERISK
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"NSDictionary",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;r;
+			}
 			| NS_MUTABLE_DICTIONARY ASTERISK
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"NSMutableDictionary",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;r;
+			}
+			| IDENTIFIER ASTERISK
+			{
+				NSString *identifier = (__bridge_transfer NSString *)$1;
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,identifier,@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;r;;
+			}
 			| ID
+			{
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OC,@"id",@"@");
+				$$ = (__bridge_retained void *)typeSpecifier;r;
+			}
 			;
 
 
 custom_type_specifier: IDENTIFIER
-			| IDENTIFIER ASTERISK
+			{
+				NSString *identifier = (__bridge_transfer NSString *)$1;
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_UNKNOWN,identifier,@"?");
+			}
 			;
 
 
@@ -387,7 +456,17 @@ primary_expression: IDENTIFIER
 			}
 			| primary_expression DOT selector LP expression_list RP
 			{
+				ANCExpression *expr = (__bridge_transfer ANCExpression *) $1;
+				NSString *selector = (__bridge_transfer NSString *) $3;
+				ANCMemberExpression *memberExpr = anc_create_expression(ANC_MEMBER_EXPRESSION);
+				memberExpr.expr = expr;
+				memberExpr.memberName = selector;
 				
+				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				funcCallExpr.expr = memberExpr;
+				funcCallExpr.args;
+				
+				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 			| IDENTIFIER LP RP
 		    | IDENTIFIER LP expression_list RP

@@ -166,8 +166,7 @@ ANCStatement *anc_create_statement(ANCStatementKind kind){
 
 ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
 	if (![typeEncodingKey isEqualToString:@"typeEncoding"]) {
-		
-		
+	
 	}
 	
 	if (![keysKey isEqualToString:@"keys"]) {
@@ -179,6 +178,15 @@ ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *type
 	structDeclare.keys = keysValue;
 	
 	return structDeclare;
+	
+}
+
+ANCTypeSpecifier *anc_create_type_specifier(ANCExpressionTypeKind kind, NSString *identifier, NSString *typeEncoding){
+	ANCTypeSpecifier *typeSpecifier = [[ANCTypeSpecifier alloc] init];
+	typeSpecifier.typeKind = kind;
+	typeSpecifier.identifer = identifier;
+	typeSpecifier.typeEncoding = typeEncoding;
+	return typeSpecifier;
 	
 }
 

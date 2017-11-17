@@ -1,7 +1,7 @@
 
 //声明在OC中已定义的结构体
 declare struct CGAffineTransform{
-	typeEncoding: "ffffff",
+	typeEncoding: "{CGAffineTransform=dddddd}",
 	keys:a, b, c, d, tx, ty
 }
 

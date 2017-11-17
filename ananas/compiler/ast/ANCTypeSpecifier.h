@@ -8,16 +8,13 @@
 
 #import <Foundation/Foundation.h>
 typedef NS_ENUM(NSInteger, ANCExpressionTypeKind) {
-	ANC_VOID_TYPE,
-	ANC_BOOL_TYPE,
-	ANC_NS_INTEGER_TYPE,
-	ANC_NS_U_INTEGER_TYPE,
-	ANC_CG_RECT_TYPE,
-	ANC_CG_DOUBLE_TYPE,
-	ANC_OC_TYPE,
-	NSC_NS_STRING_TYPE,
-	NSC_NS_NUMBER_TYPE,
-	ANC_STRUCT,
+	ANC_TYPE_VOID,
+	ANC_TYPE_BOOL,
+	ANC_TYPE_NS_U_INTEGER,
+	ANC_TYPE_NS_INTEGER,
+	ANC_TYPE_OC,
+	ANC_TYPE_STRUCT,
+	ANC_TYPE_UNKNOWN
 };
 @interface ANCTypeSpecifier : NSObject
 @property (copy, nonatomic) NSString *identifer;

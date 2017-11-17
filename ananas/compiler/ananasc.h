@@ -9,6 +9,7 @@
 #ifndef ananasc_h
 #define ananasc_h
 #import "anc_ast.h"
+#import <CoreFoundation/CoreFoundation.h>
 
 
 
@@ -20,5 +21,6 @@ NSString *anc_create_identifier(char *str);
 ANCExpression *anc_create_expression(ANCExpressionKind kind);
 ANCStatement *anc_create_statement(ANCStatementKind kind);
 ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
+ANCTypeSpecifier *anc_create_type_specifier(ANCExpressionTypeKind kind, NSString *identifier, NSString *typeEncoding);
 
 #endif /* ananasc_h */
