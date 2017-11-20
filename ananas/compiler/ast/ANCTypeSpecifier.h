@@ -14,10 +14,15 @@ typedef NS_ENUM(NSInteger, ANCExpressionTypeKind) {
 	ANC_TYPE_NS_INTEGER,
 	ANC_TYPE_OC,
 	ANC_TYPE_STRUCT,
+	ANC_TYPE_BLOCK,
 	ANC_TYPE_UNKNOWN
 };
 @interface ANCTypeSpecifier : NSObject
 @property (copy, nonatomic) NSString *identifer;
 @property (assign, nonatomic) ANCExpressionTypeKind typeKind;
 @property (copy, nonatomic) NSString *typeEncoding;
+
+@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
+@property (strong, nonatomic) NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier;
+
 @end

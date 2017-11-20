@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ANCExpression.h"
+#import "ANCDeclaration.h"
 
 typedef NS_ENUM(NSInteger, ANCStatementKind) {
 	ANCStatementKindExpression = 1,
@@ -39,10 +40,11 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 
 @end
 
+
+
+
 @interface ANCDeclarationStatement: ANCStatement
-@property (strong, nonatomic) ANCTypeSpecifier *type;
-@property (copy, nonatomic) NSString *name;
-@property (strong, nonatomic) ANCExpression *initializer;
+@property (strong, nonatomic) ANCDeclaration *declaration;
 @end
 
 
@@ -58,7 +60,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @property (strong, nonatomic) ANCExpression *condition;
 @property (strong, nonatomic) ANCBlock *thenBlock;
 @property (strong, nonatomic) ANCBlock *elseBlocl;
-@property (strong, nonatomic) NSMutableArray<ANCElseIf *> *elseIfList;
+@property (strong, nonatomic) NSArray<ANCElseIf *> *elseIfList;
 
 @end
 
@@ -71,13 +73,13 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @interface ANCSwitchStatement: ANCStatement
 @property (strong, nonatomic) ANCExpression *expr;
 @property (strong, nonatomic) NSMutableArray<ANCCase *> *caseList;
-@property (strong, nonatomic) ANCBlock *block;
+@property (strong, nonatomic) ANCBlock *defaultBlock;
 @end
 
 @interface ANCForStatement: ANCStatement
 @property (copy, nonatomic) NSString *label;
 @property (strong, nonatomic) ANCExpression *initializerExpr;
-@property (assign, nonatomic) ANCDeclarationStatement *declaration;
+@property (assign, nonatomic) ANCDeclaration *declaration;
 @property (strong, nonatomic) ANCExpression *condition;
 @property (strong, nonatomic) ANCExpression *post;
 @property (strong, nonatomic) ANCBlock *block;
@@ -85,8 +87,8 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 
 @interface ANCForEachStatement: ANCStatement
 @property (copy, nonatomic) NSString *label;
-@property (strong, nonatomic) ANCTypeSpecifier *type;
-@property (copy, nonatomic) NSString *varName;
+@property (assign, nonatomic) ANCDeclaration *declaration;
+@property (strong, nonatomic) ANCExpression *expr;
 @property (strong, nonatomic) ANCExpression *arrayExpr;
 @property (strong, nonatomic) ANCBlock *block;
 @end

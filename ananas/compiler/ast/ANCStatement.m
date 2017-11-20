@@ -9,53 +9,57 @@
 #import "ANCStatement.h"
 
 @implementation ANCStatement
+
+
 @end
 
-@implementation ANCBlock: NSObject
+@implementation ANCBlock
 @end
 
-@implementation ANCExpressionStatement: ANCStatement
-@end
+@implementation ANCExpressionStatement
 
-@implementation ANCDeclarationStatement: ANCStatement
-@end
-
-
-@implementation ANCElseIf: ANCStatement
-@end
-
-@implementation ANCIfStatement: ANCStatement
 @end
 
 
-@implementation ANCCase: ANCStatement
-@end
-
-@implementation ANCSwitchStatement: ANCStatement
-@end
-
-@implementation ANCForStatement: ANCStatement
-@end
-
-@implementation ANCForEachStatement: ANCStatement
-@end
-
-@implementation ANCWhileStatement: ANCStatement
+@implementation ANCDeclarationStatement
 @end
 
 
-@implementation ANCDoWhileStatement: ANCStatement
+@implementation ANCElseIf
 @end
 
-@implementation ANCContinueStatement: ANCStatement
-@end
-
-
-@implementation ANCBreakStatement: ANCStatement
+@implementation ANCIfStatement
 @end
 
 
-@implementation ANCReturnStatement: ANCStatement
+@implementation ANCCase
+@end
+
+@implementation ANCSwitchStatement
+@end
+
+@implementation ANCForStatement
+@end
+
+@implementation ANCForEachStatement
+@end
+
+@implementation ANCWhileStatement
+@end
+
+
+@implementation ANCDoWhileStatement
+@end
+
+@implementation ANCContinueStatement
+@end
+
+
+@implementation ANCBreakStatement
+@end
+
+
+@implementation ANCReturnStatement
 @end
 
 

@@ -17,8 +17,9 @@
 
 @interface ANCFunctionDefinition: NSObject
 @property (assign, nonatomic) NSUInteger lineNumber;
+@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
 @property (copy, nonatomic) NSString *name;//or selecor
-@property (strong, nonatomic) NSMutableArray<ANCParameter *> *params;
+@property (strong, nonatomic) NSArray<ANCParameter *> *params;
 
 
 @end

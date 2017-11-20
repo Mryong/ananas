@@ -10,7 +10,7 @@
 #import "ANCFunctionDefinition.h"
 
 
-typedef NS_ENUM(NSInteger, ANCPropertyModifier) {
+typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 	ANCPropertyModifierMemStrong = 0x00,
 	ANCPropertyModifierMemWeak = 0x01,
 	ANCPropertyModifierMemCopy = 0x2,
@@ -25,29 +25,45 @@ typedef NS_ENUM(NSInteger, ANCPropertyModifier) {
 
 
 
-@interface ANCClassMemberDefinition: NSObject
+@interface ANCMemberDefinition: NSObject
 
 @end
 
-@interface ANCClassPropertyDefinition: ANCClassMemberDefinition
+@interface ANCPropertyDefinition: ANCMemberDefinition
 @property (assign, nonatomic) ANCPropertyModifier modifier;
-@property (strong, nonatomic) ANCTypeSpecifier *type;
+@property (strong, nonatomic) ANCTypeSpecifier *typeSpecifier;
 @property (copy, nonatomic) NSString *name;
 
-
-
 @end
 
 
-@interface ANCClassMehodDefinition: ANCClassMemberDefinition
-@property (strong, nonatomic) ANCFunctionDefinition *func;
+@interface ANCMethodDefinition: ANCMemberDefinition
+@property (assign, nonatomic) BOOL classMethod;
+@property (strong, nonatomic) ANCFunctionDefinition *functionDefinition;
 @end
 
 
 @interface ANCClassDefinition : NSObject
 @property (copy, nonatomic) NSString *name;
 @property (copy, nonatomic) NSString *superNmae;
-@property (strong, nonatomic) NSMutableArray<NSString *> *protocol;
-@property (strong, nonatomic) NSMutableArray<ANCClassPropertyDefinition *> *properties;
-@property (strong, nonatomic) NSMutableArray<ANCClassMehodDefinition *> *methods;
+@property (strong, nonatomic) NSArray<NSString *> *protocolNames;
+@property (strong, nonatomic) NSArray<ANCPropertyDefinition *> *properties;
+@property (strong, nonatomic) NSArray<ANCMethodDefinition *> *classMethods;
+@property (strong, nonatomic) NSArray<ANCMethodDefinition *> *instanceMethods;
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

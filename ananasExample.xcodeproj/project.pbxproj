@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */; };
 		41D02D1C1FA8A09300E1829A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D1B1FA8A09300E1829A /* AppDelegate.m */; };
 		41D02D1F1FA8A09400E1829A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D1E1FA8A09400E1829A /* ViewController.m */; };
 		41D02D221FA8A09400E1829A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 41D02D201FA8A09400E1829A /* Main.storyboard */; };
@@ -45,6 +46,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		41C98B131FC2D1DA00BADBE9 /* ANCDeclaration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCDeclaration.h; sourceTree = "<group>"; };
+		41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCDeclaration.m; sourceTree = "<group>"; };
 		41D02D171FA8A09300E1829A /* ananasExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ananasExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D02D1A1FA8A09300E1829A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		41D02D1B1FA8A09300E1829A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -198,6 +201,8 @@
 				41E83EB31FBD8C9E00A48592 /* ANCStructDeclare.h */,
 				41E83EB41FBD8C9E00A48592 /* ANCStructDeclare.m */,
 				41E83EB71FBDBED200A48592 /* anc_ast.h */,
+				41C98B131FC2D1DA00BADBE9 /* ANCDeclaration.h */,
+				41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */,
 			);
 			path = ast;
 			sourceTree = "<group>";
@@ -357,6 +362,7 @@
 			files = (
 				41E83EAF1FBD653900A48592 /* ANCFunctionDefinition.m in Sources */,
 				41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */,
+				41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */,
 				41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */,
 				41E83EAC1FBD5F8E00A48592 /* ANCClassDefinition.m in Sources */,
 				41E83EB21FBD6F6600A48592 /* ANCStatement.m in Sources */,
