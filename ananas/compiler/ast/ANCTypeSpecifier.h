@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, ANCExpressionTypeKind) {
 @property (assign, nonatomic) ANCExpressionTypeKind typeKind;
 @property (copy, nonatomic) NSString *typeEncoding;
 
-@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
-@property (strong, nonatomic) NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier;
+@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;//for block type
+@property (strong, nonatomic) NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier;//for block type
 
 @end

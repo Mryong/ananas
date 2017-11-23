@@ -28,7 +28,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @property (assign, nonatomic) ANCStatementKind kind;
 @end
 
-@interface ANCBlock: SObject
+@interface ANCBlock: NSObject
 
 @property (strong, nonatomic) NSArray<ANCStatement *> *statementList;
 

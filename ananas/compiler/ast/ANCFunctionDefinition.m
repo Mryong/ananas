@@ -9,7 +9,7 @@
 #import "ANCFunctionDefinition.h"
 
 
-@implementation ANCParameter:NSObject
+@implementation ANCParameter
 
 @end
 

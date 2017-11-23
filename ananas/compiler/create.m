@@ -8,11 +8,14 @@
 
 #include <stdio.h>
 #include "ananasc.h"
-#import "ANCExpression.h"
-#import "ANCStatement.h"
-#import "ANCStructDeclare.h"
 
-int line_number = 1;
+static ANCompileUtil *st_current_compile_util;
+
+
+
+
+
+
 
 #define STRING_ALLOC_SIZE (256)
 static char *st_string_literal_buffer = NULL;
@@ -22,9 +25,23 @@ static int st_string_literal_buffer_alloc_size = 0;
 
 
 int yyerror(char const *str){
-	printf("line:%d: %s\n",line_number,str);
+	printf("line:%zd: %s\n",anc_get_current_compile_util().lineNumber,str);
 	return 0;
 }
+
+
+ANCompileUtil *anc_get_current_compile_util(){
+	return st_current_compile_util;
+}
+
+void anc_set_current_compile_util(ANCompileUtil *compileUtil){
+	st_current_compile_util = compileUtil;
+}
+
+
+
+
+
 
 
 NSString *anc_create_identifier(char *str){
@@ -360,6 +377,7 @@ ANCMethodDefinition *anc_create_method_definition(BOOL classMethod, ANCTypeSpeci
 	funcDefinition.name = selector;
 	funcDefinition.params = params;
 	funcDefinition.block = block;
+	methodDefinition.functionDefinition = funcDefinition;
 	return methodDefinition;
 	
 }
@@ -374,11 +392,6 @@ ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifi
 
 ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames,
 												NSArray<ANCMemberDefinition *> *members){
-	
-	ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(ANCPropertyModifier modifier, <#ANCTypeSpecifier *typeSpecifier#>, <#NSString *name#>)
-	
-	
-	
 
 	
 	ANCClassDefinition *classDefinition = [[ANCClassDefinition alloc] init];
@@ -404,6 +417,17 @@ ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superN
 	classDefinition.classMethods = classMethods;
 	classDefinition.instanceMethods = instanceMethods;
 	return classDefinition;
+	
+}
+
+void anc_add_struct_declare(ANCStructDeclare *structDeclare){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	[compileUtil.structDeclareList addObject:structDeclare];
+}
+
+void anc_add_class_definition(ANCClassDefinition *classDefinition){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	[compileUtil.classDefinitionList addObject:classDefinition];
 	
 }
 

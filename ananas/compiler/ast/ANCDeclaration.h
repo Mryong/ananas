@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+@class ANCTypeSpecifier;
+@class ANCExpression;
 
 @interface ANCDeclaration: NSObject
 @property (strong, nonatomic) ANCTypeSpecifier *type;

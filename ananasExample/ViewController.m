@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()<UITableViewDataSource>
+@interface ViewController ()
 
 @end
 
@@ -19,7 +19,6 @@
 	// Do any additional setup after loading the view, typically from a nib.
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{}
 
 - (void)didReceiveMemoryWarning {
 	[super didReceiveMemoryWarning];

@@ -9,11 +9,12 @@
 #ifndef ananasc_h
 #define ananasc_h
 #import "anc_ast.h"
+#import "ANC.h"
 #import <CoreFoundation/CoreFoundation.h>
 
 
 
-/*create.m*/
+/* create.m */
 void anc_open_string_literal_buf(void);
 void anc_append_string_literal(int letter);
 const char* anc_end_string_literal(void);
@@ -48,7 +49,8 @@ ANCMethodDefinition *anc_create_method_definition(BOOL classMethod, ANCTypeSpeci
 ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifier, ANCTypeSpecifier *typeSpecifier, NSString *name);
 ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames,
 												NSArray<ANCMemberDefinition *> *members);
-
+void anc_add_class_definition(ANCClassDefinition *classDefinition);
+void anc_add_struct_declare(ANCStructDeclare *structDeclare);
 
 
 

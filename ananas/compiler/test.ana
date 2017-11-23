@@ -7,13 +7,9 @@ declare struct CGAffineTransform{
 
 
 //定义类
-class ABC: UIViewController <UITableViewDelegate,UITableViewDataSource> {
+class MyViewController: UIViewController <UITableViewDelegate,UITableViewDataSource> {
 
 @property(weak,nonatomic) UITableView *tableView; //暂时只支持strong，weak, copy, assign/nonatomic,atomic
-
-- (void)viewDidLoad{
-		c = @"中国saegs";
-}
 
 
 

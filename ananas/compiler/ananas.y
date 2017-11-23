@@ -11,26 +11,23 @@ int yylex(void);
 %}
 
 %union{
-	void*	identifier;
-	void*	identifier_list;
-	void*   expression;
-	void*   statement;
-	void*   statement_list;
-	void*   dic_entry;
-	void* 	dic_entry_list;
-	void*   type_specifier;
-	void* 	type_specifier_list;
-	void*   one_case;
-	void*   case_list;
-	void*	else_if;
-	void	*else_if_list;
-	NSUInteger   property_modifier_list;
-	void	*property_definition_key;
+	void	*identifier;
+	void	*expression;
+	void	*statement;
+	void	*dic_entry;
+	void	*type_specifier;
+	void	*one_case;
+	void	*else_if;
 	void	*class_definition;
 	void	*declare_struct;
 	void	*member_definition;
 	void	*block_statement;
-	void	*protocol_list;
+	void	*list;
+	void	*method_name_item;
+	void	*function_param;
+	void	*declaration;
+	ANCAssignKind assignment_operator;
+	ANCPropertyModifier property_modifier_list;
 
 
 
@@ -54,28 +51,33 @@ int yylex(void);
 	BOOL_ NS_INTEGER NS_U_INTEGER  CG_FLOAT  DOUBLE CHAR NS_STRING NS_NUMBER NS_ARRAY NS_MUTABLE_ARRAY NS_DICTIONARY NS_MUTABLE_DICTIONARY ID
 	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE
 
-%type <expression> expression assign_expression ternary_operator_expression logic_or_expression logic_and_expression  
+%type <assignment_operator> assignment_operator
+%type <expression> expression expression_opt assign_expression ternary_operator_expression logic_or_expression logic_and_expression  
 equality_expression relational_expression additive_expression multiplication_expression unary_expression postfix_expression
 primary_expression dic block_body
 
-%type <identifier> label_opt identifier_opt struct_name
-%type <identifier_list> identifier_list
+%type <identifier> label_opt identifier_opt struct_name selector selector_1 selector_2
 
+%type <list> identifier_list dic_entry_list statement_list type_specifier_list protocol_list else_if_list case_list member_definition_list
+method_name method_name_1 method_name_2 expression_list function_param_list 
+
+%type <method_name_item> method_name_item
 %type <dic_entry> dic_entry
-%type <dic_entry_list> dic_entry_list
 %type <statement> statement if_statement switch_statement for_statement foreach_statement while_statement do_while_statement
 break_statement continue_statement return_statement declaration_statement
-%type <statement_list> statement_list
 %type <type_specifier> type_specifier non_block_type_specifier base_type_specifier oc_type_specifier struct_type_specifier custom_type_specifier block_type_specifier
 %type <block_statement> block_statement default_opt
-%type <type_specifier_list> type_specifier_list
 %type <declare_struct> declare_struct
 %type <property_modifier_list> property_modifier_list property_modifier property_rc_modifier  property_atomic_modifier
-%type <protocol_list> protocol_list
-
+%type <class_definition> class_definition
+%type <member_definition> member_definition property_definition method_definition class_method_definition instance_method_definition
+%type <one_case> one_case
+%type <else_if> else_if
+%type <function_param> function_param
+%type <declaration> declaration
 %%
 
-translation_util: /*empty*/
+compile_util: /*empty*/
 			| definition_list
 			;
 
@@ -85,14 +87,37 @@ definition_list: definition
 			;
 
 definition:  class_definition
+			{
+				ANCClassDefinition *classDefinition = (__bridge_transfer ANCClassDefinition *)$1;
+				anc_add_class_definition(classDefinition);
+			}
 			| declare_struct
+			{
+				ANCStructDeclare *structDeclare = (__bridge_transfer ANCStructDeclare *)$1;
+				anc_add_struct_declare(structDeclare);
+			}
 			;
 
 struct_name: IDENTIFIER
-			| struct_type_specifier
+			| CG_RECT
 			{
-				ANCTypeSpecifier *type = (__bridge_transfer ANCTypeSpecifier *)$1;
-				$$ = (__bridge_retained void *)type.identifer;
+				$$ = (__bridge_retained void *)@"CGRect";
+			}
+			| CG_SIZE
+			{
+				$$ = (__bridge_retained void *)@"CGSzie";
+			}
+			| CG_POINT
+			{
+				$$ = (__bridge_retained void *)@"CGPoint";
+			}
+			| CG_AFFINE_TRANSFORM
+			{
+				$$ = (__bridge_retained void *)@"CGAffineTransform";
+			}
+			| NS_RANGE
+			{
+				$$ = (__bridge_retained void *)@"NSRange";
 			}
 			;
 
@@ -147,9 +172,37 @@ identifier_list: IDENTIFIER
 
 
 class_definition: CLASS IDENTIFIER COLON IDENTIFIER LC RC
+			{
+				NSString *name = (__bridge_transfer NSString *)$2;
+				NSString *superNmae = (__bridge_transfer NSString *)$4;
+				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,nil, nil);
+				$$ = (__bridge_retained void *)classDefinition;
+			}
 			| CLASS IDENTIFIER COLON IDENTIFIER LC member_definition_list RC
+			{
+				NSString *name = (__bridge_transfer NSString *)$2;
+				NSString *superNmae = (__bridge_transfer NSString *)$4;
+				NSArray *members = (__bridge_transfer NSArray *)$6;
+				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,nil, members);
+				$$ = (__bridge_retained void *)classDefinition;
+			}
 			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC RC
+			{
+				NSString *name = (__bridge_transfer NSString *)$2;
+				NSString *superNmae = (__bridge_transfer NSString *)$4;
+				NSArray *protocolNames = (__bridge_transfer NSArray *)$6;
+				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,protocolNames, nil);
+				$$ = (__bridge_retained void *)classDefinition;
+			}
 			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC member_definition_list RC
+			{
+				NSString *name = (__bridge_transfer NSString *)$2;
+				NSString *superNmae = (__bridge_transfer NSString *)$4;
+				NSArray *protocolNames = (__bridge_transfer NSArray *)$6;
+				NSArray *members = (__bridge_transfer NSArray *)$9;
+				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,protocolNames, members);
+				$$ = (__bridge_retained void *)classDefinition;
+			}
 			;
 
 protocol_list: IDENTIFIER
@@ -191,7 +244,7 @@ property_definition: PROPERTY LP property_modifier_list RP type_specifier IDENTI
 property_modifier_list: property_modifier
 			| property_modifier_list COMMA property_modifier
 			{
-				$$ = $1 | $3
+				$$ = $1 | $3;
 			}
 			;
 
@@ -349,22 +402,22 @@ oc_type_specifier: NS_STRING ASTERISK
 			| NS_ARRAY ASTERISK
 			{
 				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSArray",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;r;
+				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_MUTABLE_ARRAY ASTERISK
 			{
 				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSMutableArray",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;r;
+				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_DICTIONARY ASTERISK
 			{
 				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSDictionary",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;r;
+				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_MUTABLE_DICTIONARY ASTERISK
 			{
 				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSMutableDictionary",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;r;
+				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| IDENTIFIER ASTERISK
 			{
@@ -446,10 +499,12 @@ method_name_2: method_name_item
 
 method_name_item: IDENTIFIER COLON LP type_specifier RP IDENTIFIER
 			{
-				NSString *name = $1;
-				ANCTypeSpecifier *typeSpecifier = $4;
-				NSString *paramName = $6;
+				NSString *name = (__bridge_transfer NSString *)$1;
+				name = [NSString stringWithFormat:@"%@:",name];
+				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
+				NSString *paramName = (__bridge_transfer NSString *)$6;
 				ANCMethodNameItem *item = anc_create_method_name_item(name, typeSpecifier, paramName);
+				$$ = (__bridge_retained void *)item;
 			}
 		;
 
@@ -811,8 +866,8 @@ primary_expression: IDENTIFIER
 			}
 			| primary_expression LB expression RB
 			{
-				ANCExpression *arrExpr = = (__bridge_transfer ANCExpression *)$1;
-				ANCExpression *indexExpr = = (__bridge_transfer ANCExpression *)$3;
+				ANCExpression *arrExpr = (__bridge_transfer ANCExpression *)$1;
+				ANCExpression *indexExpr = (__bridge_transfer ANCExpression *)$3;
 				
 				ANCIndexExpression *expr = (ANCIndexExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
 				expr.arrayExpression = arrExpr;
@@ -1003,7 +1058,7 @@ if_statement: IF LP expression RP block_statement
 				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
 				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
 				ANCBlock *elseBlocl = (__bridge_transfer ANCBlock *)$7;
-				ANCIfStatement *anc_create_if_statement(condition, thenBlock, nil, elseBlocl);
+				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, nil, elseBlocl);
 				$$ = (__bridge_retained void *)statement;
 			}
 			| IF LP expression RP block_statement else_if_list
@@ -1011,7 +1066,7 @@ if_statement: IF LP expression RP block_statement
 				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
 				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
 				NSArray<ANCElseIf *> *elseIfList = (__bridge_transfer NSArray<ANCElseIf *> *)$6;
-				ANCIfStatement *anc_create_if_statement(condition, thenBlock, elseIfList, nil);
+				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, elseIfList, nil);
 				$$ = (__bridge_retained void *)statement;
 			}
 			| IF LP expression RP block_statement else_if_list ELSE block_statement
@@ -1020,7 +1075,7 @@ if_statement: IF LP expression RP block_statement
 				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
 				NSArray<ANCElseIf *> *elseIfList = (__bridge_transfer NSArray<ANCElseIf *> *)$6;
 				ANCBlock *elseBlocl = (__bridge_transfer ANCBlock *)$8;
-				ANCIfStatement *anc_create_if_statement(condition, thenBlock, elseIfList, elseBlocl);
+				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, elseIfList, elseBlocl);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1070,7 +1125,7 @@ case_list: one_case
 			| case_list one_case
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCCase *case_ = (__bridge_transfer ANCCase *)2;
+				ANCCase *case_ = (__bridge_transfer ANCCase *)$2;
 				[list addObject:case_];
 				$$ = (__bridge_retained void *)list;
 			}

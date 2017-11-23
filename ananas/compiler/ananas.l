@@ -9,6 +9,11 @@
 int yywrap(){
 	return 1;
 }
+
+static void increment_line_number(){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	compileUtil.lineNumber++;
+}
 %}
 %start C_COMMENT CC_COMMENT STRING_LITERAL_STATE
 %%
@@ -202,11 +207,11 @@ int yywrap(){
 
 
 <INITIAL>"//" { BEGIN CC_COMMENT; }
-<CC_COMMENT>\n { line_number++; BEGIN INITIAL; }
+<CC_COMMENT>\n { increment_line_number(); BEGIN INITIAL; }
 <CC_COMMENT>. ;
 
 <INITIAL>[ \t]+  ;
-<INITIAL>[\n]  { line_number++; };
+<INITIAL>[\n]  { increment_line_number(); };
 <INITIAL>.  ;
 %%
 

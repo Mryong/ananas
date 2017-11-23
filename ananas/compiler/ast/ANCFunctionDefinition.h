@@ -10,6 +10,7 @@
 #import "ANCTypeSpecifier.h"
 #import "ANCExpression.h"
 #import "ANCStatement.h"
+@class ANCBlock;
 
 @interface ANCParameter:NSObject
 @property (strong, nonatomic) ANCTypeSpecifier *type;
