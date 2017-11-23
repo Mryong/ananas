@@ -101,6 +101,7 @@ int yywrap(){
 <INITIAL>"NSUInteger" {return NS_U_INTEGER; }
 <INITIAL>"CGFloat" {return CG_FLOAT; }
 <INITIAL>"double" {return DOUBLE; }
+<INITIAL>"char" {return CHAR; }
 
 <INITIAL>"CGRect" {return CG_RECT; }
 <INITIAL>"CGSize" {return CG_SIZE; }
@@ -178,7 +179,7 @@ int yywrap(){
 
 <STRING_LITERAL_STATE>\" {
 	ANCExpression *expression = anc_create_expression(ANC_STRING_EXPRESSION);
-	expression.string_value = anc_end_string_literal();
+	expression.utf8_string_value = anc_end_string_literal();
 	yylval.expression = (__bridge_retained void *)expression;
 	BEGIN  INITIAL;
 	return STRING_LITERAL;

@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "ANCTypeSpecifier.h"
+#import "ANCFunctionDefinition.h"
+@class ANCBlock;
+
 
 typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 	ANC_BOOLEAN_EXPRESSION = 1,
@@ -16,7 +19,9 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 	ANC_FLOAT_EXPRESSION,
 	ANC_DOUBLE_EXPRESSION,
 	ANC_STRING_EXPRESSION,
+	ANC_BLOCK_EXPRESSION,
 	ANC_IDENTIFIER_EXPRESSION,
+	ANC_TERNARY_EXPRESSION,
 	ANC_ASSIGN_EXPRESSION,
 	ANC_PLUS_EXPRESSION,
 	ANC_MINUS_EXPRESSION,
@@ -32,6 +37,7 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 	ANC_LOGICAL_AND_EXPRESSION,
 	ANC_LOGICAL_OR_EXPRESSION,
 	ANC_LOGICAL_NOT_EXPRESSION,
+	NSC_NEGATIVE_EXPRESSION,
 	ANC_FUNCTION_CALL_EXPRESSION,
 	ANC_MEMBER_EXPRESSION,
 	ANC_NIL_EXPRESSION,
@@ -41,11 +47,10 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 	ANC_DIC_LITERAL_EXPRESSION,
 	ANC_STRUCT_LITERAL_EXPRESSION,
 	ANC_INDEX_EXPRESSION,
-	NSC_NEGATIVE_EXPRESSION,
 	ANC_INCREMENT_EXPRESSION,
-	ANC_DECREMENT_EXPRESSION
+	ANC_DECREMENT_EXPRESSION,
+	ANC_AT_EXPRESSION
 };
-
 
 
 
@@ -59,7 +64,7 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 @property (assign, nonatomic) NSUInteger uinteger_value;
 @property (assign, nonatomic) CGFloat float_value;
 @property (assign, nonatomic) double double_value;
-@property (copy, nonatomic) NSString *string_value;
+@property (assign, nonatomic) const char *utf8_string_value;
 @end
 
 @interface ANCIdentifierExpression: ANCExpression
@@ -90,6 +95,13 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 
 @end
 
+
+@interface ANCTernaryExpression: ANCExpression
+@property (strong, nonatomic) ANCExpression *condition;
+@property (strong, nonatomic) ANCExpression *trueExpr;
+@property (strong, nonatomic) ANCExpression *falseExpr;
+
+@end
 
 @interface ANCUnaryExpression: ANCExpression
 
@@ -130,10 +142,17 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 
 @end
 
+
+
+@interface ANCDicEntry: NSObject
+@property (strong, nonatomic) ANCExpression *keyExpr;
+@property (strong, nonatomic) ANCExpression *valueExpr;
+
+@end
+
 @interface ANCDictionaryExpression: ANCExpression
 
-@property (strong, nonatomic) NSMutableArray<ANCExpression *> *keyExpressions;
-@property (strong, nonatomic) NSMutableArray<ANCExpression *> *valueExpressions;
+@property (strong, nonatomic) NSArray<ANCDicEntry *> *entriesExpr;
 
 @end
 
@@ -141,6 +160,14 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 @interface ANCArrayExpression: ANCExpression
 
 @property (strong, nonatomic) NSMutableArray<ANCExpression *> *itemExpressions;
+
+@end
+
+
+@interface ANCBlockExpression: ANCExpression
+@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
+@property (strong, nonatomic) NSArray<ANCParameter *> *parameter;
+@property (strong, nonatomic) ANCBlock *block;
 
 @end
 

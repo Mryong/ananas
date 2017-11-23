@@ -12,15 +12,19 @@
 
 @end
 
-@implementation ANCMemberDefinition: NSObject
+@implementation ANCMemberDefinition
 
 @end
 
-@implementation ANCPropertyDefinition: ANCMemberDefinition
+@implementation ANCPropertyDefinition
+
+@end
+
+@implementation ANCMethodNameItem
 
 @end
 
 
-@implementation ANCMethodDefinition: ANCMemberDefinition
+@implementation ANCMethodDefinition
 
 @end

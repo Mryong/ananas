@@ -28,9 +28,9 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @property (assign, nonatomic) ANCStatementKind kind;
 @end
 
-@interface ANCBlock: NSObject // ANCBlockStatement is not a ANCStatement
+@interface ANCBlock: SObject
 
-@property (strong, nonatomic) NSMutableArray<ANCBlock *> *statements;
+@property (strong, nonatomic) NSArray<ANCStatement *> *statementList;
 
 @end
 
@@ -72,7 +72,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 
 @interface ANCSwitchStatement: ANCStatement
 @property (strong, nonatomic) ANCExpression *expr;
-@property (strong, nonatomic) NSMutableArray<ANCCase *> *caseList;
+@property (strong, nonatomic) NSArray<ANCCase *> *caseList;
 @property (strong, nonatomic) ANCBlock *defaultBlock;
 @end
 
@@ -88,7 +88,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @interface ANCForEachStatement: ANCStatement
 @property (copy, nonatomic) NSString *label;
 @property (assign, nonatomic) ANCDeclaration *declaration;
-@property (strong, nonatomic) ANCExpression *expr;
+@property (strong, nonatomic) ANCExpression *varExpr;
 @property (strong, nonatomic) ANCExpression *arrayExpr;
 @property (strong, nonatomic) ANCBlock *block;
 @end

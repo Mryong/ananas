@@ -12,43 +12,51 @@
 
 @end
 
-@implementation ANCIdentifierExpression: ANCExpression
+@implementation ANCIdentifierExpression
 
 @end
 
-@implementation ANCAssignExpression: ANCExpression
+@implementation ANCAssignExpression
 
 @end
 
-@implementation ANCBinaryExpression: ANCExpression
+@implementation ANCBinaryExpression
 
 @end
 
-@implementation ANCUnaryExpression: ANCExpression
+@implementation ANCTernaryExpression
 
 @end
 
-@implementation ANCMemberExpression: ANCExpression
+@implementation ANCUnaryExpression
 
 @end
 
-@implementation ANCFunctonCallExpression: ANCExpression
+@implementation ANCMemberExpression
 
 @end
 
-@implementation ANCIndexExpression: ANCExpression
-@end
-
-@implementation ANCStructpression: ANCExpression
+@implementation ANCFunctonCallExpression
 
 @end
 
-@implementation ANCDictionaryExpression: ANCExpression
+@implementation ANCIndexExpression
+@end
+
+@implementation ANCStructpression
+
+@end
+
+@implementation ANCDicEntry
+
+@end
+
+@implementation ANCDictionaryExpression
 
 @end
 
 
-@implementation ANCArrayExpression: ANCExpression
+@implementation ANCArrayExpression
 
 @end
 

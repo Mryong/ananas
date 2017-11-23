@@ -37,6 +37,13 @@ typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 @end
 
 
+@interface ANCMethodNameItem: NSObject
+@property (copy, nonatomic) NSString *name;
+@property (strong, nonatomic) ANCParameter *param;
+
+@end
+
+
 @interface ANCMethodDefinition: ANCMemberDefinition
 @property (assign, nonatomic) BOOL classMethod;
 @property (strong, nonatomic) ANCFunctionDefinition *functionDefinition;

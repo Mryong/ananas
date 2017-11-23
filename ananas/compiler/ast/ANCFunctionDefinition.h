@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "ANCTypeSpecifier.h"
+#import "ANCExpression.h"
+#import "ANCStatement.h"
 
 @interface ANCParameter:NSObject
 @property (strong, nonatomic) ANCTypeSpecifier *type;
@@ -20,6 +22,7 @@
 @property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
 @property (copy, nonatomic) NSString *name;//or selecor
 @property (strong, nonatomic) NSArray<ANCParameter *> *params;
+@property (strong, nonatomic) ANCBlock *block;
 
 
 @end

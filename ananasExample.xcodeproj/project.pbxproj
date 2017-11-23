@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */; };
+		41C98B181FC5843B00BADBE9 /* xxx.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B171FC5843B00BADBE9 /* xxx.m */; };
 		41D02D1C1FA8A09300E1829A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D1B1FA8A09300E1829A /* AppDelegate.m */; };
 		41D02D1F1FA8A09400E1829A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D1E1FA8A09400E1829A /* ViewController.m */; };
 		41D02D221FA8A09400E1829A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 41D02D201FA8A09400E1829A /* Main.storyboard */; };
@@ -48,6 +49,8 @@
 /* Begin PBXFileReference section */
 		41C98B131FC2D1DA00BADBE9 /* ANCDeclaration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCDeclaration.h; sourceTree = "<group>"; };
 		41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCDeclaration.m; sourceTree = "<group>"; };
+		41C98B161FC5843B00BADBE9 /* xxx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxx.h; sourceTree = "<group>"; };
+		41C98B171FC5843B00BADBE9 /* xxx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = xxx.m; sourceTree = "<group>"; };
 		41D02D171FA8A09300E1829A /* ananasExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ananasExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D02D1A1FA8A09300E1829A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		41D02D1B1FA8A09300E1829A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -137,6 +140,8 @@
 				41D02D1B1FA8A09300E1829A /* AppDelegate.m */,
 				41D02D1D1FA8A09400E1829A /* ViewController.h */,
 				41D02D1E1FA8A09400E1829A /* ViewController.m */,
+				41C98B161FC5843B00BADBE9 /* xxx.h */,
+				41C98B171FC5843B00BADBE9 /* xxx.m */,
 				41D02D201FA8A09400E1829A /* Main.storyboard */,
 				41D02D231FA8A09400E1829A /* Assets.xcassets */,
 				41D02D251FA8A09400E1829A /* LaunchScreen.storyboard */,
@@ -360,6 +365,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41C98B181FC5843B00BADBE9 /* xxx.m in Sources */,
 				41E83EAF1FBD653900A48592 /* ANCFunctionDefinition.m in Sources */,
 				41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */,
 				41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */,

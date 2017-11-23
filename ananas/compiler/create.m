@@ -59,11 +59,11 @@ void anc_rest_string_literal_buffer(void){
 	
 }
 
-NSMutableString *anc_end_string_literal(){
+const char *anc_end_string_literal(){
 	anc_append_string_literal('\0');
 	NSMutableString *str = [NSMutableString stringWithUTF8String:st_string_literal_buffer];
 	anc_rest_string_literal_buffer();
-	return str;
+	return [str UTF8String];
 }
 
 Class anc_expression_class_of_kind(ANCExpressionKind kind){
@@ -80,8 +80,12 @@ Class anc_expression_class_of_kind(ANCExpressionKind kind){
 			return [ANCExpression class];
 		case ANC_IDENTIFIER_EXPRESSION:
 			return [ANCIdentifierExpression class];
+		case ANC_BLOCK_EXPRESSION:
+			return [ANCBlockExpression class];
 		case ANC_ASSIGN_EXPRESSION:
 			return [ANCAssignExpression class];
+		case ANC_TERNARY_EXPRESSION:
+			return [ANCTernaryExpression class];
 		case ANC_PLUS_EXPRESSION:
 		case ANC_MINUS_EXPRESSION:
 		case ANC_MUL_EXPRESSION:
@@ -100,6 +104,7 @@ Class anc_expression_class_of_kind(ANCExpressionKind kind){
 		case ANC_INCREMENT_EXPRESSION:
 		case ANC_DECREMENT_EXPRESSION:
 		case NSC_NEGATIVE_EXPRESSION:
+		case ANC_AT_EXPRESSION:
 			return [ANCUnaryExpression class];
 		case ANC_INDEX_EXPRESSION:
 			return [ANCIndexExpression class];
@@ -119,20 +124,38 @@ Class anc_expression_class_of_kind(ANCExpressionKind kind){
 	
 }
 
+ANCDicEntry *anc_create_dic_entry(ANCExpression *keyExpr, ANCExpression *valueExpr){
+	ANCDicEntry *dicEntry = [[ANCDicEntry alloc] init];
+	dicEntry.keyExpr = keyExpr;
+	dicEntry.valueExpr = valueExpr;
+	return dicEntry;
+}
+
 ANCExpression *anc_create_expression(ANCExpressionKind kind){
 	Class clazz = anc_expression_class_of_kind(kind);
 	ANCExpression *expr = [[clazz alloc] init];
 	expr.expressionKind = kind;
 	return expr;
 }
-//@property (strong, nonatomic) ANCTypeSpecifier *type;
-//@property (copy, nonatomic) NSString *name;
-//@property (strong, nonatomic) ANCExpression *initializer;
-ANCDeclarationStatement *anc_create_declaration_statement(ANCTypeSpecifier *type, NSString *name, ANCExpression *initializer){
-	ANCDeclaration *
-	
+
+
+
+
+ANCDeclaration *anc_create_declaration(ANCTypeSpecifier *type, NSString *name, ANCExpression *initializer){
+	ANCDeclaration *declaration = [[ANCDeclaration alloc] init];
+	declaration.type = type;
+	declaration.name = name;
+	declaration.initializer = initializer;
+	return declaration;
 }
 
+ANCDeclarationStatement *anc_create_declaration_statement(ANCDeclaration *declaration){
+	ANCDeclarationStatement *statement = [[ANCDeclarationStatement alloc] init];
+	statement.kind = ANCStatementKindDeclaration;
+	statement.declaration = declaration;
+	return statement;
+	
+}
 
 
 ANCExpressionStatement *anc_create_expression_statement(ANCExpression *expr){
@@ -142,7 +165,15 @@ ANCExpressionStatement *anc_create_expression_statement(ANCExpression *expr){
 	return statement;
 }
 
-ANCIfStatement *anc_create_if_statement(ANCExpression *condition,ANCBlock *thenBlock,ANCBlock *elseBlocl,NSArray<ANCElseIf *> *elseIfList){
+ANCElseIf *anc_create_else_if(ANCExpression *condition, ANCBlock *thenBlock){
+	ANCElseIf *elseIf = [[ANCElseIf alloc] init];
+	elseIf.condition = condition;
+	elseIf.thenBlock = thenBlock;
+	return elseIf;
+}
+
+
+ANCIfStatement *anc_create_if_statement(ANCExpression *condition,ANCBlock *thenBlock,NSArray<ANCElseIf *> *elseIfList,ANCBlock *elseBlocl){
 	ANCIfStatement *statement = [[ANCIfStatement alloc] init];
 	statement.kind = ANCStatementKindIf;
 	statement.condition = condition;
@@ -153,7 +184,15 @@ ANCIfStatement *anc_create_if_statement(ANCExpression *condition,ANCBlock *thenB
 }
 
 
-ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSMutableArray<ANCCase *> *caseList, ANCBlock *defaultBlock){
+
+ANCCase *anc_create_case(ANCExpression *expr, ANCBlock *block){
+	ANCCase *case_ = [[ANCCase alloc] init];
+	case_.expr = expr;
+	case_.block = block;
+	return case_;
+}
+
+ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSArray<ANCCase *> *caseList, ANCBlock *defaultBlock){
 	ANCSwitchStatement *statement = [[ANCSwitchStatement alloc] init];
 	statement.kind = ANCStatementKindSwitch;
 	statement.expr = expr;
@@ -161,6 +200,7 @@ ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSMutableAr
 	statement.defaultBlock = defaultBlock;
 	return statement;
 }
+
 
 ANCForStatement *anc_create_for_statement(NSString *label, ANCExpression *initializerExpr, ANCDeclaration *declaration,
 										  ANCExpression *condition, ANCExpression *post, ANCBlock *block){
@@ -176,12 +216,18 @@ ANCForStatement *anc_create_for_statement(NSString *label, ANCExpression *initia
 }
 
 
-ANCForEachStatement *anc_create_for_each_statement(NSString *label, ANCDeclaration *declaration, ANCExpression *varExpr, ANCExpression *arrayExpr,ANCBlock *block){
+ANCForEachStatement *anc_create_for_each_statement(NSString *label, ANCTypeSpecifier *typeSpecifier,NSString *varName, ANCExpression *arrayExpr,ANCBlock *block){
 	ANCForEachStatement *statement = [[ANCForEachStatement alloc] init];
 	statement.kind = ANCStatementKindForEach;
 	statement.label  = label;
-	statement.declaration = declaration;
-	statement.varExpr = varExpr;
+	if (typeSpecifier) {
+		statement.declaration = anc_create_declaration(typeSpecifier, varName, nil);
+	}else{
+		ANCIdentifierExpression *varExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
+		varExpr.identifier = varName;
+		statement.varExpr = varExpr;
+	}
+	
 	statement.arrayExpr = arrayExpr;
 	statement.block = block;
 	return statement;
@@ -206,11 +252,35 @@ ANCDoWhileStatement *anc_create_do_while_statement(NSString *label, ANCBlock *bl
 	return statement;
 }
 
+ANCContinueStatement *anc_create_continue_statement(NSString *label){
+	ANCContinueStatement *statement = [[ANCContinueStatement alloc] init];
+	statement.kind = ANCStatementKindContinue;
+	statement.label = label;
+	return statement;
+}
 
 
+ANCBreakStatement *anc_create_break_statement(NSString *label){
+	ANCBreakStatement *statement = [[ANCBreakStatement alloc] init];
+	statement.kind = ANCStatementKindBreak;
+	statement.label = label;
+	return statement;
+	
+}
+
+ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr){
+	ANCReturnStatement *statement = [[ANCReturnStatement alloc] init];
+	statement.kind = ANCStatementKindReturn;
+	statement.retValExpr = retValExpr;
+	return statement;
+}
 
 
-
+ANCBlock *anc_create_blcok_statement(NSArray<ANCStatement *> *statementList){
+	ANCBlock *block = [[ANCBlock alloc] init];
+	block.statementList = statementList;
+	return block;
+}
 
 
 
@@ -248,18 +318,48 @@ ANCTypeSpecifier *anc_create_block_type_specifier(ANCTypeSpecifier *returnTypeSp
 	return typeSpecifier;
 }
 
-ANCFunctionDefinition *anc_create_function_definition(ANCTypeSpecifier *returnTypeSpecifier,NSString *name ,NSArray<ANCParameter *> *prasms){
+ANCParameter *anc_create_parameter(ANCTypeSpecifier *type, NSString *name){
+	ANCParameter *parameter = [[ANCParameter alloc] init];
+	parameter.type = type;
+	parameter.name = name;
+	return parameter;
+}
+
+ANCFunctionDefinition *anc_create_function_definition(ANCTypeSpecifier *returnTypeSpecifier,NSString *name ,NSArray<ANCParameter *> *prasms,
+													  ANCBlock *block){
 	ANCFunctionDefinition *functionDefinition = [[ANCFunctionDefinition alloc] init];
 	functionDefinition.returnTypeSpecifier = returnTypeSpecifier;
 	functionDefinition.name = name;
 	functionDefinition.params = prasms;
+	functionDefinition.block = block;
 	return functionDefinition;
 }
 
-ANCMethodDefinition *anc_create_method_definition(BOOL classMethod, ANCFunctionDefinition *functionDefinition){
+ANCMethodNameItem *anc_create_method_name_item(NSString *name, ANCTypeSpecifier *typeSpecifier, NSString *paramName){
+	ANCMethodNameItem *item = [[ANCMethodNameItem alloc] init];
+	item.name = name;
+	ANCParameter *param = [[ANCParameter alloc] init];
+	param.type = typeSpecifier;
+	param.name = paramName;
+	item.param = param;
+	return item;
+	
+}
+
+ANCMethodDefinition *anc_create_method_definition(BOOL classMethod, ANCTypeSpecifier *returnTypeSpecifier, NSArray<ANCMethodNameItem *> *items, ANCBlock *block){
 	ANCMethodDefinition *methodDefinition = [[ANCMethodDefinition alloc] init];
 	methodDefinition.classMethod = classMethod;
-	methodDefinition.functionDefinition = functionDefinition;
+	ANCFunctionDefinition *funcDefinition = [[ANCFunctionDefinition alloc] init];
+	funcDefinition.returnTypeSpecifier = returnTypeSpecifier;
+	NSMutableArray<ANCParameter *> *params = [NSMutableArray array];
+	NSMutableString *selector = [NSMutableString string];
+	for (ANCMethodNameItem *itme in items) {
+		[selector appendString:itme.name];
+		[params addObject:itme.param];
+	}
+	funcDefinition.name = selector;
+	funcDefinition.params = params;
+	funcDefinition.block = block;
 	return methodDefinition;
 	
 }
@@ -274,6 +374,13 @@ ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifi
 
 ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames,
 												NSArray<ANCMemberDefinition *> *members){
+	
+	ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(ANCPropertyModifier modifier, <#ANCTypeSpecifier *typeSpecifier#>, <#NSString *name#>)
+	
+	
+	
+
+	
 	ANCClassDefinition *classDefinition = [[ANCClassDefinition alloc] init];
 	classDefinition.name = name;
 	classDefinition.superNmae = superNmae;
