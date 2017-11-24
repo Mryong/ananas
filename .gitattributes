@@ -1,0 +1,3 @@
+*.m linguist-language = c
+*.y linguist-language = c
+*.l linguist-language = c
