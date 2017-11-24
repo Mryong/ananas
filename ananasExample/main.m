@@ -19,13 +19,12 @@ int main(int argc, char * argv[]) {
 	extern int yyparse(void);
 	char *path = "/Users/yongpengliang/Documents/ananas/ananas/compiler/test.ana";
 	yyin = fopen(path, "r");
-	ANCompileUtil *compileUtil_backup = anc_get_current_compile_util();
 	ANCompileUtil *compileUtil = [[ANCompileUtil alloc] init];
 	anc_set_current_compile_util(compileUtil);
 	if(yyparse()){
 		printf("编译错误");
 	}
-	anc_set_current_compile_util(compileUtil_backup);
+
 	
 	
 	

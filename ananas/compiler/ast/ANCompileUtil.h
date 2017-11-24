@@ -14,4 +14,5 @@
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (strong, nonatomic) NSMutableArray<ANCClassDefinition *> *classDefinitionList;
 @property (strong, nonatomic) NSMutableArray<ANCStructDeclare *> *structDeclareList;
+@property (strong, nonatomic) NSMutableArray<ANCStatement *> *statementList;
 @end

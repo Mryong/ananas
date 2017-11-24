@@ -431,6 +431,13 @@ void anc_add_class_definition(ANCClassDefinition *classDefinition){
 	
 }
 
+void anc_add_statement(ANCStatement *statement){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	[compileUtil.statementList addObject:statement];
+	
+}
+
+
 
 
 

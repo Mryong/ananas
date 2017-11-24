@@ -22,7 +22,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	// Override point for customization after application launch.
 //	objc_setAssociatedObject(nil, NULL, nil, objc_AssociationPolicy policy)
-
+	void (^bb)(NSInteger);
 	
 	return YES;
 }

@@ -47,7 +47,7 @@ int yylex(void);
 	AND OR NOT EQ NE LT LE GT GE MINUS MINUS_ASSIGN PLUS PLUS_ASSIGN MUL MUL_ASSIGN DIV DIV_ASSIGN MOD MOD_ASSIGN INCREMENT DECREMENT
 	CLASS STRUCT DECLARE
 	RETURN IF ELSE FOR WHILE DO SWITCH CASE DEFAULT BREAK CONTINUE 
-	PROPERTY WEAK STRONG COPY ASSIGN_MEM NONATOMIC ATOMIC  ADDRESS ASTERISK ASTERISK_ASSIGN
+	PROPERTY WEAK STRONG COPY ASSIGN_MEM NONATOMIC ATOMIC  ADDRESS ASTERISK ASTERISK_ASSIGN VOID
 	BOOL_ NS_INTEGER NS_U_INTEGER  CG_FLOAT  DOUBLE CHAR NS_STRING NS_NUMBER NS_ARRAY NS_MUTABLE_ARRAY NS_DICTIONARY NS_MUTABLE_DICTIONARY ID
 	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE
 
@@ -95,6 +95,11 @@ definition:  class_definition
 			{
 				ANCStructDeclare *structDeclare = (__bridge_transfer ANCStructDeclare *)$1;
 				anc_add_struct_declare(structDeclare);
+			}
+			| statement
+			{
+				ANCStatement *statement = (__bridge_transfer ANCStatement *)$1;
+				anc_add_statement(statement);
 			}
 			;
 
@@ -330,29 +335,34 @@ block_type_specifier: IDENTIFIER LP POWER  RP LP type_specifier_list RP
 			;
 
 
-base_type_specifier: BOOL_
+base_type_specifier: VOID
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"BOOL",@"B");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_VOID,@"void",@"v");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| BOOL_
+			{
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_BOOL,@"BOOL",@"B");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_INTEGER
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"NSInteger",@"q");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_INTEGER,@"NSInteger",@"q");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_U_INTEGER
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"NSUInteger",@"Q");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER,@"NSUInteger",@"Q");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| CG_FLOAT
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGFloat",@"d");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_CG_FLOAT,@"CGFloat",@"d");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| DOUBLE
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"long double",@"D");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_DOUBLE,@"long double",@"D");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| CHAR ASTERISK
@@ -825,19 +835,19 @@ primary_expression: IDENTIFIER
 			{
 				ANCFunctonCallExpression *expr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
 				expr.expr = (__bridge_transfer ANCExpression *)$1;
-				expr.args;
+				$$ = (__bridge_retained void *)expr;
 			}
 			| primary_expression DOT selector LP expression_list RP
 			{
 				ANCExpression *expr = (__bridge_transfer ANCExpression *)$1;
 				NSString *selector = (__bridge_transfer NSString *)$3;
-				ANCMemberExpression *memberExpr = anc_create_expression(ANC_MEMBER_EXPRESSION);
+				ANCMemberExpression *memberExpr = (ANCMemberExpression *)anc_create_expression(ANC_MEMBER_EXPRESSION);
 				memberExpr.expr = expr;
 				memberExpr.memberName = selector;
 				
 				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = memberExpr;
-				funcCallExpr.args;
+				funcCallExpr.args = (__bridge_transfer NSArray<ANCExpression *> *)$5;
 				
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
@@ -846,7 +856,7 @@ primary_expression: IDENTIFIER
 				ANCIdentifierExpression *identifierExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
 				NSString *identifier = (__bridge_transfer NSString *)$1;
 				identifierExpr.identifier = identifier;
-				ANCFunctonCallExpression *funcCallExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = identifierExpr;
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
@@ -855,9 +865,9 @@ primary_expression: IDENTIFIER
 				ANCIdentifierExpression *identifierExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
 				NSString *identifier = (__bridge_transfer NSString *)$1;
 				identifierExpr.identifier = identifier;
-				ANCFunctonCallExpression *funcCallExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = identifierExpr;
-				funcCallExpr.args = (__bridge_transfer NSArray *)$3;
+				funcCallExpr.args = (__bridge_transfer NSArray<ANCExpression *> *)$3;
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 			| LP expression RP
@@ -937,14 +947,14 @@ primary_expression: IDENTIFIER
 			}
 			| AT LB expression_list RB
 			{
-				ANCArrayExpression *expr = anc_create_expression(ANC_ARRAY_LITERAL_EXPRESSION);
+				ANCArrayExpression *expr = (ANCArrayExpression *)anc_create_expression(ANC_ARRAY_LITERAL_EXPRESSION);
 				NSArray *itemExpressions = (__bridge_transfer NSArray *)$3;
 				expr.itemExpressions = itemExpressions;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT LB  RB
 			{
-				ANCArrayExpression *expr = anc_create_expression(ANC_ARRAY_LITERAL_EXPRESSION);
+				ANCArrayExpression *expr = (ANCArrayExpression *)anc_create_expression(ANC_ARRAY_LITERAL_EXPRESSION);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| dic
@@ -967,7 +977,7 @@ block_body:  POWER type_specifier LP  RP block_statement
 			| POWER type_specifier LP function_param_list RP block_statement
 			{
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
-				NSArray<ANCParameter *> *parameter = (__bridge_transfer ANCParameter *)$4;
+				NSArray<ANCParameter *> *parameter = (__bridge_transfer NSArray<ANCParameter *> *)$4;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$6;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
 				expr.returnTypeSpecifier = returnTypeSpecifier;
@@ -985,7 +995,7 @@ block_body:  POWER type_specifier LP  RP block_statement
 			}
 			| POWER  LP function_param_list RP block_statement
 			{
-				NSArray<ANCParameter *> *parameter = (__bridge_transfer ANCParameter *)$3;
+				NSArray<ANCParameter *> *parameter = (__bridge_transfer NSArray<ANCParameter *> *)$3;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
 				expr.parameter = parameter;
@@ -1016,6 +1026,7 @@ function_param: type_specifier IDENTIFIER
 				ANCTypeSpecifier *type = (__bridge_transfer ANCTypeSpecifier *)$1;
 				NSString *name = (__bridge_transfer NSString *)$2;
 				ANCParameter *parameter = anc_create_parameter(type, name);
+				$$ = (__bridge_retained void *)parameter;
 			}
 			;
 

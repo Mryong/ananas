@@ -5,6 +5,8 @@ declare struct CGAffineTransform{
 	keys:a, b, c, d, tx, ty
 }
 
+NSInteger i = 10;
+NSInteger j = 20;
 
 //定义类
 class MyViewController: UIViewController <UITableViewDelegate,UITableViewDataSource> {
@@ -12,9 +14,15 @@ class MyViewController: UIViewController <UITableViewDelegate,UITableViewDataSou
 @property(weak,nonatomic) UITableView *tableView; //暂时只支持strong，weak, copy, assign/nonatomic,atomic
 
 
+- (void)viewDidLoad{
+	void (^)(NSInteger, NSInteger) block = ^(NSInteger a, NSInteger b){
+		NSInteger c = a + b;
+	};
+	self.testMemodParam1:param2:(1,block);
+}
 
 - (void)testMemodParam1:(NSInteger)p1 param2:(void (^)(NSInteger, NSInteger))param2{
-	param2(1,2);
+
 }
 
 

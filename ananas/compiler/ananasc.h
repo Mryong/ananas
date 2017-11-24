@@ -51,6 +51,7 @@ ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superN
 												NSArray<ANCMemberDefinition *> *members);
 void anc_add_class_definition(ANCClassDefinition *classDefinition);
 void anc_add_struct_declare(ANCStructDeclare *structDeclare);
+void anc_add_statement(ANCStatement *statement);
 
 
 

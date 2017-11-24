@@ -24,6 +24,13 @@
 	return _structDeclareList;
 }
 
+- (NSMutableArray<ANCStatement *> *)statementList{
+	if (_statementList == nil) {
+		_statementList = [NSMutableArray array];
+	}
+	return _statementList;
+}
+
 
 
 @end

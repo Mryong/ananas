@@ -120,7 +120,7 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 @interface ANCFunctonCallExpression: ANCExpression
 
 @property (strong, nonatomic) ANCExpression *expr;
-@property (strong, nonatomic) NSMutableArray<ANCExpression *> *args;
+@property (strong, nonatomic) NSArray<ANCExpression *> *args;
 
 @end
 
@@ -159,7 +159,7 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 
 @interface ANCArrayExpression: ANCExpression
 
-@property (strong, nonatomic) NSMutableArray<ANCExpression *> *itemExpressions;
+@property (strong, nonatomic) NSArray<ANCExpression *> *itemExpressions;
 
 @end
 

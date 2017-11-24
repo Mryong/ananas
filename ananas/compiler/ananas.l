@@ -101,6 +101,7 @@ static void increment_line_number(){
 <INITIAL>"nonatomic" {return NONATOMIC; }
 <INITIAL>"atomic" {return ATOMIC; }
 
+<INITIAL>"void" {return VOID; }
 <INITIAL>"BOOL" {return BOOL_; }
 <INITIAL>"NSInteger" {return NS_INTEGER; }
 <INITIAL>"NSUInteger" {return NS_U_INTEGER; }
@@ -141,7 +142,7 @@ static void increment_line_number(){
 <INITIAL>[1-9][0-9]* {
 	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
 	NSInteger val;
-	sscanf(yytext,"%lx",&val);
+	sscanf(yytext,"%ld",&val);
 	expression.integer_value = val;
 	yylval.expression = (__bridge_retained void *)expression;
 	return INTETER_LITERAL;
