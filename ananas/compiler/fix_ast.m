@@ -9,8 +9,16 @@
 #import "anc_ast.h"
 
 
+void anc_fix_declaration_statement(){}
 
 
+void anc_fix_statement_list(NSArray<ANCStatement *> *statementList){
+	
+}
+
+void anc_fix_function(ANCFunctionDefinition *functionDefinition){
+	
+}
 
 void anc_fix_class(ANCClassDefinition *classDefinition){
 	

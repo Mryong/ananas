@@ -40,15 +40,13 @@ ANCDoWhileStatement *anc_create_do_while_statement(NSString *label, ANCBlock *bl
 ANCContinueStatement *anc_create_continue_statement(NSString *label);
 ANCBreakStatement *anc_create_break_statement(NSString *label);
 ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr);
-ANCBlock *anc_create_blcok_statement(NSArray<ANCStatement *> *statementList);
-
+void anc_start_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames);
+ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *members);
 
 ANCFunctionDefinition *anc_create_function_definition(ANCTypeSpecifier *returnTypeSpecifier,NSString *name ,NSArray<ANCParameter *> *prasms, ANCBlock *block);
 ANCMethodNameItem *anc_create_method_name_item(NSString *name, ANCTypeSpecifier *typeSpecifier, NSString *paramName);
 ANCMethodDefinition *anc_create_method_definition(BOOL classMethod, ANCTypeSpecifier *returnTypeSpecifier, NSArray<ANCMethodNameItem *> *items, ANCBlock *block);
 ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifier, ANCTypeSpecifier *typeSpecifier, NSString *name);
-ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames,
-												NSArray<ANCMemberDefinition *> *members);
 void anc_add_class_definition(ANCClassDefinition *classDefinition);
 void anc_add_struct_declare(ANCStructDeclare *structDeclare);
 void anc_add_statement(ANCStatement *statement);

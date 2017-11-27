@@ -12,7 +12,7 @@ int yywrap(){
 
 static void increment_line_number(){
 	ANCompileUtil *compileUtil = anc_get_current_compile_util();
-	compileUtil.lineNumber++;
+	compileUtil.currentLineNumber++;
 }
 %}
 %start C_COMMENT CC_COMMENT STRING_LITERAL_STATE

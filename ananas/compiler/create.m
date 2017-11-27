@@ -25,7 +25,7 @@ static int st_string_literal_buffer_alloc_size = 0;
 
 
 int yyerror(char const *str){
-	printf("line:%zd: %s\n",anc_get_current_compile_util().lineNumber,str);
+	printf("line:%zd: %s\n",anc_get_current_compile_util().currentLineNumber,str);
 	return 0;
 }
 
@@ -293,11 +293,25 @@ ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr){
 }
 
 
-ANCBlock *anc_create_blcok_statement(NSArray<ANCStatement *> *statementList){
+
+ANCBlock *anc_open_block_statement(){
 	ANCBlock *block = [[ANCBlock alloc] init];
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	block.outBlock = compileUtil.currentBlock;
+	compileUtil.currentBlock = block;
+	return block;
+	
+}
+
+ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *statementList){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	NSCAssert(block == compileUtil.currentBlock, @"block != anc_get_current_compile_util().currentBlock");
 	block.statementList = statementList;
+	compileUtil.currentBlock = block.outBlock;
 	return block;
 }
+
+
 
 
 
@@ -367,6 +381,7 @@ ANCMethodDefinition *anc_create_method_definition(BOOL classMethod, ANCTypeSpeci
 	ANCMethodDefinition *methodDefinition = [[ANCMethodDefinition alloc] init];
 	methodDefinition.classMethod = classMethod;
 	ANCFunctionDefinition *funcDefinition = [[ANCFunctionDefinition alloc] init];
+	funcDefinition.method = YES;
 	funcDefinition.returnTypeSpecifier = returnTypeSpecifier;
 	NSMutableArray<ANCParameter *> *params = [NSMutableArray array];
 	NSMutableString *selector = [NSMutableString string];
@@ -390,14 +405,19 @@ ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifi
 	return propertyDefinition;
 }
 
-ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames,
-												NSArray<ANCMemberDefinition *> *members){
-
-	
+void anc_start_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
 	ANCClassDefinition *classDefinition = [[ANCClassDefinition alloc] init];
 	classDefinition.name = name;
 	classDefinition.superNmae = superNmae;
 	classDefinition.protocolNames = protocolNames;
+	compileUtil.currentClassDefinition = classDefinition;
+}
+
+
+ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *members){
+	ANCompileUtil *compileUtil = anc_get_current_compile_util();
+	ANCClassDefinition *classDefinition = compileUtil.currentClassDefinition;
 	NSMutableArray<ANCPropertyDefinition *> *propertyDefinition = [NSMutableArray array];
 	NSMutableArray<ANCMethodDefinition *> *classMethods = [NSMutableArray array];
 	NSMutableArray<ANCMethodDefinition *> *instanceMethods = [NSMutableArray array];
@@ -416,9 +436,13 @@ ANCClassDefinition *anc_create_class_definition(NSString *name, NSString *superN
 	classDefinition.properties = propertyDefinition;
 	classDefinition.classMethods = classMethods;
 	classDefinition.instanceMethods = instanceMethods;
+	compileUtil.currentClassDefinition = nil;
 	return classDefinition;
-	
 }
+
+
+
+
 
 void anc_add_struct_declare(ANCStructDeclare *structDeclare){
 	ANCompileUtil *compileUtil = anc_get_current_compile_util();

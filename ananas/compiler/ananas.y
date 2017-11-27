@@ -176,22 +176,34 @@ identifier_list: IDENTIFIER
 
 
 
-class_definition: CLASS IDENTIFIER COLON IDENTIFIER LC RC
+class_definition: CLASS IDENTIFIER COLON IDENTIFIER LC
 			{
 				NSString *name = (__bridge_transfer NSString *)$2;
 				NSString *superNmae = (__bridge_transfer NSString *)$4;
-				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,nil, nil);
+				anc_start_class_definition(name, superNmae,nil);
+			}
+			RC
+			{
+				ANCClassDefinition *classDefinition = anc_end_class_definition(nil);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
-			| CLASS IDENTIFIER COLON IDENTIFIER LC member_definition_list RC
+			| CLASS IDENTIFIER COLON IDENTIFIER LC
 			{
 				NSString *name = (__bridge_transfer NSString *)$2;
 				NSString *superNmae = (__bridge_transfer NSString *)$4;
-				NSArray *members = (__bridge_transfer NSArray *)$6;
-				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,nil, members);
+				anc_start_class_definition(name, superNmae,nil);
+			}
+			member_definition_list RC
+			{
+				NSArray *members = (__bridge_transfer NSArray *)$7;
+				ANCClassDefinition *classDefinition = anc_end_class_definition(members);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
-			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC RC
+			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC
+			{
+				
+			}
+			RC
 			{
 				NSString *name = (__bridge_transfer NSString *)$2;
 				NSString *superNmae = (__bridge_transfer NSString *)$4;
@@ -1276,15 +1288,27 @@ return_statement: RETURN expression_opt SEMICOLON
 			;
 
 
-block_statement: LC RC
+block_statement: LC
 			{
-				ANCBlock *block = anc_create_blcok_statement(nil);
+				ANCBlock *block = anc_open_block_statement();
+				$<block_statement>$ = (__bridge_retained void *)block;
+			}
+			RC
+			{
+				ANCBlock *block = $<block_statement>2;
+				block = anc_close_block_statement(block,nil);
 				$$ = (__bridge_retained void *)block;
 			}
-			| LC  statement_list RC
+			| LC
 			{
-				NSArray *list = (__bridge_transfer NSArray *)$2;
-				ANCBlock *block = anc_create_blcok_statement(list);
+				ANCBlock *block = anc_open_block_statement();
+				$<block_statement>$ = (__bridge_retained void *)block;
+			}
+			statement_list RC
+			{
+				ANCBlock *block = $<block_statement>2;
+				NSArray *list = (__bridge_transfer NSArray *)$3;
+				block = anc_close_block_statement(block,nil);
 				$$ = (__bridge_retained void *)block;
 			}
 			;

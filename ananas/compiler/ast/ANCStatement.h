@@ -31,6 +31,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @interface ANCBlock: NSObject
 
 @property (strong, nonatomic) NSArray<ANCStatement *> *statementList;
+@property (weak, nonatomic) ANCBlock *outBlock;
 
 @end
 
