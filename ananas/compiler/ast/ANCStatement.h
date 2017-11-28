@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ANCExpression.h"
 #import "ANCDeclaration.h"
+@class ANCBlock;
 
 typedef NS_ENUM(NSInteger, ANCStatementKind) {
 	ANCStatementKindExpression = 1,
@@ -28,12 +29,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @property (assign, nonatomic) ANCStatementKind kind;
 @end
 
-@interface ANCBlock: NSObject
 
-@property (strong, nonatomic) NSArray<ANCStatement *> *statementList;
-@property (weak, nonatomic) ANCBlock *outBlock;
-
-@end
 
 @interface ANCExpressionStatement: ANCStatement
 

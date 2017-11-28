@@ -22,6 +22,7 @@
 		41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6A1FA9C00700E1829A /* ananas.l */; };
 		41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6B1FA9C00700E1829A /* ananas.y */; };
 		41E543541FC80E8B00E6CED5 /* fix_ast.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E543531FC80E8B00E6CED5 /* fix_ast.m */; };
+		41E543571FCD312600E6CED5 /* ANCBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E543561FCD312600E6CED5 /* ANCBlock.m */; };
 		41E83EA61FB9671200A48592 /* ANCExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EA51FB9671200A48592 /* ANCExpression.m */; };
 		41E83EA91FB992C200A48592 /* ANCTypeSpecifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EA81FB992C200A48592 /* ANCTypeSpecifier.m */; };
 		41E83EAC1FBD5F8E00A48592 /* ANCClassDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EAB1FBD5F8E00A48592 /* ANCClassDefinition.m */; };
@@ -75,6 +76,8 @@
 		41D02D7A1FA9C83500E1829A /* test.ana */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.ana; sourceTree = "<group>"; };
 		41E543501FC6C0F900E6CED5 /* ANC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANC.h; sourceTree = "<group>"; };
 		41E543531FC80E8B00E6CED5 /* fix_ast.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = fix_ast.m; sourceTree = "<group>"; };
+		41E543551FCD312600E6CED5 /* ANCBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCBlock.h; sourceTree = "<group>"; };
+		41E543561FCD312600E6CED5 /* ANCBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCBlock.m; sourceTree = "<group>"; };
 		41E83EA41FB9671200A48592 /* ANCExpression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCExpression.h; sourceTree = "<group>"; };
 		41E83EA51FB9671200A48592 /* ANCExpression.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCExpression.m; sourceTree = "<group>"; };
 		41E83EA71FB992C200A48592 /* ANCTypeSpecifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCTypeSpecifier.h; sourceTree = "<group>"; };
@@ -221,6 +224,8 @@
 				41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */,
 				41C98B191FC6B26500BADBE9 /* ANCompileUtil.h */,
 				41C98B1A1FC6B26500BADBE9 /* ANCompileUtil.m */,
+				41E543551FCD312600E6CED5 /* ANCBlock.h */,
+				41E543561FCD312600E6CED5 /* ANCBlock.m */,
 			);
 			path = ast;
 			sourceTree = "<group>";
@@ -380,6 +385,7 @@
 			files = (
 				41E543541FC80E8B00E6CED5 /* fix_ast.m in Sources */,
 				41E83EAF1FBD653900A48592 /* ANCFunctionDefinition.m in Sources */,
+				41E543571FCD312600E6CED5 /* ANCBlock.m in Sources */,
 				41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */,
 				41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */,
 				41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */,

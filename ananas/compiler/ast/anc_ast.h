@@ -17,6 +17,7 @@
 #import "ANCStatement.h"
 #import "ANCStructDeclare.h"
 #import "ANCDeclaration.h"
+#import "ANCBlock.h"
 
 
 #endif /* nac_ast_h */

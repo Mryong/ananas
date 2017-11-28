@@ -40,6 +40,8 @@ ANCDoWhileStatement *anc_create_do_while_statement(NSString *label, ANCBlock *bl
 ANCContinueStatement *anc_create_continue_statement(NSString *label);
 ANCBreakStatement *anc_create_break_statement(NSString *label);
 ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr);
+ANCBlock *anc_open_block_statement(void);
+ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *statementList);
 void anc_start_class_definition(NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames);
 ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *members);
 

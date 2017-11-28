@@ -7,6 +7,7 @@
 //
 
 #import "ANCExpression.h"
+#import "ANCBlock.h"
 
 @implementation ANCExpression
 

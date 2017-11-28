@@ -201,23 +201,27 @@ class_definition: CLASS IDENTIFIER COLON IDENTIFIER LC
 			}
 			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC
 			{
-				
+				NSString *name = (__bridge_transfer NSString *)$2;
+				NSString *superNmae = (__bridge_transfer NSString *)$4;
+				NSArray *protocolNames = (__bridge_transfer NSArray *)$6;
+				anc_start_class_definition(name, superNmae,protocolNames);
 			}
 			RC
 			{
-				NSString *name = (__bridge_transfer NSString *)$2;
-				NSString *superNmae = (__bridge_transfer NSString *)$4;
-				NSArray *protocolNames = (__bridge_transfer NSArray *)$6;
-				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,protocolNames, nil);
+				ANCClassDefinition *classDefinition = anc_end_class_definition(nil);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
-			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC member_definition_list RC
+			| CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC
 			{
 				NSString *name = (__bridge_transfer NSString *)$2;
 				NSString *superNmae = (__bridge_transfer NSString *)$4;
 				NSArray *protocolNames = (__bridge_transfer NSArray *)$6;
-				NSArray *members = (__bridge_transfer NSArray *)$9;
-				ANCClassDefinition *classDefinition = anc_create_class_definition(name, superNmae,protocolNames, members);
+				anc_start_class_definition(name, superNmae,protocolNames);
+			}
+			member_definition_list RC
+			{
+				NSArray *members = (__bridge_transfer NSArray *)$10;
+				ANCClassDefinition *classDefinition = anc_end_class_definition(members);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
 			;
@@ -982,6 +986,8 @@ block_body:  POWER type_specifier LP  RP block_statement
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
 				expr.returnTypeSpecifier = returnTypeSpecifier;
+				block.kind = ANCBlockKindBock;
+				block.blockExpr = expr;
 				expr.block = block;
 				$$ = (__bridge_retained void *)expr;
 				
@@ -1295,7 +1301,7 @@ block_statement: LC
 			}
 			RC
 			{
-				ANCBlock *block = $<block_statement>2;
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$<block_statement>2;
 				block = anc_close_block_statement(block,nil);
 				$$ = (__bridge_retained void *)block;
 			}
@@ -1306,9 +1312,9 @@ block_statement: LC
 			}
 			statement_list RC
 			{
-				ANCBlock *block = $<block_statement>2;
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$<block_statement>2;
 				NSArray *list = (__bridge_transfer NSArray *)$3;
-				block = anc_close_block_statement(block,nil);
+				block = anc_close_block_statement(block,list);
 				$$ = (__bridge_retained void *)block;
 			}
 			;
