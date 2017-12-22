@@ -6,9 +6,9 @@
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "ANCompileUtil.h"
+#import "Interpreter.h"
 
-@implementation ANCompileUtil
+@implementation Interpreter
 
 - (NSMutableArray<ANCClassDefinition *> *)classDefinitionList{
 	if (_classDefinitionList == nil) {
@@ -24,11 +24,11 @@
 	return _structDeclareList;
 }
 
-- (NSMutableArray<ANCStatement *> *)statementList{
-	if (_statementList == nil) {
-		_statementList = [NSMutableArray array];
+- (NSMutableArray<ANCStatement *> *)topList{
+	if (_topList == nil) {
+		_topList = [NSMutableArray array];
 	}
-	return _statementList;
+	return _topList;
 }
 
 

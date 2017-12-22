@@ -11,8 +11,8 @@ int yywrap(){
 }
 
 static void increment_line_number(){
-	ANCompileUtil *compileUtil = anc_get_current_compile_util();
-	compileUtil.currentLineNumber++;
+	Interpreter *interpreter = anc_get_current_compile_util();
+	interpreter.currentLineNumber++;
 }
 %}
 %start C_COMMENT CC_COMMENT STRING_LITERAL_STATE
@@ -88,12 +88,14 @@ static void increment_line_number(){
 
 
 
-          
+
+<INITIAL>"#If" {return ANNOTATION_IF; }
 
 
 
 
 <INITIAL>"@property" {return PROPERTY; }
+<INITIAL>"@selector" {return SELECTOR; }
 <INITIAL>"weak" {return WEAK; }
 <INITIAL>"strong" {return STRONG; }
 <INITIAL>"copy" {return COPY; }
@@ -108,6 +110,8 @@ static void increment_line_number(){
 <INITIAL>"CGFloat" {return CG_FLOAT; }
 <INITIAL>"double" {return DOUBLE; }
 <INITIAL>"char" {return CHAR; }
+<INITIAL>"Class" {return CLASS_T; }
+<INITIAL>"SEL" {return SEL_T; }
 
 <INITIAL>"CGRect" {return CG_RECT; }
 <INITIAL>"CGSize" {return CG_SIZE; }

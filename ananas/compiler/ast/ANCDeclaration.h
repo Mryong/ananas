@@ -11,7 +11,9 @@
 @class ANCExpression;
 
 @interface ANCDeclaration: NSObject
+@property (assign, nonatomic) NSUInteger lineNumber;
 @property (strong, nonatomic) ANCTypeSpecifier *type;
 @property (copy, nonatomic) NSString *name;
 @property (strong, nonatomic) ANCExpression *initializer;
+@property (assign, nonatomic,getter=isParam) BOOL param;
 @end

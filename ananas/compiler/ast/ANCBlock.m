@@ -10,4 +10,11 @@
 
 @implementation ANCBlock
 
+- (NSMutableArray<ANCDeclaration *> *)declarations{
+	if (_declarations == nil) {
+		_declarations = [NSMutableArray array];
+	}
+	return _declarations;
+}
+
 @end

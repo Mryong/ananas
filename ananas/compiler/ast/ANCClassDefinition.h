@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "ANCFunctionDefinition.h"
 
+@class ANCClassDefinition;
+
 
 typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 	ANCPropertyModifierMemStrong = 0x00,
@@ -26,10 +28,12 @@ typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 
 
 @interface ANCMemberDefinition: NSObject
-
+@property (strong, nonatomic) ANCExpression *annotationIfConditionExpr;
+@property (weak, nonatomic) ANCClassDefinition *classDefinition;
 @end
 
 @interface ANCPropertyDefinition: ANCMemberDefinition
+@property (assign, nonatomic) NSUInteger lineNumber;
 @property (assign, nonatomic) ANCPropertyModifier modifier;
 @property (strong, nonatomic) ANCTypeSpecifier *typeSpecifier;
 @property (copy, nonatomic) NSString *name;
@@ -51,12 +55,14 @@ typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 
 
 @interface ANCClassDefinition : NSObject
+@property (assign, nonatomic) NSUInteger lineNumber;
 @property (copy, nonatomic) NSString *name;
 @property (copy, nonatomic) NSString *superNmae;
 @property (strong, nonatomic) NSArray<NSString *> *protocolNames;
 @property (strong, nonatomic) NSArray<ANCPropertyDefinition *> *properties;
 @property (strong, nonatomic) NSArray<ANCMethodDefinition *> *classMethods;
 @property (strong, nonatomic) NSArray<ANCMethodDefinition *> *instanceMethods;
+@property (strong, nonatomic) ANCExpression *annotationIfConditionExpr;
 @end
 
 

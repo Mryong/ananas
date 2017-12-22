@@ -19,8 +19,8 @@ int main(int argc, char * argv[]) {
 	extern int yyparse(void);
 	char *path = "/Users/yongpengliang/Documents/ananas/ananas/compiler/test.ana";
 	yyin = fopen(path, "r");
-	ANCompileUtil *compileUtil = [[ANCompileUtil alloc] init];
-	anc_set_current_compile_util(compileUtil);
+	Interpreter *interpreter = [[Interpreter alloc] init];
+	anc_set_current_compile_util(interpreter);
 	if(yyparse()){
 		printf("编译错误");
 	}

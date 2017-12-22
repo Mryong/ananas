@@ -19,6 +19,7 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 	ANC_FLOAT_EXPRESSION,
 	ANC_DOUBLE_EXPRESSION,
 	ANC_STRING_EXPRESSION,
+	ANC_SELECTOR_EXPRESSION,
 	ANC_BLOCK_EXPRESSION,
 	ANC_IDENTIFIER_EXPRESSION,
 	ANC_TERNARY_EXPRESSION,
@@ -65,6 +66,7 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 @property (assign, nonatomic) CGFloat float_value;
 @property (assign, nonatomic) double double_value;
 @property (assign, nonatomic) const char *utf8_string_value;
+@property (copy, nonatomic) NSString *selectorName;
 @end
 
 @interface ANCIdentifierExpression: ANCExpression

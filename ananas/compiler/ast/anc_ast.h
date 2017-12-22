@@ -9,7 +9,7 @@
 #ifndef nac_ast_h
 #define nac_ast_h
 
-#import "ANCompileUtil.h"
+#import "Interpreter.h"
 #import "ANCTypeSpecifier.h"
 #import "ANCExpression.h"
 #import "ANCClassDefinition.h"

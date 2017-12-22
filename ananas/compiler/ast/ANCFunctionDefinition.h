@@ -16,6 +16,7 @@
 @interface ANCParameter:NSObject
 @property (strong, nonatomic) ANCTypeSpecifier *type;
 @property (copy, nonatomic) NSString *name;
+@property (assign, nonatomic) NSUInteger lineNumber;
 @end
 
 

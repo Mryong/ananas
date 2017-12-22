@@ -11,7 +11,7 @@
 
 #import "anc_ast.h"
 
-ANCompileUtil *anc_get_current_compile_util(void);
-void anc_set_current_compile_util(ANCompileUtil *compileUtil);
+Interpreter *anc_get_current_compile_util(void);
+void anc_set_current_compile_util(Interpreter *interpreter);
 
 #endif /* ANC_h */

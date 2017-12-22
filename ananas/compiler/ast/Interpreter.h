@@ -10,11 +10,15 @@
 #import "ANCClassDefinition.h"
 #import "ANCStructDeclare.h"
 
-@interface ANCompileUtil : NSObject
+@interface Interpreter : NSObject
 @property (assign, nonatomic) NSUInteger currentLineNumber;
 @property (strong, nonatomic) NSMutableArray<ANCClassDefinition *> *classDefinitionList;
 @property (strong, nonatomic) NSMutableArray<ANCStructDeclare *> *structDeclareList;
-@property (strong, nonatomic) NSMutableArray<ANCStatement *> *statementList;
+@property (strong, nonatomic) NSMutableArray *topList;
+
+
+
+
 @property (strong, nonatomic) ANCClassDefinition *currentClassDefinition;
 @property (strong, nonatomic) ANCBlock *currentBlock;
 @end
