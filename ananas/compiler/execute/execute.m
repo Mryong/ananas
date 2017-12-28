@@ -6,7 +6,7 @@
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "ananasc.h"
 #import "execute.h"
 #import "ANEValue.h"
@@ -73,7 +73,6 @@ static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDe
 }
 
 
-static ANCPropertyModifier currentModifier;
 
 
 #define getter(_type,_value) \
@@ -82,30 +81,9 @@ static _type getter_##_type(id _self,SEL sel){\
 	id value = objc_getAssociatedObject(_self,propKey(key));\
 return _value;\
 }
-//static objc_AssociationPolicy policy;\
-if (!_self) {\
-	static dispatch_once_t onceToken;\
-	dispatch_once(&onceToken, ^{\
-		NSUInteger mem = currentModifier & ANCPropertyModifierMemMask;\
-		NSUInteger atomic = currentModifier & ANCPropertyModifierAtomicMask;\
-		if (mem == ANCPropertyModifierMemWeak) {\
-			policy = OBJC_ASSOCIATION_ASSIGN;\
-		}else if (mem == ANCPropertyModifierMemAssign){\
-			policy = OBJC_ASSOCIATION_RETAIN_NONATOMIC;\
-		}else if (mem == ANCPropertyModifierMemStrong && atomic == ANCPropertyModifierNonatomic) {\
-			policy = OBJC_ASSOCIATION_RETAIN_NONATOMIC;\
-		}else if (mem == ANCPropertyModifierMemCopy && atomic == ANCPropertyModifierNonatomic) {\
-			policy = OBJC_ASSOCIATION_COPY_NONATOMIC;\
-		}else if (mem == ANCPropertyModifierMemStrong && atomic == ANCPropertyModifierAtomic) {\
-			policy = OBJC_ASSOCIATION_RETAIN;\
-		}else if (mem == ANCPropertyModifierMemCopy && atomic == ANCPropertyModifierAtomic) {\
-			policy = OBJC_ASSOCIATION_COPY;\
-		}\
-	});\
-	return;\
-}
+
 #define setter(_type,_value,_policy)\
-static void setter_##_type##_policy(id _self, SEL sel, _type value){\
+static void setter_##_type##_##_policy(id _self, SEL sel, _type value){\
 	NSString *setter = NSStringFromSelector(sel);\
 	NSString *firstString = [[setter substringWithRange:NSMakeRange(3, 1)] lowercaseString];\
 	NSString *otherString = setter.length > 4 ? [setter substringFromIndex:4] : nil;\
@@ -115,6 +93,7 @@ static void setter_##_type##_policy(id _self, SEL sel, _type value){\
 
 getter(BOOL, [value boolValue])
 setter(BOOL,[NSNumber numberWithBool:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(BOOL,[NSNumber numberWithBool:value],OBJC_ASSOCIATION_RETAIN)
 
 getter(NSUInteger, [value unsignedIntegerValue])
 setter(NSUInteger, [NSNumber numberWithInteger:value], OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -131,72 +110,249 @@ setter(CGFloat, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN)
 typedef long double longDouble;
 getter(longDouble, [value doubleValue])
 setter(longDouble, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(longDouble, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN)
 
-typedef const char * cstring;
-getter(cstring, [value UTF8String])
-setter(cstring, [NSString stringWithUTF8String:value], OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+typedef const char * cString;
+getter(cString, [value UTF8String])
+setter(cString, [NSString stringWithUTF8String:value], OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(cString, [NSString stringWithUTF8String:value], OBJC_ASSOCIATION_RETAIN)
 
 getter(Class, value)
 setter(Class, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(Class, value, OBJC_ASSOCIATION_RETAIN)
+setter(Class, value, OBJC_ASSOCIATION_ASSIGN)
+setter(Class, value, OBJC_ASSOCIATION_COPY_NONATOMIC)
+setter(Class, value, OBJC_ASSOCIATION_COPY)
 
 getter(SEL, NSSelectorFromString(value))
 setter(SEL, NSStringFromSelector(sel),OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(SEL, NSStringFromSelector(sel),OBJC_ASSOCIATION_RETAIN)
 
 getter(id, value)
 setter(id, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(id, value, OBJC_ASSOCIATION_RETAIN)
+setter(id, value, OBJC_ASSOCIATION_ASSIGN)
+setter(id, value, OBJC_ASSOCIATION_COPY_NONATOMIC)
+setter(id, value, OBJC_ASSOCIATION_COPY)
 
 getter(CGRect, [value CGRectValue])
 setter(CGRect, [NSValue valueWithCGRect:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(CGRect, [NSValue valueWithCGRect:value],OBJC_ASSOCIATION_RETAIN)
 
 getter(CGSize, [value CGSizeValue])
+setter(CGSize, [NSValue valueWithCGSize:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(CGSize, [NSValue valueWithCGSize:value],OBJC_ASSOCIATION_RETAIN)
 
-//CGRect CGSzie CGPointer CGAffineTransform NSRange
+getter(CGPoint, [value CGPointValue])
+setter(CGPoint, [NSValue valueWithCGPoint:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(CGPoint, [NSValue valueWithCGPoint:value],OBJC_ASSOCIATION_RETAIN)
+
+getter(CGAffineTransform, [value CGAffineTransformValue])
+setter(CGAffineTransform, [NSValue valueWithCGAffineTransform:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(CGAffineTransform, [NSValue valueWithCGAffineTransform:value],OBJC_ASSOCIATION_RETAIN)
+
+getter(NSRange, [value rangeValue])
+setter(NSRange, [NSValue valueWithRange:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(NSRange, [NSValue valueWithRange:value],OBJC_ASSOCIATION_RETAIN)
+
+getter(CGVector, [value CGVectorValue])
+setter(CGVector, [NSValue valueWithCGVector:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(CGVector, [NSValue valueWithCGVector:value],OBJC_ASSOCIATION_RETAIN)
+
+getter(UIOffset, [value UIOffsetValue])
+setter(UIOffset, [NSValue valueWithUIOffset:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(UIOffset, [NSValue valueWithUIOffset:value],OBJC_ASSOCIATION_RETAIN)
+
+getter(UIEdgeInsets, [value UIEdgeInsetsValue])
+setter(UIEdgeInsets, [NSValue valueWithUIEdgeInsets:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(UIEdgeInsets, [NSValue valueWithUIEdgeInsets:value],OBJC_ASSOCIATION_RETAIN)
+
+getter(CATransform3D, [value CATransform3DValue])
+setter(CATransform3D, [NSValue valueWithCATransform3D:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(CATransform3D, [NSValue valueWithCATransform3D:value],OBJC_ASSOCIATION_RETAIN)
+
+typedef void * unknownType;
+getter(unknownType, [value pointerValue])
+setter(unknownType, [NSValue valueWithPointer:value],OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+setter(unknownType, [NSValue valueWithPointer:value],OBJC_ASSOCIATION_RETAIN)
 
 
 
-//ANC_TYPE_VOID,
-//ANC_TYPE_BOOL,
-//ANC_TYPE_NS_U_INTEGER,
-//ANC_TYPE_NS_INTEGER,
-//ANC_TYPE_CG_FLOAT,
-//ANC_TYPE_DOUBLE,
-//ANC_TYPE_STRING,//char *
-//ANC_TYPE_CLASS,
-//ANC_TYPE_SEL,
-//ANC_TYPE_NS_OBJECT,
-//ANC_TYPE_STRUCT,
-//ANC_TYPE_NS_BLOCK,
-//ANC_TYPE_ANANAS_BLOCK,
-//ANC_TYPE_UNKNOWN
 
-static void replace_getter_method(Class clazz, ANCPropertyDefinition *prop){
+
+
+
+
+#define getter_setter_base_type(_type,_encodeing) \
+switch (prop.modifier & ANCPropertyModifierMemMask) {\
+	case ANCPropertyModifierMemStrong:{\
+		NSCAssert(0, @ #_type " type can not use strong");\
+		break;\
+	}\
+	case ANCPropertyModifierMemWeak:{\
+		NSCAssert(0, @ #_type " type can not use weak");\
+		break;\
+	}\
+	case ANCPropertyModifierMemCopy:{\
+		NSCAssert(0, @ #_type " type can not use copy");\
+		break;\
+	}\
+	case ANCPropertyModifierMemAssign:{\
+			class_replaceMethod(clazz, getterSEL, (IMP)getter_##_type, #_encodeing"@:");\
+		if ((prop.modifier & ANCPropertyModifierAtomicMask) == ANCPropertyModifierAtomic) {\
+			class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_RETAIN, "v@:"#_encodeing);\
+		}else{\
+			class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_RETAIN_NONATOMIC, "v@:"#_encodeing);\
+		}\
+		break;\
+	}\
+	default:\
+		break;\
+}
+
+#define getter_setter_oc_type(_type,_encodeing) \
+switch (prop.modifier & ANCPropertyModifierMemMask) {\
+		class_replaceMethod(clazz, getterSEL, (IMP)getter_##_type, #_encodeing"@:");\
+	case ANCPropertyModifierMemStrong:{\
+		if ((prop.modifier & ANCPropertyModifierAtomicMask) == ANCPropertyModifierAtomic) {\
+			class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_RETAIN, "v@:"#_encodeing);\
+		}else{\
+			class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_RETAIN_NONATOMIC, "v@:"#_encodeing);\
+		}\
+		break;\
+	}\
+	case ANCPropertyModifierMemAssign:\
+	case ANCPropertyModifierMemWeak:{\
+		class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_ASSIGN, "v@:"#_encodeing);\
+	}\
+	case ANCPropertyModifierMemCopy:{\
+		if ((prop.modifier & ANCPropertyModifierAtomicMask) == ANCPropertyModifierAtomic) {\
+			class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_COPY, "v@:"#_encodeing);\
+		}else{\
+			class_replaceMethod(clazz, setterSEL, (IMP)setter_##_type##_OBJC_ASSOCIATION_COPY_NONATOMIC, "v@:"#_encodeing);\
+		}\
+		break;\
+	}\
+	default:\
+		break;\
+}
+
+
+static void replace_getter_setter_method(Class clazz, ANCPropertyDefinition *prop){
+	SEL getterSEL = NSSelectorFromString(prop.name);
+	NSString *str1 = [[prop.name substringWithRange:NSMakeRange(0, 1)] uppercaseString];
+	NSString *str2 = prop.name.length > 1 ? [prop.name substringFromIndex:1] : nil;
+	SEL setterSEL = NSSelectorFromString([NSString stringWithFormat:@"set%@%@:",str1,str2]);
 	switch (prop.typeSpecifier.typeKind) {
-		case ANC_TYPE_BOOL:
-			class_replaceMethod(clazz, NSSelectorFromString(prop.name), (IMP)getter_BOOL, "B@:");
+		case ANC_TYPE_BOOL:{
+			getter_setter_base_type(BOOL, B)
 			break;
+		}
+		case ANC_TYPE_NS_U_INTEGER:{
+			getter_setter_base_type(NSUInteger, Q)
+			break;
+		}
+		case ANC_TYPE_NS_INTEGER:{
+			getter_setter_base_type(NSInteger, q)
+			break;
+		}
+		case ANC_TYPE_CG_FLOAT:{
+			getter_setter_base_type(CGFloat, d)
+			break;
+		}
+		case ANC_TYPE_DOUBLE:{
+			getter_setter_base_type(longDouble, D)
+			break;
+		}
+		case ANC_TYPE_STRING:{
+			getter_setter_base_type(cString, *)
+			break;
+		}
+		case ANC_TYPE_SEL:{
+			getter_setter_base_type(SEL, :)
+			break;
+		}
+		case ANC_TYPE_UNKNOWN:{
+			getter_setter_base_type(unknownType, ^v)
+			break;
+		}
+		case ANC_TYPE_CLASS:{
+			getter_setter_oc_type(Class, #)
+			break;
+		}
+		case ANC_TYPE_ANANAS_BLOCK:{
+			getter_setter_oc_type(id, ?@)
+			break;
+		}
+		case ANC_TYPE_NS_OBJECT:{
+			getter_setter_oc_type(id, @)
+			break;
+		}
+
+
+		case ANC_TYPE_STRUCT:{
+			 NSString *structName = prop.typeSpecifier.identifer;
+			
+			if ([structName isEqualToString:@"CGRect"]) {
+				getter_setter_base_type(CGRect, {CGRect={CGPoint=dd}{CGSize=dd}})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"CGSzie"]) {
+				getter_setter_base_type(CGSize, {CGSize=dd})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"CGPoint"]) {
+				getter_setter_base_type(CGPoint, {CGPoint=dd})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"CGAffineTransform"]) {
+				getter_setter_base_type(CGAffineTransform, {CGAffineTransform=dddddd})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"NSRange"]) {
+				getter_setter_base_type(NSRange, {_NSRange=QQ})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"CGVector"]) {
+				getter_setter_base_type(CGVector, {CGVector=dd})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"UIOffset"]) {
+				getter_setter_base_type(UIOffset, {UIOffset=dd})
+				break;
+			}
+			
+			if ([structName isEqualToString:@"UIEdgeInsets"]) {
+				getter_setter_base_type(UIEdgeInsets, {UIEdgeInsets=dddd})
+				break;
+			}
+			if ([structName isEqualToString:@"CATransform3D"]) {
+				getter_setter_base_type(CATransform3D, {CATransform3D=dddddddddddddddd})
+				break;
+			}
+		}
 			
 		default:
+			NSCAssert(0, @"not supper property type: %@", prop.name);
 			break;
 	}
 	
 }
 
 
-static void replace_setter_method(Class clazz, ANCPropertyDefinition *prop){
-
-}
-
-static void replace_getter_setter_method(Class clazz, ANCPropertyDefinition *prop){
-	
-}
 
 
 
-static void replace_prop(ANCClassDefinition *classDefinition, ANCPropertyDefinition *prop){
+static void replace_prop(Class clazz, ANCPropertyDefinition *prop){
 	NSNumber *i;
 	[i doubleValue];
 	
-	Class clazz = NSClassFromString(classDefinition.name);
 	NSString *t = prop.typeSpecifier.typeEncoding;
 	if ([t isEqualToString:@"@"]) {
 		t = [NSString stringWithFormat:@"@\"%@\"",prop.typeSpecifier.identifer];
@@ -227,10 +383,10 @@ static void replace_prop(ANCClassDefinition *classDefinition, ANCPropertyDefinit
 		default:
 			break;
 	}
-//	NSString *varName = [NSString stringWithFormat:@"_%@",prop.name];
-//	objc_property_attribute_t backingivar = {"V",varName.UTF8String};
 	objc_property_attribute_t attrs[] = { type, memAttr, atomicAttr };
 	class_replaceProperty(clazz, prop.name.UTF8String, attrs, 3);
+	
+	replace_getter_setter_method(clazz, prop);
 	
 	
 }
@@ -238,17 +394,8 @@ static void replace_prop(ANCClassDefinition *classDefinition, ANCPropertyDefinit
 
 static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
 	Class clazz = NSClassFromString(classDefinition.name);
-
 	for (ANCPropertyDefinition *prop in classDefinition.properties) {
-
-		
-	
-		
-		
-		
-		
-		
-	
+		replace_prop(clazz, prop);
 	}
 	
 	for (ANCMethodDefinition *classMethod in classDefinition.classMethods) {
@@ -283,6 +430,7 @@ void anc_interpret(ANCInterpreter *interpreter){
 		}else if ([top isKindOfClass:[ANCStructDeclare class]]){
 			add_struct_declare();
 		}else if ([top isKindOfClass:[ANCClassDefinition class]]){
+			define_class(interpreter, top);
 			fix_class(interpreter,top);
 		}
 	}

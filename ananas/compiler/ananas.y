@@ -52,7 +52,7 @@ int yylex(void);
 	RETURN IF ELSE FOR WHILE DO SWITCH CASE DEFAULT BREAK CONTINUE 
 	PROPERTY WEAK STRONG COPY ASSIGN_MEM NONATOMIC ATOMIC  ADDRESS ASTERISK ASTERISK_ASSIGN VOID
 	BOOL_ NS_INTEGER NS_U_INTEGER  CG_FLOAT  DOUBLE CHAR  CLASS_T SEL_T NS_STRING NS_NUMBER NS_ARRAY NS_MUTABLE_ARRAY NS_DICTIONARY NS_MUTABLE_DICTIONARY ID
-	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE CG_VECTOR UI_OFFSET UI_DEGE_INSETS CA_TRANSFORM_3D NS_DIRECTIONL_EDGE_INSETS
+	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE CG_VECTOR UI_OFFSET UI_DEGE_INSETS CA_TRANSFORM_3D
 
 
 
@@ -112,31 +112,6 @@ struct_name: IDENTIFIER
 			{
 				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
 				$$ = $1;
-			}
-			| CG_RECT
-			{
-				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
-				$$ = (__bridge_retained void *)@"CGRect";
-			}
-			| CG_SIZE
-			{
-				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
-				$$ = (__bridge_retained void *)@"CGSzie";
-			}
-			| CG_POINT
-			{
-				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
-				$$ = (__bridge_retained void *)@"CGPoint";
-			}
-			| CG_AFFINE_TRANSFORM
-			{
-				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
-				$$ = (__bridge_retained void *)@"CGAffineTransform";
-			}
-			| NS_RANGE
-			{
-				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
-				$$ = (__bridge_retained void *)@"NSRange";
 			}
 			;
 
@@ -438,12 +413,12 @@ struct_type_specifier: CG_RECT
 			}
 			| CG_SIZE
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGSzie",@"{CGSize=dd}");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGSize",@"{CGSize=dd}");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| CG_POINT
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGPointer",@"{CGPoint=dd}");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGPoint",@"{CGPoint=dd}");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| CG_AFFINE_TRANSFORM
@@ -476,13 +451,7 @@ struct_type_specifier: CG_RECT
 				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CATransform3D",@"{CATransform3D=dddddddddddddddd}");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
-			| NS_DIRECTIONL_EDGE_INSETS
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"NSDirectionalEdgeInsets",@"{NSDirectionalEdgeInsets=dddd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
 			;
-
 
 
 

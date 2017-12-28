@@ -147,7 +147,6 @@ static void increment_line_number(){
 <INITIAL>"UIOffset" {return UI_OFFSET; }
 <INITIAL>"UIEdgeInsets" {return UI_DEGE_INSETS; }
 <INITIAL>"CATransform3D" {return CA_TRANSFORM_3D; }
-<INITIAL>"NSDirectionalEdgeInsets" {return NS_DIRECTIONL_EDGE_INSETS; }
 
 <INITIAL>"NSString" {return NS_STRING; }
 <INITIAL>"NSNumber" {return NS_NUMBER; }
