@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "ANCTypeSpecifier.h"
-#import "ANCFunctionDefinition.h"
+@class ANCFunctionDefinition;
 @class ANCBlock;
 
 

@@ -11,7 +11,7 @@
 
 extern NSUInteger anc_struct_declare_line_number;;
 
-static Interpreter *st_current_compile_util;
+static ANCInterpreter *st_current_compile_util;
 
 
 
@@ -32,11 +32,11 @@ int yyerror(char const *str){
 }
 
 
-Interpreter *anc_get_current_compile_util(){
+ANCInterpreter *anc_get_current_compile_util(){
 	return st_current_compile_util;
 }
 
-void anc_set_current_compile_util(Interpreter *interpreter){
+void anc_set_current_compile_util(ANCInterpreter *interpreter){
 	st_current_compile_util = interpreter;
 }
 
@@ -336,7 +336,7 @@ ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr){
 
 ANCBlock *anc_open_block_statement(){
 	ANCBlock *block = [[ANCBlock alloc] init];
-	Interpreter *interpreter = anc_get_current_compile_util();
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	block.outBlock = interpreter.currentBlock;
 	interpreter.currentBlock = block;
 	return block;
@@ -344,7 +344,7 @@ ANCBlock *anc_open_block_statement(){
 }
 
 ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *statementList){
-	Interpreter *interpreter = anc_get_current_compile_util();
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	NSCAssert(block == interpreter.currentBlock, @"block != anc_get_current_compile_util().currentBlock");
 	block.statementList = statementList;
 	interpreter.currentBlock = block.outBlock;
@@ -359,7 +359,7 @@ ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *st
 
 
 
-ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
+ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
 	if (![typeEncodingKey isEqualToString:@"typeEncoding"]) {
 		anc_compile_err(anc_struct_declare_line_number, ANCCompileErrorStructDeclareLackTypeEncoding);
 	}
@@ -369,6 +369,7 @@ ANCStructDeclare *anc_create_struct_declare(NSString *structName, NSString *type
 	}
 	
 	ANCStructDeclare *structDeclare = [[ANCStructDeclare alloc] init];
+	structDeclare.annotationIfConditionExpr = annotaionIfConditionExpr;
 	structDeclare.lineNumber = anc_struct_declare_line_number;
 	structDeclare.name = structName;
 	structDeclare.typeEncoding = typeEncodingValue;
@@ -388,7 +389,7 @@ ANCTypeSpecifier *anc_create_type_specifier(ANCTypeSpecifierKind kind, NSString 
 
 ANCTypeSpecifier *anc_create_block_type_specifier(ANCTypeSpecifier *returnTypeSpecifier,NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier){
 	ANCTypeSpecifier *typeSpecifier = [[ANCTypeSpecifier alloc] init];
-	typeSpecifier.typeKind = ANC_TYPE_BLOCK;
+	typeSpecifier.typeKind = ANC_TYPE_ANANAS_BLOCK;
 	typeSpecifier.returnTypeSpecifier = returnTypeSpecifier;
 	typeSpecifier.paramsTypeSpecifier = paramsTypeSpecifier;
 	return typeSpecifier;
@@ -451,8 +452,9 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	
 }
 
-ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifier, ANCTypeSpecifier *typeSpecifier, NSString *name){
+ANCPropertyDefinition *anc_create_property_definition(ANCExpression *annotaionIfConditionExpr, ANCPropertyModifier modifier, ANCTypeSpecifier *typeSpecifier, NSString *name){
 	ANCPropertyDefinition *propertyDefinition = [[ANCPropertyDefinition alloc] init];
+	propertyDefinition.annotationIfConditionExpr = annotaionIfConditionExpr;
 	propertyDefinition.lineNumber = anc_get_current_compile_util().currentLineNumber;
 	propertyDefinition.modifier = modifier;
 	propertyDefinition.typeSpecifier = typeSpecifier;
@@ -460,8 +462,8 @@ ANCPropertyDefinition *anc_create_property_definition(ANCPropertyModifier modifi
 	return propertyDefinition;
 }
 
-void anc_start_class_definition(ANCExpression *annotaionIfConditionExpr ,NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames){
-	Interpreter *interpreter = anc_get_current_compile_util();
+void anc_start_class_definition(ANCExpression *annotaionIfConditionExpr, NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames){
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	ANCClassDefinition *classDefinition = [[ANCClassDefinition alloc] init];
 	classDefinition.lineNumber = interpreter.currentLineNumber;
 	classDefinition.annotationIfConditionExpr = annotaionIfConditionExpr;
@@ -473,7 +475,7 @@ void anc_start_class_definition(ANCExpression *annotaionIfConditionExpr ,NSStrin
 
 
 ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *members){
-	Interpreter *interpreter = anc_get_current_compile_util();
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	ANCClassDefinition *classDefinition = interpreter.currentClassDefinition;
 	NSMutableArray<ANCPropertyDefinition *> *propertyDefinition = [NSMutableArray array];
 	NSMutableArray<ANCMethodDefinition *> *classMethods = [NSMutableArray array];
@@ -503,20 +505,20 @@ ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *mem
 
 
 void anc_add_struct_declare(ANCStructDeclare *structDeclare){
-	Interpreter *interpreter = anc_get_current_compile_util();
-	[interpreter.structDeclareList addObject:structDeclare];
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
+	interpreter.structDeclareDic[structDeclare.name] = structDeclare;
 	[interpreter.topList addObject:structDeclare];
 }
 
 void anc_add_class_definition(ANCClassDefinition *classDefinition){
-	Interpreter *interpreter = anc_get_current_compile_util();
-	[interpreter.classDefinitionList addObject:classDefinition];
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
+	interpreter.classDefinitionDic[classDefinition.name] = classDefinition;
 	[interpreter.topList addObject:classDefinition];
 	
 }
 
 void anc_add_statement(ANCStatement *statement){
-	Interpreter *interpreter = anc_get_current_compile_util();
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	[interpreter.topList addObject:statement];
 	
 }

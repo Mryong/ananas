@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+@class ANCExpression;
 
 @interface ANCStructDeclare : NSObject
 @property (strong, nonatomic) ANCExpression *annotationIfConditionExpr;

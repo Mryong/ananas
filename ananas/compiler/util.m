@@ -45,10 +45,10 @@ ANCTypeSpecifier *anc_alloc_type_specifier(ANCTypeSpecifierKind kind, NSString *
 			case ANC_TYPE_SEL:
 				typeSpecifier.typeEncoding = @":";
 				break;
-			case ANC_TYPE_OC:
+			case ANC_TYPE_NS_OBJECT:
 				typeSpecifier.typeEncoding = @"@";
 				break;
-			case ANC_TYPE_BLOCK:
+			case ANC_TYPE_NS_BLOCK:
 				typeSpecifier.typeEncoding = @"?@";
 				break;
 			case ANC_TYPE_STRUCT:

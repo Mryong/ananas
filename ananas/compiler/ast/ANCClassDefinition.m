@@ -10,6 +10,13 @@
 
 @implementation ANCClassDefinition
 
+- (instancetype)init{
+	if (self = [super init]) {
+		_annotationIfExprResult = AnnotationIfExprResultNoComputed;
+	}
+	return self;
+}
+
 @end
 
 @implementation ANCMemberDefinition

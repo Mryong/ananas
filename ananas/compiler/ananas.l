@@ -1,17 +1,44 @@
 %{
+	#undef YY_INPUT
+	#define YY_INPUT(buf, result, max_size) (result = string_input(buf, max_size))
 	#include <Foundation/Foundation.h>
 	#include "ananasc.h"
 	#include "y.tab.h"
 	#import "ANCExpression.h"
 	
-	extern int line_number;
+	
+	static char const *st_source_string;
+	static unsigned long st_current_char_index;
+	static unsigned long st_source_len;
+	
+	void
+	nac_set_source_string(char const *source)
+	{
+		st_source_string = source;
+		st_current_char_index = 0;
+		st_source_len = strlen(source);
+	}
+	
+	
+	static int string_input(char *buf, int max_size)
+	{
+		int len = st_source_len - st_current_char_index;
+		if(len <= 0){
+			return 0;
+		}
+		len = smaller(len, max_size);
+		strncpy(buf, &st_source_string[st_current_char_index], len);
+		st_current_char_index += len;
+		return len;
+	}
+	
 
 int yywrap(){
 	return 1;
 }
 
 static void increment_line_number(){
-	Interpreter *interpreter = anc_get_current_compile_util();
+	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	interpreter.currentLineNumber++;
 }
 %}
@@ -21,8 +48,6 @@ static void increment_line_number(){
 <INITIAL>"^" {return POWER; }
 <INITIAL>"," {return COMMA ;}
 <INITIAL>";" {return SEMICOLON; }
-<INITIAL>"<" {return LA; }
-<INITIAL>">" {return RA; }
 <INITIAL>"(" {return LP; }
 <INITIAL>")" {return RP; }
 <INITIAL>"[" {return LB; }
@@ -118,6 +143,11 @@ static void increment_line_number(){
 <INITIAL>"CGPoint" {return CG_POINT; }
 <INITIAL>"CGAffineTransform" {return CG_AFFINE_TRANSFORM; }
 <INITIAL>"NSRange" {return NS_RANGE; }
+<INITIAL>"CGVector" {return CG_VECTOR; }
+<INITIAL>"UIOffset" {return UI_OFFSET; }
+<INITIAL>"UIEdgeInsets" {return UI_DEGE_INSETS; }
+<INITIAL>"CATransform3D" {return CA_TRANSFORM_3D; }
+<INITIAL>"NSDirectionalEdgeInsets" {return NS_DIRECTIONL_EDGE_INSETS; }
 
 <INITIAL>"NSString" {return NS_STRING; }
 <INITIAL>"NSNumber" {return NS_NUMBER; }

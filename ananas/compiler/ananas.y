@@ -46,18 +46,20 @@ int yylex(void);
 %token <expression> YES_
 %token <expression> NO_
 
-%token COLON SEMICOLON COMMA  LA RA LP RP LB RB LC RC  QUESTION DOT ASSIGN AT POWER
+%token COLON SEMICOLON COMMA  LP RP LB RB LC RC  QUESTION DOT ASSIGN AT POWER
 	AND OR NOT EQ NE LT LE GT GE MINUS MINUS_ASSIGN PLUS PLUS_ASSIGN MUL MUL_ASSIGN DIV DIV_ASSIGN MOD MOD_ASSIGN INCREMENT DECREMENT
 	ANNOTATION_IF CLASS STRUCT DECLARE SELECTOR
 	RETURN IF ELSE FOR WHILE DO SWITCH CASE DEFAULT BREAK CONTINUE 
 	PROPERTY WEAK STRONG COPY ASSIGN_MEM NONATOMIC ATOMIC  ADDRESS ASTERISK ASTERISK_ASSIGN VOID
 	BOOL_ NS_INTEGER NS_U_INTEGER  CG_FLOAT  DOUBLE CHAR  CLASS_T SEL_T NS_STRING NS_NUMBER NS_ARRAY NS_MUTABLE_ARRAY NS_DICTIONARY NS_MUTABLE_DICTIONARY ID
-	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE
+	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE CG_VECTOR UI_OFFSET UI_DEGE_INSETS CA_TRANSFORM_3D NS_DIRECTIONL_EDGE_INSETS
+
+
 
 %type <assignment_operator> assignment_operator
 %type <expression> expression expression_opt assign_expression ternary_operator_expression logic_or_expression logic_and_expression  
 equality_expression relational_expression additive_expression multiplication_expression unary_expression postfix_expression
-primary_expression dic block_body
+primary_expression dic block_body annotation_if
 
 %type <identifier> label_opt identifier_opt struct_name selector selector_1 selector_2
 
@@ -154,12 +156,13 @@ declare_struct: annotation_if DECLARE STRUCT struct_name LC
 			IDENTIFIER COLON identifier_list
 			RC
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				NSString *structName = (__bridge_transfer NSString *)$4;
 				NSString *typeEncodingKey = (__bridge_transfer NSString *)$6;
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$8;
 				NSString *keysKey = (__bridge_transfer NSString *)$10;
 				NSArray *keysValue = (__bridge_transfer NSArray *)$12;
-				ANCStructDeclare *structDeclare = anc_create_struct_declare(structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
+				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -168,12 +171,13 @@ declare_struct: annotation_if DECLARE STRUCT struct_name LC
 			IDENTIFIER COLON STRING_LITERAL
 			RC
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				NSString *structName = (__bridge_transfer NSString *)$4;
 				NSString *keysKey = (__bridge_transfer NSString *)$6;
 				NSArray *keysValue = (__bridge_transfer NSArray *)$8;
 				NSString *typeEncodingKey = (__bridge_transfer NSString *)$10;
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$12;
-				ANCStructDeclare *structDeclare = anc_create_struct_declare(structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
+				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -201,9 +205,10 @@ identifier_list: IDENTIFIER
 
 class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
-				anc_start_class_definition(name, superNmae,nil);
+				anc_start_class_definition(annotaionIfConditionExpr, name, superNmae,nil);
 			}
 			RC
 			{
@@ -212,9 +217,10 @@ class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			}
 			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
-				anc_start_class_definition(name, superNmae,nil);
+				anc_start_class_definition(annotaionIfConditionExpr, name, superNmae,nil);
 			}
 			member_definition_list RC
 			{
@@ -222,24 +228,26 @@ class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 				ANCClassDefinition *classDefinition = anc_end_class_definition(members);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
-			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC
+			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LT protocol_list GT LC
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
 				NSArray *protocolNames = (__bridge_transfer NSArray *)$7;
-				anc_start_class_definition(name, superNmae,protocolNames);
+				anc_start_class_definition(annotaionIfConditionExpr, name, superNmae,protocolNames);
 			}
 			RC
 			{
 				ANCClassDefinition *classDefinition = anc_end_class_definition(nil);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
-			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LA protocol_list RA LC
+			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LT protocol_list GT LC
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
 				NSArray *protocolNames = (__bridge_transfer NSArray *)$7;
-				anc_start_class_definition(name, superNmae,protocolNames);
+				anc_start_class_definition(annotaionIfConditionExpr, name, superNmae,protocolNames);
 			}
 			member_definition_list RC
 			{
@@ -268,17 +276,19 @@ protocol_list: IDENTIFIER
 
 property_definition: annotation_if PROPERTY LP property_modifier_list RP type_specifier IDENTIFIER  SEMICOLON
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				ANCPropertyModifier modifier = $4;
 				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$6;
 				NSString *name = (__bridge_transfer NSString *)$7;
-				ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(modifier, typeSpecifier, name);
+				ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(annotaionIfConditionExpr, modifier, typeSpecifier, name);
 				$$ = (__bridge_retained void *)propertyDefinition;
 			}
 			| annotation_if PROPERTY LP  RP type_specifier IDENTIFIER SEMICOLON
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$5;
 				NSString *name = (__bridge_transfer NSString *)$6;
-				ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(0x00, typeSpecifier, name);
+				ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(annotaionIfConditionExpr, 0x00, typeSpecifier, name);
 				$$ = (__bridge_retained void *)propertyDefinition;
 			}
 			;
@@ -446,47 +456,75 @@ struct_type_specifier: CG_RECT
 				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"NSRange",@"{_NSRange=QQ}");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
+			| CG_VECTOR
+			{
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGVector",@"{CGVector=dd}");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| UI_OFFSET
+			{
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"UIOffset",@"{UIOffset=dd}");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| UI_DEGE_INSETS
+			{
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"UIEdgeInsets",@"{UIEdgeInsets=dddd}");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| CA_TRANSFORM_3D
+			{
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CATransform3D",@"{CATransform3D=dddddddddddddddd}");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
+			| NS_DIRECTIONL_EDGE_INSETS
+			{
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"NSDirectionalEdgeInsets",@"{NSDirectionalEdgeInsets=dddd}");
+				$$ = (__bridge_retained void *)typeSpecifier;
+			}
 			;
+
+
+
 
 oc_type_specifier: NS_STRING ASTERISK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSString",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSString",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_NUMBER ASTERISK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSNumber",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSNumber",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_ARRAY ASTERISK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSArray",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSArray",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_MUTABLE_ARRAY ASTERISK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSMutableArray",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSMutableArray",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_DICTIONARY ASTERISK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSDictionary",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSDictionary",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| NS_MUTABLE_DICTIONARY ASTERISK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"NSMutableDictionary",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSMutableDictionary",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| IDENTIFIER ASTERISK
 			{
 				NSString *identifier = (__bridge_transfer NSString *)$1;
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,identifier,@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,identifier,@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			| ID
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_OC,@"id",@"@");
+				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"id",@"@");
 				$$ = (__bridge_retained void *)typeSpecifier;
 			}
 			;
@@ -508,20 +546,22 @@ method_definition: instance_method_definition
 
 instance_method_definition: annotation_if MINUS LP type_specifier RP method_name block_statement
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
 				NSArray *items = (__bridge_transfer NSArray *)$6;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$7;
-				ANCMethodDefinition *methodDefinition = anc_create_method_definition(NO, returnTypeSpecifier, items, block);
+				ANCMethodDefinition *methodDefinition = anc_create_method_definition(annotaionIfConditionExpr, NO, returnTypeSpecifier, items, block);
 				$$ = (__bridge_retained void *)methodDefinition;
 			}
 			;
 
 class_method_definition: annotation_if PLUS LP type_specifier RP method_name  block_statement
 			{
+				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
 				NSArray *items = (__bridge_transfer NSArray *)$6;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$7;
-				ANCMethodDefinition *methodDefinition = anc_create_method_definition(YES, returnTypeSpecifier, items, block);
+				ANCMethodDefinition *methodDefinition = anc_create_method_definition(annotaionIfConditionExpr, YES, returnTypeSpecifier, items, block);
 				$$ = (__bridge_retained void *)methodDefinition;
 			}
 			;	

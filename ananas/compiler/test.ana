@@ -6,7 +6,6 @@ declare struct CGAffineTransform{
 }
 
 NSInteger i = 10;
-NSInteger j = 20;
 
 //定义类
 class MyViewController: UIViewController <UITableViewDelegate,UITableViewDataSource> {
@@ -15,12 +14,9 @@ class MyViewController: UIViewController <UITableViewDelegate,UITableViewDataSou
 
 
 - (void)viewDidLoad{
-	void (^)(NSInteger, NSInteger) block = ^(NSInteger a, NSInteger b){
-		NSInteger c = a + b;
-	};
-	self.testMemodParam1:param2:(1,block);
 }
 
+#If(version > 10)
 - (void)testMemodParam1:(NSInteger)p1 param2:(void (^)(NSInteger, NSInteger))param2{
 
 }

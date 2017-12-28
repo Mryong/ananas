@@ -11,6 +11,12 @@
 
 @class ANCClassDefinition;
 
+typedef NS_ENUM(NSInteger, AnnotationIfExprResult) {
+	AnnotationIfExprResultNoComputed,
+	AnnotationIfExprResultTrue,
+	AnnotationIfExprResultFalse
+};
+
 
 typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 	ANCPropertyModifierMemStrong = 0x00,
@@ -63,6 +69,8 @@ typedef NS_ENUM(NSUInteger, ANCPropertyModifier) {
 @property (strong, nonatomic) NSArray<ANCMethodDefinition *> *classMethods;
 @property (strong, nonatomic) NSArray<ANCMethodDefinition *> *instanceMethods;
 @property (strong, nonatomic) ANCExpression *annotationIfConditionExpr;
+@property (assign, nonatomic) AnnotationIfExprResult annotationIfExprResult;
+
 @end
 
 
