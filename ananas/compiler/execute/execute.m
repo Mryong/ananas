@@ -391,6 +391,13 @@ static void replace_prop(Class clazz, ANCPropertyDefinition *prop){
 	
 }
 
+static void replace_method(Class clazz, ANCMethodDefinition *method){
+	ANCFunctionDefinition *func = method.functionDefinition;
+	NSMutableString *type = [NSMutableString stringWithString:];
+	
+	class_replaceMethod(clazz, NSSelectorFromString(method.functionDefinition.name), _objc_msgForward, "<#const char * _Nullable types#>")
+}
+
 
 static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
 	Class clazz = NSClassFromString(classDefinition.name);
@@ -399,6 +406,8 @@ static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefin
 	}
 	
 	for (ANCMethodDefinition *classMethod in classDefinition.classMethods) {
+		
+		
 		
 	}
 	
