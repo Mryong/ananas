@@ -108,7 +108,7 @@ setter(CGFloat, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN_NONAT
 setter(CGFloat, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN)
 
 typedef long double longDouble;
-getter(longDouble, [value doubleValue])
+getter(longDouble, [(NSNumber *)value doubleValue])
 setter(longDouble, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 setter(longDouble, [NSNumber numberWithDouble:value], OBJC_ASSOCIATION_RETAIN)
 
@@ -391,11 +391,59 @@ static void replace_prop(Class clazz, ANCPropertyDefinition *prop){
 	
 }
 
-static void replace_method(Class clazz, ANCMethodDefinition *method){
-	ANCFunctionDefinition *func = method.functionDefinition;
-	NSMutableString *type = [NSMutableString stringWithString:];
+static NSString *fix_type_encoding(ANCInterpreter *interpreter,ANCTypeSpecifier *type){
+	if (![type.typeEncoding isEqualToString:@"v^"]) {
+		return type.typeEncoding;
+	}
 	
-	class_replaceMethod(clazz, NSSelectorFromString(method.functionDefinition.name), _objc_msgForward, "<#const char * _Nullable types#>")
+	NSString *identifer = type.identifer;
+	ANCStructDeclare *structdeclare = interpreter.structDeclareDic[identifer];
+	if (!structdeclare) {
+		return type.typeEncoding;
+	}
+	
+	type.typeEncoding = structdeclare.typeEncoding;
+	return type.typeEncoding;
+	
+	
+	
+	
+}
+
+
+static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation)
+{
+	
+}
+
+static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){
+	ANCFunctionDefinition *func = method.functionDefinition;
+	fix_type_encoding(interpreter, func.returnTypeSpecifier);
+	for (ANCParameter *param in func.params) {
+		fix_type_encoding(interpreter, param.type);
+	}
+	
+	SEL sel = NSSelectorFromString(func.name);
+	const char *typeEncoding;
+	Method ocMethod;
+	if (method.classMethod) {
+		ocMethod = class_getClassMethod(clazz, sel);
+	}else{
+		ocMethod = class_getInstanceMethod(clazz, sel);
+	}
+	
+	if (ocMethod) {
+		typeEncoding = method_getTypeEncoding(ocMethod);
+	}else{
+		NSMutableString *tempTypeEncoding = [NSMutableString stringWithString:func.returnTypeSpecifier.typeEncoding];
+		for (ANCParameter *param in func.params) {
+			[tempTypeEncoding appendString:param.type.typeEncoding];
+		}
+		typeEncoding = tempTypeEncoding.UTF8String;
+	}
+	Class c2 = method.classMethod ? objc_getMetaClass(class_getName(clazz)) : clazz;
+	class_replaceMethod(c2, @selector(forwardInvocation:), (IMP)ananas_forward_invocation,"v@:@");
+	class_replaceMethod(c2, sel, _objc_msgForward, typeEncoding);
 }
 
 
