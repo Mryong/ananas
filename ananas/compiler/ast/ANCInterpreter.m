@@ -33,6 +33,13 @@
 	return _structDeclareDic;
 }
 
+- (NSMutableDictionary<Class, NSMutableDictionary<NSString *,ANCFunctionDefinition *> *> *)functionDefinitionDic{
+	if (_functionDefinitionDic == nil) {
+		_functionDefinitionDic = [NSMutableDictionary dictionary];
+	}
+	return _functionDefinitionDic;
+}
+
 - (NSMutableArray<ANCStatement *> *)topList{
 	if (_topList == nil) {
 		_topList = [NSMutableArray array];

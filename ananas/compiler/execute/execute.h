@@ -15,6 +15,6 @@
 
 /* eval.m */
 ANEValue *ane_eval_expression(ANCInterpreter *interpreter, ANELocalEnvironment *env,ANCExpression *expr);
-
+void ane_interpret(ANCInterpreter *interpreter);
 
 #endif /* execute_h */

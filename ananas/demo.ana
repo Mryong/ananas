@@ -1,0 +1,7 @@
+class ViewController:UIViewController {
+
+- (void)testReplaceMethod:(NSString *)param{
+
+}
+
+}

@@ -7,6 +7,8 @@
 //
 
 #include <stdio.h>
+#import <objc/runtime.h>
+#import <objc/message.h>
 #include "ananasc.h"
 
 extern NSUInteger anc_struct_declare_line_number;;
@@ -491,6 +493,13 @@ ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *mem
 			}else{
 				[instanceMethods addObject:methodDefinition];
 			}
+			Class ocClass =methodDefinition.classMethod ? objc_getMetaClass(classDefinition.name.UTF8String) : NSClassFromString(classDefinition.name);
+			NSMutableDictionary<NSString *, ANCFunctionDefinition *> *classMethodDic = interpreter.functionDefinitionDic[ocClass];
+			if (!classMethodDic) {
+				interpreter.functionDefinitionDic[(id<NSCopying>)ocClass] = [NSMutableDictionary dictionary];
+			}
+			interpreter.functionDefinitionDic[ocClass][methodDefinition.functionDefinition.name] = methodDefinition.functionDefinition;
+			
 		}
 	}
 	classDefinition.properties = propertyDefinition;

@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
+#import "ANCContext.h"
 
 
 
@@ -20,9 +21,9 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	// Override point for customization after application launch.
-//	objc_setAssociatedObject(nil, NULL, nil, objc_AssociationPolicy policy)
-	void (^bb)(NSInteger);
+	NSURL *scriptUrl = [NSURL URLWithString:@"file:///Users/yongpengliang/Documents/ananas/ananas/demo.ana"];
+	ANCContext *context = [[ANCContext alloc] init];
+	[context evalAnanasScriptWithURL:scriptUrl];
 	
 	return YES;
 }

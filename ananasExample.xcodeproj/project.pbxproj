@@ -14,6 +14,7 @@
 		412E4A221FF1F1960074536F /* ANEBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A211FF1F1960074536F /* ANEBlock.m */; };
 		412E4A251FF1F8470074536F /* ANELocalEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A241FF1F8470074536F /* ANELocalEnvironment.m */; };
 		412E4A291FF2149E0074536F /* ANEVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A281FF2149E0074536F /* ANEVariable.m */; };
+		412E4A691FFB60F20074536F /* demo.ana in Resources */ = {isa = PBXBuildFile; fileRef = 412E4A681FFB60F20074536F /* demo.ana */; };
 		4156E9EC1FF0E09C0036973A /* ANCContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156E9EB1FF0E09C0036973A /* ANCContext.m */; };
 		4156E9F11FF0EE050036973A /* execute.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156E9F01FF0EE050036973A /* execute.m */; };
 		41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */; };
@@ -73,6 +74,7 @@
 		412E4A261FF2024B0074536F /* execute.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = execute.h; sourceTree = "<group>"; };
 		412E4A271FF2149E0074536F /* ANEVariable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEVariable.h; sourceTree = "<group>"; };
 		412E4A281FF2149E0074536F /* ANEVariable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEVariable.m; sourceTree = "<group>"; };
+		412E4A681FFB60F20074536F /* demo.ana */ = {isa = PBXFileReference; lastKnownFileType = text; path = demo.ana; sourceTree = "<group>"; };
 		4156E9EA1FF0E09C0036973A /* ANCContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCContext.h; sourceTree = "<group>"; };
 		4156E9EB1FF0E09C0036973A /* ANCContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCContext.m; sourceTree = "<group>"; };
 		4156E9F01FF0EE050036973A /* execute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = execute.m; sourceTree = "<group>"; };
@@ -226,10 +228,11 @@
 		41D02D4C1FA8A0C900E1829A /* ananas */ = {
 			isa = PBXGroup;
 			children = (
+				412E4A681FFB60F20074536F /* demo.ana */,
+				41D02D571FA9A53500E1829A /* ananasc.h */,
 				4156E9EA1FF0E09C0036973A /* ANCContext.h */,
 				4156E9EB1FF0E09C0036973A /* ANCContext.m */,
 				4156E9EF1FF0EE050036973A /* execute */,
-				41E5434F1FC6C0E900E6CED5 /* include */,
 				41D02D521FA9A4C400E1829A /* compiler */,
 			);
 			path = ananas;
@@ -247,14 +250,6 @@
 				41CB962A1FCFF43100373143 /* errrorc.m */,
 			);
 			path = compiler;
-			sourceTree = "<group>";
-		};
-		41E5434F1FC6C0E900E6CED5 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				41D02D571FA9A53500E1829A /* ananasc.h */,
-			);
-			path = include;
 			sourceTree = "<group>";
 		};
 		41E83EA31FB9668B00A48592 /* ast */ = {
@@ -394,6 +389,7 @@
 				41D02D241FA8A09400E1829A /* Assets.xcassets in Resources */,
 				41D02D7B1FA9C83500E1829A /* test.ana in Resources */,
 				41D02D221FA8A09400E1829A /* Main.storyboard in Resources */,
+				412E4A691FFB60F20074536F /* demo.ana in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

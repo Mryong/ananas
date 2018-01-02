@@ -65,7 +65,7 @@ static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDe
 	}else{
 		Class superClass = class_getSuperclass(clazz);
 		char const *superClassName = class_getName(superClass);
-		if (!strcmp(classDefinition.superNmae.UTF8String, superClassName)) {
+		if (strcmp(classDefinition.superNmae.UTF8String, superClassName)) {
 			NSCAssert(0, @"类 %@ 在ananas中与OC中父类名称不一致,ananas:%@ OC:%s ",classDefinition.name,classDefinition.superNmae, superClassName);
 			return;
 		}
@@ -414,6 +414,7 @@ static NSString *fix_type_encoding(ANCInterpreter *interpreter,ANCTypeSpecifier 
 static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation)
 {
 	
+	NSLog(@"");
 }
 
 static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){
@@ -454,13 +455,11 @@ static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefin
 	}
 	
 	for (ANCMethodDefinition *classMethod in classDefinition.classMethods) {
-		
-		
-		
+		replace_method(interpreter, clazz, classMethod);
 	}
 	
 	for (ANCMethodDefinition *instanceMethod in classDefinition.instanceMethods) {
-		
+		replace_method(interpreter, clazz, instanceMethod);
 	}
 	
 	
@@ -479,7 +478,7 @@ void add_struct_declare(){
 
 
 
-void anc_interpret(ANCInterpreter *interpreter){
+void ane_interpret(ANCInterpreter *interpreter){
 	
 	for (__kindof NSObject *top in interpreter.topList) {
 		if ([top isKindOfClass:[ANCStatement class]]) {

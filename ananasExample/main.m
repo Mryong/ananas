@@ -15,11 +15,9 @@
 #include <stdio.h>
 
 int main(int argc, char * argv[]) {
-	NSURL *scriptUrl = [NSURL URLWithString:@"file:///Users/yongpengliang/Documents/ananas/ananas/compiler/test.ana"];
-	ANCContext *context = [[ANCContext alloc] init];
-	[context evalAnanasScriptWithURL:scriptUrl];
+
 	
-//	@autoreleasepool {
-//	    return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-//	}
+	@autoreleasepool {
+	    return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+	}
 }
