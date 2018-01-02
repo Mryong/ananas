@@ -8,11 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "anc_ast.h"
-#import "ANEValue.h"
-#import "ANELocalEnvironment.h"
+#import "ANEEnvironment.h"
 
 
-ANEValue *ane_eval_expression(ANCInterpreter *interpreter, ANELocalEnvironment *env,ANCExpression *expr){
+ANEValue *ane_eval_expression(ANCInterpreter *interpreter, ANEEnvironment *env,ANCExpression *expr){
 	return nil;
 }
 

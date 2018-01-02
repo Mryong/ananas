@@ -1,12 +1,12 @@
 //
-//  ANCValue.m
+//  ANEEnvironment.m
 //  ananasExample
 //
-//  Created by jerry.yong on 2017/12/25.
-//  Copyright © 2017年 yongpengliang. All rights reserved.
+//  Created by jerry.yong on 2018/1/2.
+//  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
-#import "ANEValue.h"
+#import "ANEEnvironment.h"
 
 @implementation ANEValue
 //ANC_TYPE_VOID,
@@ -58,5 +58,13 @@
 	}
 	
 }
+
+@end
+
+@implementation ANEVariable
+
+@end
+
+@implementation ANEEnvironment
 
 @end

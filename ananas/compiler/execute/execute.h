@@ -9,12 +9,11 @@
 #ifndef execute_h
 #define execute_h
 
-#import "ANEValue.h"
-#import "ANEVariable.h"
-#import "ANELocalEnvironment.h"
+#import "ANEEnvironment.h"
+
 
 /* eval.m */
-ANEValue *ane_eval_expression(ANCInterpreter *interpreter, ANELocalEnvironment *env,ANCExpression *expr);
+ANEValue *ane_eval_expression(ANCInterpreter *interpreter, ANEEnvironment *env,ANCExpression *expr);
 void ane_interpret(ANCInterpreter *interpreter);
 
 #endif /* execute_h */

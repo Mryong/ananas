@@ -1,17 +1,15 @@
 //
-//  ANCValue.h
+//  ANEEnvironment.h
 //  ananasExample
 //
-//  Created by jerry.yong on 2017/12/25.
-//  Copyright © 2017年 yongpengliang. All rights reserved.
+//  Created by jerry.yong on 2018/1/2.
+//  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "ANCTypeSpecifier.h"
 #import "ANEBlock.h"
-
-
 
 @interface ANEValue : NSObject
 @property (assign, nonatomic) ANCTypeSpecifier *type;
@@ -27,28 +25,19 @@
 @property (assign, nonatomic) id nsBlockValue;
 @property (strong, nonatomic) ANEBlock *ananasBlockValue;
 @property (assign, nonatomic) void *unknownKindValue;
-
-
 - (BOOL)isTrue;
+@end
 
 
 
 
+@interface ANEVariable:NSObject
+@property (assign, nonatomic)BOOL ananasVar;
+@property (copy, nonatomic) NSString *name;
+@property (strong, nonatomic) ANEValue *value;
+@end
 
-
-//ANC_TYPE_VOID,
-//ANC_TYPE_BOOL,
-//ANC_TYPE_NS_U_INTEGER,
-//ANC_TYPE_NS_INTEGER,
-//ANC_TYPE_CG_FLOAT,
-//ANC_TYPE_DOUBLE,
-//ANC_TYPE_STRING,//char *
-//ANC_TYPE_CLASS,
-//ANC_TYPE_SEL,
-//ANC_TYPE_OC,
-//ANC_TYPE_STRUCT,
-//ANC_TYPE_BLOCK,
-//ANC_TYPE_UNKNOWN
-
-
+@interface ANEEnvironment : NSObject
+@property (strong, nonatomic) NSMutableArray<ANEVariable *> *vars;
+@property (strong, nonatomic) Class clazz;
 @end
