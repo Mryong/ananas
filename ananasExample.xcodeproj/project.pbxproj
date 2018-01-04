@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		412E4A151FF100BF0074536F /* ANCStatementResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A141FF100BF0074536F /* ANCStatementResult.m */; };
 		412E4A181FF1040F0074536F /* ANCStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A171FF1040F0074536F /* ANCStack.m */; };
 		412E4A1A1FF1056D0074536F /* eval.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A191FF1056D0074536F /* eval.m */; };
 		412E4A221FF1F1960074536F /* ANEBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A211FF1F1960074536F /* ANEBlock.m */; };
@@ -58,8 +57,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		412E4A131FF100BF0074536F /* ANCStatementResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCStatementResult.h; sourceTree = "<group>"; };
-		412E4A141FF100BF0074536F /* ANCStatementResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCStatementResult.m; sourceTree = "<group>"; };
 		412E4A161FF1040F0074536F /* ANCStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCStack.h; sourceTree = "<group>"; };
 		412E4A171FF1040F0074536F /* ANCStack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCStack.m; sourceTree = "<group>"; };
 		412E4A191FF1056D0074536F /* eval.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = eval.m; sourceTree = "<group>"; };
@@ -146,8 +143,6 @@
 			children = (
 				412E4A261FF2024B0074536F /* execute.h */,
 				4156E9F01FF0EE050036973A /* execute.m */,
-				412E4A131FF100BF0074536F /* ANCStatementResult.h */,
-				412E4A141FF100BF0074536F /* ANCStatementResult.m */,
 				412E4A161FF1040F0074536F /* ANCStack.h */,
 				412E4A171FF1040F0074536F /* ANCStack.m */,
 				412E4A191FF1056D0074536F /* eval.m */,
@@ -428,7 +423,6 @@
 				412E4A1A1FF1056D0074536F /* eval.m in Sources */,
 				41E543571FCD312600E6CED5 /* ANCBlock.m in Sources */,
 				41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */,
-				412E4A151FF100BF0074536F /* ANCStatementResult.m in Sources */,
 				41CB962B1FCFF43100373143 /* errrorc.m in Sources */,
 				41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */,
 				412E4A6C1FFB86B00074536F /* ANEEnvironment.m in Sources */,

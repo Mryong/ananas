@@ -65,6 +65,15 @@
 
 @end
 
+@implementation ANEScopeChain
+
+@end
+
+@implementation ANCStatementResult
+
+@end
+
+
 @implementation ANEEnvironment
 
 @end

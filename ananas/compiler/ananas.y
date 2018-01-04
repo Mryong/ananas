@@ -61,7 +61,7 @@ int yylex(void);
 equality_expression relational_expression additive_expression multiplication_expression unary_expression postfix_expression
 primary_expression dic block_body annotation_if
 
-%type <identifier> label_opt identifier_opt struct_name selector selector_1 selector_2
+%type <identifier> struct_name selector selector_1 selector_2
 
 %type <list> identifier_list dic_entry_list statement_list type_specifier_list protocol_list else_if_list case_list member_definition_list
 method_name method_name_1 method_name_2 expression_list function_param_list 
@@ -1234,100 +1234,80 @@ expression_opt: /* empty */
 			| expression
 			;
 
-identifier_opt: /* empty */
-			| IDENTIFIER
-			;
 
-label_opt: /* empty */
-			{
-				$$ = nil;
-			}
-			| IDENTIFIER COLON
-			{
-				$$ = $1;
-			}
-			;
 
-for_statement: label_opt FOR LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP block_statement
+for_statement: FOR LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP block_statement
 			{
-				NSString *label = (__bridge_transfer NSString *)$1;
-				ANCExpression *initializerExpr = (__bridge_transfer ANCExpression *)$4;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$6;
-				ANCExpression *post = (__bridge_transfer ANCExpression *)$8;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$10;
-				ANCForStatement *statement = anc_create_for_statement(label, initializerExpr, nil,
-				condition, post, block);
-				$$ = (__bridge_retained void *)statement;
-			}
-
-			| label_opt FOR LP declaration SEMICOLON  expression_opt SEMICOLON expression_opt RP block_statement
-			{
-				NSString *label = (__bridge_transfer NSString *)$1;
-				ANCDeclaration *declaration = (__bridge_transfer ANCDeclaration *)$4;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$6;
-				ANCExpression *post = (__bridge_transfer ANCExpression *)$8;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$10;
-				ANCForStatement *statement = anc_create_for_statement(label, nil, declaration,
-				condition, post, block);
-				$$ = (__bridge_retained void *)statement;
-			}
-			;
-
-while_statement: label_opt WHILE LP expression RP block_statement
-			{
-				NSString *label = (__bridge_transfer NSString *)$1;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$4;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$6;
-				ANCWhileStatement *statement = anc_create_while_statement(label, condition, block);
-				$$ = (__bridge_retained void *)statement;
-			}
-			;
-
-do_while_statement:label_opt DO block_statement WHILE LP expression RP SEMICOLON
-			{
-				NSString *label = (__bridge_transfer NSString *)$1;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$3;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$6;
-				ANCDoWhileStatement *statement = anc_create_do_while_statement(label, block, condition);
-				$$ = (__bridge_retained void *)statement;
-			}
-			;
-
-foreach_statement: label_opt FOR  LP type_specifier IDENTIFIER COLON expression RP block_statement
-			{
-				NSString *label = (__bridge_transfer NSString *)$1;
-				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
-				NSString *varName = (__bridge_transfer NSString *)$5;
-				ANCExpression *arrayExpr = (__bridge_transfer ANCExpression *)$7;
+				ANCExpression *initializerExpr = (__bridge_transfer ANCExpression *)$3;
+				ANCExpression *condition = (__bridge_transfer ANCExpression *)$5;
+				ANCExpression *post = (__bridge_transfer ANCExpression *)$7;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$9;
-				ANCForEachStatement *statement = anc_create_for_each_statement(label, typeSpecifier, varName, arrayExpr, block);
+				ANCForStatement *statement = anc_create_for_statement(initializerExpr, nil,
+				condition, post, block);
 				$$ = (__bridge_retained void *)statement;
 			}
-			| label_opt FOR  LP IDENTIFIER COLON expression RP block_statement
+
+			| FOR LP declaration SEMICOLON  expression_opt SEMICOLON expression_opt RP block_statement
 			{
-				NSString *label = (__bridge_transfer NSString *)$1;
+				ANCDeclaration *declaration = (__bridge_transfer ANCDeclaration *)$3;
+				ANCExpression *condition = (__bridge_transfer ANCExpression *)$5;
+				ANCExpression *post = (__bridge_transfer ANCExpression *)$7;
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$9;
+				ANCForStatement *statement = anc_create_for_statement(nil, declaration,
+				condition, post, block);
+				$$ = (__bridge_retained void *)statement;
+			}
+			;
+
+while_statement: WHILE LP expression RP block_statement
+			{
+				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
+				ANCWhileStatement *statement = anc_create_while_statement( condition, block);
+				$$ = (__bridge_retained void *)statement;
+			}
+			;
+
+do_while_statement: DO block_statement WHILE LP expression RP SEMICOLON
+			{
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$2;
+				ANCExpression *condition = (__bridge_transfer ANCExpression *)$5;
+				ANCDoWhileStatement *statement = anc_create_do_while_statement(block, condition);
+				$$ = (__bridge_retained void *)statement;
+			}
+			;
+
+foreach_statement: FOR LP type_specifier IDENTIFIER COLON expression RP block_statement
+			{
+				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$3;
 				NSString *varName = (__bridge_transfer NSString *)$4;
 				ANCExpression *arrayExpr = (__bridge_transfer ANCExpression *)$6;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$8;
-				ANCForEachStatement *statement = anc_create_for_each_statement(label, nil, varName, arrayExpr, block);
+				ANCForEachStatement *statement = anc_create_for_each_statement(typeSpecifier, varName, arrayExpr, block);
+				$$ = (__bridge_retained void *)statement;
+			}
+			| FOR  LP IDENTIFIER COLON expression RP block_statement
+			{
+				NSString *varName = (__bridge_transfer NSString *)$3;
+				ANCExpression *arrayExpr = (__bridge_transfer ANCExpression *)$5;
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$7;
+				ANCForEachStatement *statement = anc_create_for_each_statement(nil, varName, arrayExpr, block);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
 
 
-continue_statement: CONTINUE identifier_opt SEMICOLON
+continue_statement: CONTINUE SEMICOLON
 			{
-				NSString *label = (__bridge_transfer NSString *)$2;
-				ANCContinueStatement *statement = anc_create_continue_statement(label);
+				ANCContinueStatement *statement = anc_create_continue_statement();
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
 
 
-break_statement: BREAK identifier_opt SEMICOLON
+break_statement: BREAK SEMICOLON
 			{
-				NSString *label = (__bridge_transfer NSString *)$2;
-				ANCBreakStatement *statement = anc_create_break_statement(label);
+				ANCBreakStatement *statement = anc_create_break_statement();
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1335,8 +1315,8 @@ break_statement: BREAK identifier_opt SEMICOLON
 
 return_statement: RETURN expression_opt SEMICOLON
 			{
-				NSString *label = (__bridge_transfer NSString *)$2;
-				ANCBreakStatement *statement = anc_create_break_statement(label);
+				ANCExpression *expr = (__bridge_transfer ANCExpression *)$2;
+				ANCReturnStatement *statement = anc_create_return_statement(expr);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;

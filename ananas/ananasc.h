@@ -55,13 +55,13 @@ ANCElseIf *anc_create_else_if(ANCExpression *condition, ANCBlock *thenBlock);
 ANCIfStatement *anc_create_if_statement(ANCExpression *condition,ANCBlock *thenBlock,NSArray<ANCElseIf *> *elseIfList,ANCBlock *elseBlocl);
 ANCCase *anc_create_case(ANCExpression *expr, ANCBlock *block);
 ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSArray<ANCCase *> *caseList, ANCBlock *defaultBlock);
-ANCForStatement *anc_create_for_statement(NSString *label, ANCExpression *initializerExpr, ANCDeclaration *declaration,
+ANCForStatement *anc_create_for_statement(ANCExpression *initializerExpr, ANCDeclaration *declaration,
 										  ANCExpression *condition, ANCExpression *post, ANCBlock *block);
-ANCForEachStatement *anc_create_for_each_statement(NSString *label, ANCTypeSpecifier *typeSpecifier, NSString *varName, ANCExpression *arrayExpr, ANCBlock *block);
-ANCWhileStatement *anc_create_while_statement(NSString *label, ANCExpression *condition, ANCBlock *block);
-ANCDoWhileStatement *anc_create_do_while_statement(NSString *label, ANCBlock *block, ANCExpression *condition);
-ANCContinueStatement *anc_create_continue_statement(NSString *label);
-ANCBreakStatement *anc_create_break_statement(NSString *label);
+ANCForEachStatement *anc_create_for_each_statement( ANCTypeSpecifier *typeSpecifier, NSString *varName, ANCExpression *arrayExpr, ANCBlock *block);
+ANCWhileStatement *anc_create_while_statement(ANCExpression *condition, ANCBlock *block);
+ANCDoWhileStatement *anc_create_do_while_statement( ANCBlock *block, ANCExpression *condition);
+ANCContinueStatement *anc_create_continue_statement(void);
+ANCBreakStatement *anc_create_break_statement(void);
 ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr);
 ANCBlock *anc_open_block_statement(void);
 ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *statementList);

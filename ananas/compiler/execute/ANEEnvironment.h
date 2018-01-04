@@ -11,6 +11,8 @@
 #import "ANCTypeSpecifier.h"
 #import "ANEBlock.h"
 
+
+
 @interface ANEValue : NSObject
 @property (assign, nonatomic) ANCTypeSpecifier *type;
 @property (assign, nonatomic) BOOL boolValue;
@@ -28,16 +30,33 @@
 - (BOOL)isTrue;
 @end
 
-
-
-
 @interface ANEVariable:NSObject
 @property (assign, nonatomic)BOOL ananasVar;
 @property (copy, nonatomic) NSString *name;
 @property (strong, nonatomic) ANEValue *value;
 @end
 
-@interface ANEEnvironment : NSObject
+@interface ANEScopeChain: NSObject
+@property (assign, nonatomic,getter=isClazz) BOOL clazz;
 @property (strong, nonatomic) NSMutableArray<ANEVariable *> *vars;
+@property (strong, nonatomic) ANEScopeChain *next;
+
+@end
+
+typedef NS_ENUM(NSInteger, ANEStatementResultType) {
+	ANEStatementResultTypeNormal,
+	ANEStatementResultTypeReutun,
+	ANEStatementResultTypeBreak,
+	ANEStatementResultTypeContinue,
+};
+
+
+@interface ANCStatementResult : NSObject
+@property (assign, nonatomic) ANEStatementResultType type;
+@property (strong, nonatomic) ANEValue *reutrnValue;
+@end
+
+@interface ANEEnvironment : NSObject
 @property (strong, nonatomic) Class clazz;
+@property (strong, nonatomic) ANEScopeChain *scope;
 @end

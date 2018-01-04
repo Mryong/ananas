@@ -477,12 +477,6 @@ void add_struct_declare(){
 
 
 
-
-
-
-
-
-
 void ane_interpret(ANCInterpreter *interpreter){
 	
 	for (__kindof NSObject *top in interpreter.topList) {

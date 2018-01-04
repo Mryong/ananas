@@ -74,7 +74,6 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @end
 
 @interface ANCForStatement: ANCStatement
-@property (copy, nonatomic) NSString *label;
 @property (strong, nonatomic) ANCExpression *initializerExpr;
 @property (assign, nonatomic) ANCDeclaration *declaration;
 @property (strong, nonatomic) ANCExpression *condition;
@@ -83,7 +82,6 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @end
 
 @interface ANCForEachStatement: ANCStatement
-@property (copy, nonatomic) NSString *label;
 @property (assign, nonatomic) ANCDeclaration *declaration;
 @property (strong, nonatomic) ANCExpression *varExpr;
 @property (strong, nonatomic) ANCExpression *arrayExpr;
@@ -91,25 +89,21 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 @end
 
 @interface ANCWhileStatement: ANCStatement
-@property (copy, nonatomic) NSString *label;
 @property (strong, nonatomic) ANCExpression *condition;
 @property (strong, nonatomic) ANCBlock *block;
 @end
 
 
 @interface ANCDoWhileStatement: ANCStatement
-@property (copy, nonatomic) NSString *label;
 @property (strong, nonatomic) ANCBlock *block;
 @property (strong, nonatomic) ANCExpression *condition;
 @end
 
 @interface ANCContinueStatement: ANCStatement
-@property (copy, nonatomic) NSString *label;
 @end
 
 
 @interface ANCBreakStatement: ANCStatement
-@property (copy, nonatomic) NSString *label;
 @end
 
 

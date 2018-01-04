@@ -44,10 +44,6 @@ void anc_set_current_compile_util(ANCInterpreter *interpreter){
 
 
 
-
-
-
-
 NSString *anc_create_identifier(char *str){
 	NSString *ocStr = [NSString stringWithUTF8String:str];
 	return ocStr;
@@ -245,7 +241,7 @@ ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSArray<ANC
 }
 
 
-ANCForStatement *anc_create_for_statement(NSString *label, ANCExpression *initializerExpr, ANCDeclaration *declaration,
+ANCForStatement *anc_create_for_statement(ANCExpression *initializerExpr, ANCDeclaration *declaration,
 										  ANCExpression *condition, ANCExpression *post, ANCBlock *block){
 	ANCForStatement *statement = [[ANCForStatement alloc] init];
 	
@@ -253,7 +249,6 @@ ANCForStatement *anc_create_for_statement(NSString *label, ANCExpression *initia
 	block.statement = statement;
 	
 	statement.kind = ANCStatementKindFor;
-	statement.label = label;
 	statement.initializerExpr = initializerExpr;
 	statement.declaration = declaration;
 	statement.condition = condition;
@@ -263,14 +258,13 @@ ANCForStatement *anc_create_for_statement(NSString *label, ANCExpression *initia
 }
 
 
-ANCForEachStatement *anc_create_for_each_statement(NSString *label, ANCTypeSpecifier *typeSpecifier,NSString *varName, ANCExpression *arrayExpr,ANCBlock *block){
+ANCForEachStatement *anc_create_for_each_statement(ANCTypeSpecifier *typeSpecifier,NSString *varName, ANCExpression *arrayExpr,ANCBlock *block){
 	ANCForEachStatement *statement = [[ANCForEachStatement alloc] init];
 	
 	block.kind = ANCBlockKindStatement;
 	block.statement = statement;
 	
 	statement.kind = ANCStatementKindForEach;
-	statement.label  = label;
 	if (typeSpecifier) {
 		statement.declaration = anc_create_declaration(typeSpecifier, varName, nil);
 	}else{
@@ -285,44 +279,40 @@ ANCForEachStatement *anc_create_for_each_statement(NSString *label, ANCTypeSpeci
 }
 
 
-ANCWhileStatement *anc_create_while_statement(NSString *label, ANCExpression *condition, ANCBlock *block){
+ANCWhileStatement *anc_create_while_statement(ANCExpression *condition, ANCBlock *block){
 	ANCWhileStatement *statement = [[ANCWhileStatement alloc] init];
 	
 	block.kind = ANCBlockKindStatement;
 	block.statement = statement;
 	
 	statement.kind = ANCStatementKindWhile;
-	statement.label = label;
 	statement.condition = condition;
 	statement.block = block;
 	return statement;
 }
 
-ANCDoWhileStatement *anc_create_do_while_statement(NSString *label, ANCBlock *block, ANCExpression *condition){
+ANCDoWhileStatement *anc_create_do_while_statement(ANCBlock *block, ANCExpression *condition){
 	ANCDoWhileStatement *statement = [[ANCDoWhileStatement alloc] init];
 	
 	block.kind = ANCBlockKindStatement;
 	block.statement = statement;
 	
 	statement.kind = ANCStatementKindDoWhile;
-	statement.label = label;
 	statement.block = block;
 	statement.condition = condition;
 	return statement;
 }
 
-ANCContinueStatement *anc_create_continue_statement(NSString *label){
+ANCContinueStatement *anc_create_continue_statement(){
 	ANCContinueStatement *statement = [[ANCContinueStatement alloc] init];
 	statement.kind = ANCStatementKindContinue;
-	statement.label = label;
 	return statement;
 }
 
 
-ANCBreakStatement *anc_create_break_statement(NSString *label){
+ANCBreakStatement *anc_create_break_statement(){
 	ANCBreakStatement *statement = [[ANCBreakStatement alloc] init];
 	statement.kind = ANCStatementKindBreak;
-	statement.label = label;
 	return statement;
 	
 }
