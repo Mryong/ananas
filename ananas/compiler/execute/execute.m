@@ -25,9 +25,36 @@ static const void *propKey(NSString *propName) {
 }
 
 
-void execute_statement(){
-	
+static  ANEStatementResult *execute_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCStatement *statement){
+	ANEStatementResult *res;
+	switch (statement.kind) {
+		case ANCStatementKindExpression:
+			
+			break;
+			
+		default:
+			break;
+	}
+	return res;
 }
+
+
+ANEStatementResult *ane_execute_statement_list(ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList){
+	ANEStatementResult *result;
+	if (statementList.count) {
+		for (ANCStatement *statement in statementList) {
+			result = execute_statement(inter, scope, statement);
+			if (result.type != ANEStatementResultTypeNormal) {
+				break;
+			}
+		}
+	}else{
+		result = [[ANEStatementResult alloc] init];
+		result.type = ANEStatementResultTypeNormal;
+	}
+	return result;
+}
+
 
 static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
 	if (classDefinition.annotationIfExprResult == AnnotationIfExprResultNoComputed) {
@@ -467,8 +494,6 @@ static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefin
 		replace_method(interpreter, clazz, instanceMethod);
 	}
 	
-	
-	
 }
 
 void add_struct_declare(){
@@ -481,7 +506,7 @@ void ane_interpret(ANCInterpreter *interpreter){
 	
 	for (__kindof NSObject *top in interpreter.topList) {
 		if ([top isKindOfClass:[ANCStatement class]]) {
-			execute_statement();
+			ANEStatementResult *result = execute_statement(interpreter, interpreter.topScope, top);
 		}else if ([top isKindOfClass:[ANCStructDeclare class]]){
 			add_struct_declare();
 		}else if ([top isKindOfClass:[ANCClassDefinition class]]){

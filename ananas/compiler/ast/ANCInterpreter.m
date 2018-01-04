@@ -7,6 +7,7 @@
 //
 
 #import "ANCInterpreter.h"
+#import "ANEEnvironment.h"
 
 @implementation ANCInterpreter
 
@@ -14,6 +15,7 @@
 	if (self = [super init]) {
 		_currentLineNumber = 1;
 		_stack = [[ANCStack alloc] init];
+		_topScope = [[ANEScopeChain alloc] init];
 	}
 	return self;
 }

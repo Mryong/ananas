@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger, ANEStatementResultType) {
 };
 
 
-@interface ANCStatementResult : NSObject
+@interface ANEStatementResult : NSObject
 @property (assign, nonatomic) ANEStatementResultType type;
 @property (strong, nonatomic) ANEValue *reutrnValue;
 @end

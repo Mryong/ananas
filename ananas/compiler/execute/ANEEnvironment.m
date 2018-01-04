@@ -69,7 +69,7 @@
 
 @end
 
-@implementation ANCStatementResult
+@implementation ANEStatementResult
 
 @end
 
