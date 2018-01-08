@@ -29,8 +29,9 @@ static  ANEStatementResult *execute_statement(ANCInterpreter *inter, ANEScopeCha
 	ANEStatementResult *res;
 	switch (statement.kind) {
 		case ANCStatementKindExpression:
-			
+			ane_eval_expression(nil ,inter, scope, [(ANCExpressionStatement *)statement expr]);
 			break;
+		
 			
 		default:
 			break;
@@ -60,7 +61,7 @@ static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDe
 	if (classDefinition.annotationIfExprResult == AnnotationIfExprResultNoComputed) {
 		ANCExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
 		if (annotationIfConditionExpr) {
-			ANEValue *value = ane_eval_expression(interpreter, nil, annotationIfConditionExpr);
+			ANEValue *value = ane_eval_expression(nil ,interpreter, nil, annotationIfConditionExpr);
 			classDefinition.annotationIfExprResult = value.isTrue ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
 			if (!value.isTrue) {
 				return;

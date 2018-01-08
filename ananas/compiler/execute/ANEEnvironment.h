@@ -20,10 +20,11 @@
 @property (assign, nonatomic) NSInteger intValue;
 @property (assign, nonatomic) CGFloat cgFloatValue;
 @property (assign, nonatomic) long double doubleValue;
-@property (assign, nonatomic) char *stringValue;
+@property (assign, nonatomic) const char *stringValue;
 @property (strong, nonatomic) Class classValue;
 @property (assign, nonatomic) SEL selValue;
 @property (strong, nonatomic) id nsObjValue;
+@property (assign, nonatomic) BOOL isSuper;
 @property (assign, nonatomic) id nsBlockValue;
 @property (strong, nonatomic) ANEBlock *ananasBlockValue;
 @property (assign, nonatomic) void *unknownKindValue;
@@ -37,9 +38,11 @@
 @end
 
 @interface ANEScopeChain: NSObject
-@property (assign, nonatomic,getter=isClazz) BOOL clazz;
+@property (strong, nonatomic) id instance;
 @property (strong, nonatomic) NSMutableArray<ANEVariable *> *vars;
 @property (strong, nonatomic) ANEScopeChain *next;
+
+
 
 @end
 
@@ -56,7 +59,18 @@ typedef NS_ENUM(NSInteger, ANEStatementResultType) {
 @property (strong, nonatomic) ANEValue *reutrnValue;
 @end
 
-@interface ANEEnvironment : NSObject
-@property (strong, nonatomic) Class clazz;
-@property (strong, nonatomic) ANEScopeChain *scope;
+
+@interface ANEStack : NSObject
+
+- (void)push:(ANEValue *)value;
+- (ANEValue *)pop;
+- (ANEValue *)peekStack:(NSUInteger)index;
+- (void)shrinkStack:(NSUInteger)shrinkSize;
 @end
+
+
+
+
+
+
+

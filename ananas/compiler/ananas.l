@@ -156,11 +156,37 @@ static void increment_line_number(){
 <INITIAL>"NSMutableDictionary" {return NS_MUTABLE_DICTIONARY; }
 <INITIAL>"id" {return ID; }
 
-<INITIAL>"self" {return SELF; }
-<INITIAL>"super" {return SUPER; }
-<INITIAL>"nil" {return NIL; }
-<INITIAL>"YES" {return YES_; }
-<INITIAL>"NO" {return NO_; }
+<INITIAL>"self" {
+	ANCExpression *expression = anc_create_expression(ANC_SELF_EXPRESSION);
+	yylval.expression = (__bridge_retained void *)expression;
+	return SELF;
+}
+<INITIAL>"super" {
+	ANCExpression *expression = anc_create_expression(ANC_SUPER_EXPRESSION);
+	yylval.expression = (__bridge_retained void *)expression;
+	return SUPER;
+	
+}
+<INITIAL>"nil" {
+	ANCExpression *expression = anc_create_expression(ANC_NIL_EXPRESSION);
+	yylval.expression = (__bridge_retained void *)expression;
+	return NIL;
+	
+}
+<INITIAL>"YES" {
+	ANCExpression *expression = anc_create_expression(ANC_BOOLEAN_EXPRESSION);
+	expression.bool_value = YES;
+	yylval.expression = (__bridge_retained void *)expression;
+	return YES_;
+	
+}
+<INITIAL>"NO" {
+	ANCExpression *expression = anc_create_expression(ANC_BOOLEAN_EXPRESSION);
+	expression.bool_value = NO;
+	yylval.expression = (__bridge_retained void *)expression;
+	return NO_;
+	
+}
 
 
 

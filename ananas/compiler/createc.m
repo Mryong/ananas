@@ -157,6 +157,18 @@ ANCExpression *anc_create_expression(ANCExpressionKind kind){
 }
 
 
+void anc_build_block_expr(ANCBlockExpression *expr, ANCTypeSpecifier *returnTypeSpecifier, NSArray<ANCParameter *> *params, ANCBlock *block){
+	ANCFunctionDefinition *func = [[ANCFunctionDefinition alloc] init];
+	func.kind = ANCFunctionDefinitionKindBlock;
+	if (!returnTypeSpecifier) {
+		returnTypeSpecifier = anc_create_type_specifier(ANC_TYPE_VOID, @"void", @"v");
+	}
+	func.returnTypeSpecifier = returnTypeSpecifier;
+	func.params  = params;
+	func.block = block;
+	
+}
+
 
 
 ANCDeclaration *anc_create_declaration(ANCTypeSpecifier *type, NSString *name, ANCExpression *initializer){
@@ -425,7 +437,7 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	methodDefinition.annotationIfConditionExpr = annotaionIfConditionExpr;
 	methodDefinition.classMethod = classMethod;
 	ANCFunctionDefinition *funcDefinition = [[ANCFunctionDefinition alloc] init];
-	funcDefinition.method = YES;
+	funcDefinition.kind = ANCFunctionDefinitionKindMethod;
 	funcDefinition.returnTypeSpecifier = returnTypeSpecifier;
 	NSMutableArray<ANCParameter *> *params = [NSMutableArray array];
 	NSMutableString *selector = [NSMutableString string];
@@ -519,6 +531,9 @@ void anc_add_class_definition(ANCClassDefinition *classDefinition){
 void anc_add_statement(ANCStatement *statement){
 	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	[interpreter.topList addObject:statement];
+	
+	
+	
 	
 }
 

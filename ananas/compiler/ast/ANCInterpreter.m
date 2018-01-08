@@ -14,7 +14,7 @@
 - (instancetype)init{
 	if (self = [super init]) {
 		_currentLineNumber = 1;
-		_stack = [[ANCStack alloc] init];
+		_stack = [[ANEStack alloc] init];
 		_topScope = [[ANEScopeChain alloc] init];
 	}
 	return self;

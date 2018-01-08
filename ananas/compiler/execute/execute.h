@@ -13,7 +13,7 @@
 
 
 /* eval.m */
-ANEValue *ane_eval_expression(ANCInterpreter *interpreter, ANEEnvironment *env,ANCExpression *expr);
-void ane_interpret(ANCInterpreter *interpreter);
+ANEValue *ane_eval_expression(id _self,ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr);
+void ane_interpret(ANCInterpreter *inter);
 
 #endif /* execute_h */

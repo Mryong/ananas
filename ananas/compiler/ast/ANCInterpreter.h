@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "ANCClassDefinition.h"
 #import "ANCStructDeclare.h"
-#import "ANCStack.h"
 @class ANEScopeChain;
+@class ANEStack;
 
 
 
@@ -29,7 +29,7 @@
 
 
 
-@property (strong, nonatomic) ANCStack *stack;
+@property (strong, nonatomic) ANEStack *stack;
 
 - (void)compileSoruceWithURL:(NSURL *)url;
 - (void)compileSoruceWithString:(NSString *)source;

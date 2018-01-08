@@ -10,7 +10,7 @@
 #import "anc_ast.h"
 
 @interface ANEBlock : NSObject
-
+@property (strong, nonatomic) ANEScopeChain *scope;
 @property (strong, nonatomic) ANCFunctionDefinition *func;
 
 @end

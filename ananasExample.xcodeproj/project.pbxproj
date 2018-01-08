@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		412E4A181FF1040F0074536F /* ANCStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A171FF1040F0074536F /* ANCStack.m */; };
 		412E4A1A1FF1056D0074536F /* eval.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A191FF1056D0074536F /* eval.m */; };
 		412E4A221FF1F1960074536F /* ANEBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A211FF1F1960074536F /* ANEBlock.m */; };
 		412E4A691FFB60F20074536F /* demo.ana in Resources */ = {isa = PBXBuildFile; fileRef = 412E4A681FFB60F20074536F /* demo.ana */; };
@@ -57,8 +56,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		412E4A161FF1040F0074536F /* ANCStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCStack.h; sourceTree = "<group>"; };
-		412E4A171FF1040F0074536F /* ANCStack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCStack.m; sourceTree = "<group>"; };
 		412E4A191FF1056D0074536F /* eval.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = eval.m; sourceTree = "<group>"; };
 		412E4A201FF1F1960074536F /* ANEBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEBlock.h; sourceTree = "<group>"; };
 		412E4A211FF1F1960074536F /* ANEBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEBlock.m; sourceTree = "<group>"; };
@@ -143,8 +140,6 @@
 			children = (
 				412E4A261FF2024B0074536F /* execute.h */,
 				4156E9F01FF0EE050036973A /* execute.m */,
-				412E4A161FF1040F0074536F /* ANCStack.h */,
-				412E4A171FF1040F0074536F /* ANCStack.m */,
 				412E4A191FF1056D0074536F /* eval.m */,
 				412E4A201FF1F1960074536F /* ANEBlock.h */,
 				412E4A211FF1F1960074536F /* ANEBlock.m */,
@@ -433,7 +428,6 @@
 				41D02D1F1FA8A09400E1829A /* ViewController.m in Sources */,
 				41E83EB51FBD8C9E00A48592 /* ANCStructDeclare.m in Sources */,
 				41E83EA91FB992C200A48592 /* ANCTypeSpecifier.m in Sources */,
-				412E4A181FF1040F0074536F /* ANCStack.m in Sources */,
 				41E83EA61FB9671200A48592 /* ANCExpression.m in Sources */,
 				41D02D2A1FA8A09400E1829A /* main.m in Sources */,
 				412E4A221FF1F1960074536F /* ANEBlock.m in Sources */,

@@ -9,6 +9,13 @@
 #import "ANEEnvironment.h"
 
 @implementation ANEValue
+
+- (instancetype)init{
+	if (self = [super init]) {
+		_isSuper = NO;
+	}
+	return self;
+}
 //ANC_TYPE_VOID,
 //ANC_TYPE_BOOL,
 //ANC_TYPE_NS_U_INTEGER,
@@ -74,6 +81,34 @@
 @end
 
 
-@implementation ANEEnvironment
+@implementation ANEStack{
+	NSMutableArray<ANEValue *> *_arr;
+}
+
+- (instancetype)init{
+	if (self = [super init]) {
+		_arr = [NSMutableArray array];
+	}
+	return self;
+}
+
+- (void)push:(ANEValue *)value{
+	[_arr addObject:value];
+}
+
+- (ANEValue *)pop{
+	ANEValue *value = [_arr  lastObject];
+	[_arr removeLastObject];
+	return value;
+}
+
+- (ANEValue *)peekStack:(NSUInteger)index{
+	ANEValue *value = _arr[_arr.count - 1 - index];
+	return value;
+}
+
+- (void)shrinkStack:(NSUInteger)shrinkSize{
+	[_arr removeObjectsInRange:NSMakeRange(_arr.count - shrinkSize, shrinkSize)];
+}
 
 @end

@@ -955,7 +955,7 @@ primary_expression: IDENTIFIER
 			}
 			| SELECTOR LP selector RP
 			{
-				ANCExpression *expr = anc_create_expression(ANC_SELF_EXPRESSION);
+				ANCExpression *expr = anc_create_expression(ANC_SELECTOR_EXPRESSION);
 				expr.selectorName = (__bridge_transfer NSString *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
@@ -1033,10 +1033,7 @@ block_body:  POWER type_specifier LP  RP block_statement
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
-				expr.returnTypeSpecifier = returnTypeSpecifier;
-				block.kind = ANCBlockKindBock;
-				block.blockExpr = expr;
-				expr.block = block;
+				anc_build_block_expr(expr,returnTypeSpecifier,nil,block);
 				$$ = (__bridge_retained void *)expr;
 				
 			}
@@ -1046,9 +1043,7 @@ block_body:  POWER type_specifier LP  RP block_statement
 				NSArray<ANCParameter *> *parameter = (__bridge_transfer NSArray<ANCParameter *> *)$4;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$6;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
-				expr.returnTypeSpecifier = returnTypeSpecifier;
-				expr.parameter = parameter;
-				expr.block = block;
+				anc_build_block_expr(expr,returnTypeSpecifier,parameter,block);
 				$$ = (__bridge_retained void *)expr;
 				
 			}
@@ -1056,7 +1051,7 @@ block_body:  POWER type_specifier LP  RP block_statement
 			{
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$4;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
-				expr.block = block;
+				anc_build_block_expr(expr,nil,nil,block);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| POWER  LP function_param_list RP block_statement
@@ -1064,8 +1059,7 @@ block_body:  POWER type_specifier LP  RP block_statement
 				NSArray<ANCParameter *> *parameter = (__bridge_transfer NSArray<ANCParameter *> *)$3;
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
-				expr.parameter = parameter;
-				expr.block = block;
+				anc_build_block_expr(expr,nil,parameter,block);
 				$$ = (__bridge_retained void *)expr;
 			}
 			;

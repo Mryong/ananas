@@ -19,11 +19,16 @@
 @property (assign, nonatomic) NSUInteger lineNumber;
 @end
 
+typedef NS_ENUM(NSUInteger,ANCFunctionDefinitionKind) {
+	ANCFunctionDefinitionKindMethod,
+	ANCFunctionDefinitionKindBlock,
+	ANCFunctionDefinitionKindFunction
+};
 
 @interface ANCFunctionDefinition: NSObject
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
-@property (assign, nonatomic) BOOL method;
+@property (assign, nonatomic) ANCFunctionDefinitionKind kind;
 @property (weak, nonatomic) ANCMethodDefinition *methodDefinition;
 @property (copy, nonatomic) NSString *name;//or selecor
 @property (strong, nonatomic) NSArray<ANCParameter *> *params;

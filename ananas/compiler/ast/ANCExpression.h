@@ -167,9 +167,7 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 
 
 @interface ANCBlockExpression: ANCExpression
-@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
-@property (strong, nonatomic) NSArray *parameter;
-@property (strong, nonatomic) ANCBlock *block;
+@property (strong, nonatomic) ANCFunctionDefinition *func;
 
 @end
 
