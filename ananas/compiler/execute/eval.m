@@ -247,11 +247,264 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 //ANC_LOGICAL_OR_EXPRESSION,
 //ANC_LOGICAL_NOT_EXPRESSION,
 //NSC_NEGATIVE_EXPRESSION,
-static void eval_plus_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
-	
-	
+
+#define arithmeticalOperation(operation,operationName) \
+if (leftValue.type.typeKind == ANC_TYPE_DOUBLE || rightValue.type.typeKind == ANC_TYPE_DOUBLE) {\
+resultValue.type = anc_create_type_specifier(ANC_TYPE_DOUBLE, @"long double", @"D");\
+if (leftValue.type.typeKind == ANC_TYPE_DOUBLE) {\
+switch (rightValue.type.typeKind) {\
+case ANC_TYPE_DOUBLE:\
+resultValue.doubleValue = leftValue.doubleValue operation rightValue.doubleValue;\
+break;\
+case ANC_TYPE_CG_FLOAT:\
+resultValue.doubleValue = leftValue.doubleValue operation rightValue.cgFloatValue;\
+break;\
+case ANC_TYPE_NS_INTEGER:\
+resultValue.doubleValue = leftValue.doubleValue operation rightValue.intValue;\
+break;\
+case ANC_TYPE_NS_U_INTEGER:\
+resultValue.doubleValue = leftValue.doubleValue operation rightValue.uintValue;\
+break;\
+default:\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);\
+break;\
+}\
+}else{\
+switch (leftValue.type.typeKind) {\
+case ANC_TYPE_CG_FLOAT:\
+resultValue.doubleValue = leftValue.cgFloatValue operation rightValue.doubleValue;\
+break;\
+case ANC_TYPE_NS_INTEGER:\
+resultValue.doubleValue = leftValue.intValue operation rightValue.doubleValue;\
+break;\
+case ANC_TYPE_NS_U_INTEGER:\
+resultValue.doubleValue = leftValue.uintValue operation rightValue.doubleValue;\
+break;\
+default:\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.left.lineNumber ,leftValue.type.identifer);\
+break;\
+}\
+}\
+}else if (leftValue.type.typeKind == ANC_TYPE_CG_FLOAT || rightValue.type.typeKind == ANC_TYPE_CG_FLOAT){\
+resultValue.type = anc_create_type_specifier(ANC_TYPE_CG_FLOAT, @"CGFloat", @"D");\
+if (leftValue.type.typeKind == ANC_TYPE_CG_FLOAT) {\
+switch (rightValue.type.typeKind) {\
+case ANC_TYPE_CG_FLOAT:\
+resultValue.cgFloatValue = leftValue.cgFloatValue operation rightValue.cgFloatValue;\
+break;\
+case ANC_TYPE_NS_INTEGER:\
+resultValue.cgFloatValue = leftValue.cgFloatValue operation rightValue.intValue;\
+break;\
+case ANC_TYPE_NS_U_INTEGER:\
+resultValue.cgFloatValue = leftValue.cgFloatValue operation rightValue.uintValue;\
+default:\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);\
+break;\
+}\
+}else{\
+switch (leftValue.type.typeKind) {\
+case ANC_TYPE_NS_INTEGER:\
+resultValue.cgFloatValue = leftValue.intValue operation rightValue.cgFloatValue;\
+break;\
+case ANC_TYPE_NS_U_INTEGER:\
+resultValue.cgFloatValue = leftValue.uintValue operation rightValue.cgFloatValue;\
+break;\
+default:\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.left.lineNumber ,leftValue.type.identifer);\
+break;\
+}\
+}\
+}else if (leftValue.type.typeKind == ANC_TYPE_NS_INTEGER || rightValue.type.typeKind == ANC_TYPE_NS_INTEGER){\
+if (leftValue.type.typeKind == ANC_TYPE_NS_INTEGER) {\
+switch (rightValue.type.typeKind) {\
+case ANC_TYPE_NS_INTEGER:\
+resultValue.intValue = leftValue.intValue operation rightValue.intValue;\
+break;\
+case ANC_TYPE_NS_U_INTEGER:\
+resultValue.intValue = leftValue.intValue operation rightValue.uintValue;\
+break;\
+default:\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);\
+break;\
+}\
+}else{\
+switch (leftValue.type.typeKind) {\
+case ANC_TYPE_NS_U_INTEGER:\
+resultValue.intValue = leftValue.uintValue operation rightValue.intValue;\
+break;\
+default:\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.left.lineNumber ,leftValue.type.identifer);\
+break;\
+}\
+}\
+}else if (leftValue.type.typeKind == ANC_U_INT_EXPRESSION && rightValue.type.typeKind == ANC_U_INT_EXPRESSION){\
+resultValue.uintValue = leftValue.uintValue operation rightValue.uintValue;\
+}else{\
+NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);\
+}\
+
+
+static void eval_add_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];\
+	arithmeticalOperation(+,add);
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
 }
 
+
+static void eval_sub_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];\
+	arithmeticalOperation(-,sub);
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+static void eval_mul_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	arithmeticalOperation(*,mul);
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+static void eval_div_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	switch (rightValue.type.typeKind) {
+		case ANC_TYPE_DOUBLE:
+			if (rightValue.doubleValue == 0) {
+				NSCAssert(0, @"line:%zd,divisor cannot be zero!",expr.right.lineNumber);
+			}
+			break;
+		case ANC_TYPE_CG_FLOAT:
+			if (rightValue.cgFloatValue == 0) {
+				NSCAssert(0, @"line:%zd,divisor cannot be zero!",expr.right.lineNumber);
+			}
+		case ANC_TYPE_NS_INTEGER:
+			if (rightValue.intValue == 0) {
+				NSCAssert(0, @"line:%zd,divisor cannot be zero!",expr.right.lineNumber);
+			}
+		case ANC_TYPE_UNKNOWN:
+			if (rightValue.uintValue == 0) {
+				NSCAssert(0, @"line:%zd,divisor cannot be zero!",expr.right.lineNumber);
+			}
+			break;
+			
+		default:
+			NSCAssert(0, @"line:%zd, div operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);
+			break;
+	}
+	ANEValue *resultValue = [ANEValue new];\
+	arithmeticalOperation(/,div);
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+
+static void eval_mod_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	ANEValue *leftValue = [inter.stack peekStack:0];
+	if (leftValue.type.typeKind != ANC_TYPE_NS_INTEGER && leftValue.type.typeKind != ANC_TYPE_NS_U_INTEGER) {
+		NSCAssert(0, @"line:%zd, mod operation not support type: %@",expr.left.lineNumber ,leftValue.type.identifer);
+	}
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	if (rightValue.type.typeKind != ANC_TYPE_NS_INTEGER && rightValue.type.typeKind != ANC_TYPE_NS_U_INTEGER) {
+		NSCAssert(0, @"line:%zd, mod operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);
+	}
+	switch (rightValue.type.typeKind) {
+		case ANC_TYPE_NS_INTEGER:
+			if (rightValue.intValue == 0) {
+				NSCAssert(0, @"line:%zd,mod cannot be zero!",expr.right.lineNumber);
+			}
+		case ANC_TYPE_UNKNOWN:
+			if (rightValue.uintValue == 0) {
+				NSCAssert(0, @"line:%zd,mod cannot be zero!",expr.right.lineNumber);
+			}
+			break;
+			
+		default:
+			NSCAssert(0, @"line:%zd, mod operation not support type: %@",expr.right.lineNumber ,rightValue.type.identifer);
+			break;
+	}
+	ANEValue *resultValue = [ANEValue new];
+	if (leftValue.type.typeKind == ANC_TYPE_NS_INTEGER || leftValue.type.typeKind == ANC_TYPE_NS_INTEGER) {
+		resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+		if (leftValue.type.typeKind == ANC_TYPE_NS_INTEGER) {
+			if (rightValue.type.typeKind == ANC_TYPE_NS_INTEGER) {
+				resultValue.intValue = leftValue.intValue % rightValue.intValue;
+			}else{
+				resultValue.intValue = leftValue.intValue % rightValue.uintValue;
+			}
+		}else{
+			resultValue.intValue = leftValue.uintValue % rightValue.intValue;
+		}
+	}else{
+		resultValue.type = anc_create_type_specifier(ANC_TYPE_UNKNOWN, @"NSUInteger", @"Q");
+		resultValue.uintValue = leftValue.uintValue % rightValue.uintValue;
+	}
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+static BOOL equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2){
+	switch (value1.type.typeKind) {
+//			ANC_TYPE_BOOL,
+//			ANC_TYPE_NS_U_INTEGER,
+//			ANC_TYPE_NS_INTEGER,
+//			ANC_TYPE_CG_FLOAT,
+//			ANC_TYPE_DOUBLE,
+//			ANC_TYPE_STRING,//char *
+//			ANC_TYPE_CLASS,
+//			ANC_TYPE_SEL,
+//			ANC_TYPE_NS_OBJECT,
+//			ANC_TYPE_STRUCT,
+//			ANC_TYPE_NS_BLOCK,
+//			ANC_TYPE_ANANAS_BLOCK,
+//			ANC_TYPE_UNKNOWN
+		case ANC_TYPE_BOOL:{
+			switch (value2.type.typeKind) {\
+				case ANC_TYPE_BOOL:\
+					return value1.boolValue == value2.boolValue;\
+				case ANC_TYPE_NS_U_INTEGER:\
+					return value1.boolValue == value2.uintValue;
+				case ANC_TYPE_NS_INTEGER:
+					return value1.boolValue == value2.intValue;
+				case ANC_TYPE_CG_FLOAT:
+					return value1.boolValue == value2.cgFloatValue;
+				case ANC_TYPE_DOUBLE:
+					return value1.boolValue == value2.doubleValue;
+				default:
+					NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
+					break;
+			}
+		}
+			
+		default:
+			break;
+	}
+}
 
 
 static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr){
