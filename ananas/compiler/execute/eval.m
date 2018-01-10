@@ -232,21 +232,7 @@ static void eval_ternary_expression(id _self, ANCInterpreter *inter, ANEScopeCha
 static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCAssignExpression *expr){
 	//TODO
 }
-//ANC_PLUS_EXPRESSION,
-//ANC_MINUS_EXPRESSION,
-//ANC_MUL_EXPRESSION,
-//ANC_DIV_EXPRESSION,
-//ANC_MOD_EXPRESSION,
-//ANC_EQ_EXPRESSION,
-//ANC_NE_EXPRESSION,
-//ANC_GT_EXPRESSION,
-//ANC_GE_EXPRESSION,
-//ANC_LT_EXPRESSION,
-//ANC_LE_EXPRESSION,
-//ANC_LOGICAL_AND_EXPRESSION,
-//ANC_LOGICAL_OR_EXPRESSION,
-//ANC_LOGICAL_NOT_EXPRESSION,
-//NSC_NEGATIVE_EXPRESSION,
+
 
 #define arithmeticalOperation(operation,operationName) \
 if (leftValue.type.typeKind == ANC_TYPE_DOUBLE || rightValue.type.typeKind == ANC_TYPE_DOUBLE) {\
@@ -467,26 +453,26 @@ static void eval_mod_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 	[inter.stack pop];
 	[inter.stack push:resultValue];
 }
-
+#define number_value_compare(sel,oper)\
+switch (value2.type.typeKind) {\
+case ANC_TYPE_BOOL:\
+return value1.sel oper value2.boolValue;\
+case ANC_TYPE_NS_U_INTEGER:\
+return value1.sel oper value2.uintValue;\
+case ANC_TYPE_NS_INTEGER:\
+return value1.sel oper value2.intValue;\
+case ANC_TYPE_CG_FLOAT:\
+return value1.sel oper value2.cgFloatValue;\
+case ANC_TYPE_DOUBLE:\
+return value1.sel oper value2.doubleValue;\
+default:\
+NSCAssert(0, @"line:%zd == 、 != 、 < 、 <= 、 > 、 >= can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);\
+break;\
+}
 static BOOL equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2){
-#define number_equal(sel)\
-	switch (value2.type.typeKind) {\
-		case ANC_TYPE_BOOL:\
-			return value1.sel == value2.boolValue;\
-		case ANC_TYPE_NS_U_INTEGER:\
-			return value1.sel == value2.uintValue;\
-		case ANC_TYPE_NS_INTEGER:\
-			return value1.sel == value2.intValue;\
-		case ANC_TYPE_CG_FLOAT:\
-			return value1.sel == value2.cgFloatValue;\
-		case ANC_TYPE_DOUBLE:\
-			return value1.sel == value2.doubleValue;\
-		default:\
-			NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);\
-			break;\
-	}
+
 	
-#define object_equal(sel)\
+#define object_value_equal(sel)\
 switch (value2.type.typeKind) {\
 case ANC_TYPE_CLASS:\
 	return value1.sel == value2.classValue;\
@@ -505,19 +491,19 @@ default:\
 	
 	switch (value1.type.typeKind) {
 		case ANC_TYPE_BOOL:{
-			number_equal(boolValue);
+			number_value_compare(boolValue, ==);
 		}
 		case ANC_TYPE_NS_U_INTEGER:{
-			number_equal(uintValue);
+			number_value_compare(uintValue, ==);
 		}
 		case ANC_TYPE_NS_INTEGER:{
-			number_equal(intValue);
+			number_value_compare(intValue, ==);
 		}
 		case ANC_TYPE_CG_FLOAT:{
-			number_equal(cgFloatValue);
+			number_value_compare(cgFloatValue, ==);
 		}
 		case ANC_TYPE_DOUBLE:{
-			number_equal(doubleValue);
+			number_value_compare(doubleValue, ==);
 		}
 		case ANC_TYPE_STRING:{
 			switch (value2.type.typeKind) {
@@ -540,16 +526,16 @@ default:\
 			}
 		}
 		case ANC_TYPE_CLASS:{
-			object_equal(classValue);
+			object_value_equal(classValue);
 		}
 		case ANC_TYPE_NS_OBJECT:{
-			object_equal(nsObjValue);
+			object_value_equal(nsObjValue);
 		}
 		case ANC_TYPE_NS_BLOCK:{
-			object_equal(nsBlockValue);
+			object_value_equal(nsBlockValue);
 		}
 		case ANC_TYPE_ANANAS_BLOCK:{
-			object_equal(ananasBlockValue);
+			object_value_equal(ananasBlockValue);
 		}
 		case ANC_TYPE_UNKNOWN:{
 			switch (value2.type.typeKind) {
@@ -580,10 +566,178 @@ default:\
 		default:NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
 			break;
 	}
-#undef number_equal
-#undef object_equal
+#undef object_value_equal
 	return NO;
 }
+
+static void eval_eq_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	BOOL equal =  equal_value(expr.left.lineNumber, leftValue, rightValue);
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = equal;
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+static void eval_ne_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	BOOL equal =  equal_value(expr.left.lineNumber, leftValue, rightValue);
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = !equal;
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+
+#define compare_number_func(prefix, oper)\
+static BOOL prefix##_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2){\
+switch (value1.type.typeKind) {\
+	case ANC_TYPE_BOOL:\
+		number_value_compare(boolValue, oper);\
+	case ANC_TYPE_NS_U_INTEGER:\
+		number_value_compare(uintValue, oper);\
+	case ANC_TYPE_NS_INTEGER:\
+		number_value_compare(intValue, oper);\
+	case ANC_TYPE_CG_FLOAT:\
+		number_value_compare(cgFloatValue, oper);\
+	case ANC_TYPE_DOUBLE:\
+		number_value_compare(doubleValue, oper);\
+	default:\
+		NSCAssert(0, @"line:%zd == 、 != 、 < 、 <= 、 > 、 >= can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);\
+		break;\
+}\
+return NO;\
+}
+
+compare_number_func(lt, <)
+compare_number_func(le, <=)
+compare_number_func(ge, >)
+compare_number_func(gt, >=)
+
+static void eval_lt_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	BOOL lt = lt_value(expr.left.lineNumber, leftValue, rightValue);
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = lt;
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+static void eval_le_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	BOOL le = le_value(expr.left.lineNumber, leftValue, rightValue);
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = le;
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+static void eval_ge_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	BOOL ge = ge_value(expr.left.lineNumber, leftValue, rightValue);
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = ge;
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+static void eval_gt_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	eval_expression(_self, inter, scope, expr.right);
+	ANEValue *leftValue = [inter.stack peekStack:1];
+	ANEValue *rightValue = [inter.stack peekStack:0];
+	BOOL gt = gt_value(expr.left.lineNumber, leftValue, rightValue);
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = gt;
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+static void eval_logic_and_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	ANEValue *leftValue = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	if (!leftValue.isTrue) {
+		resultValue.boolValue = NO;
+		[inter.stack pop];
+	}else{
+		eval_expression(_self, inter, scope, expr.right);
+		ANEValue *rightValue = [inter.stack peekStack:0];
+		if (!rightValue.isTrue) {
+			resultValue.boolValue = NO;
+		}else{
+			resultValue.boolValue = YES;
+		}
+		[inter.stack pop];
+	}
+	[inter.stack push:resultValue];
+}
+
+static void eval_logic_or_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.left);
+	ANEValue *leftValue = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	if (leftValue.isTrue) {
+		resultValue.boolValue = YES;
+		[inter.stack pop];
+	}else{
+		eval_expression(_self, inter, scope, expr.right);
+		ANEValue *rightValue = [inter.stack peekStack:0];
+		if (rightValue.isTrue) {
+			resultValue.boolValue = YES;
+		}else{
+			resultValue.boolValue = NO;
+		}
+		[inter.stack pop];
+	}
+	[inter.stack push:resultValue];
+}
+
+static void eval_logic_not_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.expr);
+	ANEValue *value = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+	resultValue.boolValue = !value.isTrue;
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+}
+
+
+
+
 
 
 static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr){
@@ -618,6 +772,55 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 		case ANC_IDENTIFIER_EXPRESSION:
 			eval_identifer_expression(inter, scope, expr);
 			break;
+		case ANC_ASSIGN_EXPRESSION:
+			eval_assign_expression(_self, inter, scope, expr);
+			break;
+		case ANC_PLUS_EXPRESSION:
+			eval_add_expression(_self, inter, scope, expr);
+			break;
+		case ANC_MINUS_EXPRESSION:
+			eval_sub_expression(_self, inter, scope, expr);
+			break;
+		case ANC_MUL_EXPRESSION:
+			eval_mul_expression(_self, inter, scope, expr);
+			break;
+		case ANC_DIV_EXPRESSION:
+			eval_div_expression(_self, inter, scope, expr);
+			break;
+		case ANC_MOD_EXPRESSION:
+			eval_mod_expression(_self, inter, scope, expr);
+			break;
+		case ANC_EQ_EXPRESSION:
+			eval_eq_expression(_self, inter, scope, expr);
+			break;
+		case ANC_NE_EXPRESSION:
+			eval_ne_expression(_self, inter, scope, expr);
+			break;
+		case ANC_LT_EXPRESSION:
+			eval_lt_expression(_self, inter, scope, expr);
+			break;
+		case ANC_LE_EXPRESSION:
+			eval_le_expression(_self, inter, scope, expr);
+			break;
+		case ANC_GE_EXPRESSION:
+			eval_ge_expression(_self, inter, scope, expr);
+			break;
+		case ANC_GT_EXPRESSION:
+			eval_gt_expression(_self, inter, scope, expr);
+			break;
+		case ANC_LOGICAL_AND_EXPRESSION:
+			eval_logic_and_expression(_self, inter, scope, expr);
+			break;
+		case ANC_LOGICAL_OR_EXPRESSION:
+			eval_logic_or_expression(_self, inter, scope, expr);
+			break;
+		case ANC_LOGICAL_NOT_EXPRESSION:
+			eval_logic_not_expression(_self, inter, scope, expr);
+			break;
+		case ANC_TERNARY_EXPRESSION:
+			eval_ternary_expression(_self, inter, scope, expr);
+			break;
+		
 		default:
 			break;
 	}
