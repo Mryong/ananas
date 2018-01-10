@@ -469,41 +469,120 @@ static void eval_mod_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 }
 
 static BOOL equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2){
+#define number_equal(sel)\
+	switch (value2.type.typeKind) {\
+		case ANC_TYPE_BOOL:\
+			return value1.sel == value2.boolValue;\
+		case ANC_TYPE_NS_U_INTEGER:\
+			return value1.sel == value2.uintValue;\
+		case ANC_TYPE_NS_INTEGER:\
+			return value1.sel == value2.intValue;\
+		case ANC_TYPE_CG_FLOAT:\
+			return value1.sel == value2.cgFloatValue;\
+		case ANC_TYPE_DOUBLE:\
+			return value1.sel == value2.doubleValue;\
+		default:\
+			NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);\
+			break;\
+	}
+	
+#define object_equal(sel)\
+switch (value2.type.typeKind) {\
+case ANC_TYPE_CLASS:\
+	return value1.sel == value2.classValue;\
+case ANC_TYPE_NS_OBJECT:\
+	return value1.sel == value2.nsObjValue;\
+case ANC_TYPE_NS_BLOCK:\
+	return value1.sel == value2.nsBlockValue;\
+case ANC_TYPE_ANANAS_BLOCK:\
+	return value1.sel == value2.ananasBlockValue;\
+case ANC_TYPE_UNKNOWN:\
+	return value1.sel == value2.unknownKindValue;\
+default:\
+	NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);\
+	break;\
+}\
+	
 	switch (value1.type.typeKind) {
-//			ANC_TYPE_BOOL,
-//			ANC_TYPE_NS_U_INTEGER,
-//			ANC_TYPE_NS_INTEGER,
-//			ANC_TYPE_CG_FLOAT,
-//			ANC_TYPE_DOUBLE,
-//			ANC_TYPE_STRING,//char *
-//			ANC_TYPE_CLASS,
-//			ANC_TYPE_SEL,
-//			ANC_TYPE_NS_OBJECT,
-//			ANC_TYPE_STRUCT,
-//			ANC_TYPE_NS_BLOCK,
-//			ANC_TYPE_ANANAS_BLOCK,
-//			ANC_TYPE_UNKNOWN
 		case ANC_TYPE_BOOL:{
-			switch (value2.type.typeKind) {\
-				case ANC_TYPE_BOOL:\
-					return value1.boolValue == value2.boolValue;\
-				case ANC_TYPE_NS_U_INTEGER:\
-					return value1.boolValue == value2.uintValue;
-				case ANC_TYPE_NS_INTEGER:
-					return value1.boolValue == value2.intValue;
-				case ANC_TYPE_CG_FLOAT:
-					return value1.boolValue == value2.cgFloatValue;
-				case ANC_TYPE_DOUBLE:
-					return value1.boolValue == value2.doubleValue;
+			number_equal(boolValue);
+		}
+		case ANC_TYPE_NS_U_INTEGER:{
+			number_equal(uintValue);
+		}
+		case ANC_TYPE_NS_INTEGER:{
+			number_equal(intValue);
+		}
+		case ANC_TYPE_CG_FLOAT:{
+			number_equal(cgFloatValue);
+		}
+		case ANC_TYPE_DOUBLE:{
+			number_equal(doubleValue);
+		}
+		case ANC_TYPE_STRING:{
+			switch (value2.type.typeKind) {
+				case ANC_TYPE_STRING:
+					 return value1.stringValue == value2.stringValue;
+					break;
+				case ANC_TYPE_UNKNOWN:
+					return value1.stringValue == value2.unknownKindValue;
+					break;
 				default:
 					NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
 					break;
 			}
 		}
+		case ANC_TYPE_SEL:{
+			if (value2.type.typeKind == ANC_TYPE_SEL) {
+				return value1.selValue == value2.selValue;
+			} else {
+				NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
+			}
+		}
+		case ANC_TYPE_CLASS:{
+			object_equal(classValue);
+		}
+		case ANC_TYPE_NS_OBJECT:{
+			object_equal(nsObjValue);
+		}
+		case ANC_TYPE_NS_BLOCK:{
+			object_equal(nsBlockValue);
+		}
+		case ANC_TYPE_ANANAS_BLOCK:{
+			object_equal(ananasBlockValue);
+		}
+		case ANC_TYPE_UNKNOWN:{
+			switch (value2.type.typeKind) {
+				case ANC_TYPE_CLASS:
+					return value2.classValue == value1.unknownKindValue;
+				case ANC_TYPE_NS_OBJECT:
+					return value2.nsObjValue == value1.unknownKindValue;
+				case ANC_TYPE_NS_BLOCK:
+					return value2.nsBlockValue == value1.unknownKindValue;
+				case ANC_TYPE_ANANAS_BLOCK:
+					return value2.ananasBlockValue == value1.unknownKindValue;
+				case ANC_TYPE_UNKNOWN:
+					return value2.unknownKindValue == value1.unknownKindValue;
+				default:
+					NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
+					break;
+			}
+		}
+		case ANC_TYPE_STRUCT:{
+			if (value2.type.typeKind == ANC_TYPE_STRUCT) {
+				
+			}else{
+				NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
+				break;
+			}
+		}
 			
-		default:
+		default:NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.identifer, value2.type.identifer);
 			break;
 	}
+#undef number_equal
+#undef object_equal
+	return NO;
 }
 
 
