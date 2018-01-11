@@ -735,6 +735,215 @@ static void eval_logic_not_expression(id _self, ANCInterpreter *inter, ANEScopeC
 	[inter.stack push:resultValue];
 }
 
+static void eval_increment_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.expr);
+	ANEValue *value = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	switch (value.type.typeKind) {
+		case ANC_TYPE_NS_INTEGER:
+			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+//			resultValue.intValue = value.intValue +
+			break;
+			
+		default:
+			break;
+	}
+}
+
+static void eval_negative_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.expr);
+	ANEValue *value = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	switch (value.type.typeKind) {
+		case ANC_TYPE_NS_INTEGER:
+			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+			resultValue.intValue = -resultValue.intValue;
+			break;
+		case ANC_TYPE_NS_U_INTEGER:
+			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+			resultValue.intValue = - resultValue.uintValue;
+			break;
+		case ANC_TYPE_BOOL:
+			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+			resultValue.intValue = - resultValue.boolValue;
+			break;
+		case ANC_TYPE_CG_FLOAT:
+			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"CGFloat", @"d");
+			resultValue.cgFloatValue = - resultValue.cgFloatValue;
+			break;
+		case ANC_TYPE_DOUBLE:
+			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"long double", @"D");
+			resultValue.doubleValue = - resultValue.doubleValue;
+			break;
+			
+		default:
+			NSCAssert(0, @"line:%zd operator ‘-’ can not use type: %@",expr.expr.lineNumber, value.type.identifer);
+			break;
+	}
+}
+
+//todo 支持block 数组
+static void eval_index_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCIndexExpression *expr){
+	eval_expression(_self, inter, scope, expr.indexExpression);
+	ANEValue *indexValue = [inter.stack peekStack:0];
+	ANCTypeSpecifierKind kind = indexValue.type.typeKind;
+	
+	eval_expression(_self, inter, scope, expr.arrayExpression);
+	ANEValue *arrValue = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_OBJECT, @"id", @"@");
+	switch (kind) {
+		case ANC_TYPE_BOOL:
+			resultValue.nsObjValue = arrValue.nsObjValue[indexValue.boolValue];
+			break;
+		case ANC_TYPE_NS_INTEGER:
+			resultValue.nsObjValue = arrValue.nsObjValue[indexValue.intValue];
+			break;
+		case ANC_TYPE_NS_U_INTEGER:
+			resultValue.nsObjValue = arrValue.nsObjValue[indexValue.uintValue];
+			break;
+		case ANC_TYPE_CLASS:
+			resultValue.nsObjValue = resultValue.nsObjValue[indexValue.classValue];
+			break;
+		case ANC_TYPE_NS_BLOCK:
+			resultValue.nsObjValue = resultValue.nsObjValue[indexValue.nsBlockValue];
+			break;
+		case ANC_TYPE_NS_OBJECT:
+			resultValue.nsObjValue = resultValue.nsBlockValue[indexValue.nsObjValue];
+		default:
+			NSCAssert(0, @"line:%zd, index operator can not use type: %@",expr.indexExpression.lineNumber, indexValue.type.identifer);
+			break;
+	}
+	[inter.stack pop];
+	[inter.stack pop];
+	[inter.stack push:resultValue];
+	
+	
+}
+
+static void eval_at_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(_self, inter, scope, expr.expr);
+	ANEValue *value = [inter.stack peekStack:0];
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_OBJECT, @"id", @"@");
+	switch (value.type.typeKind) {
+		case ANC_TYPE_BOOL:
+			resultValue.nsObjValue = @(value.boolValue);
+			break;
+		case ANC_TYPE_NS_U_INTEGER:
+			resultValue.nsObjValue = @(value.uintValue);
+			break;
+		case ANC_TYPE_NS_INTEGER:
+			resultValue.nsObjValue = @(value.intValue);
+			break;
+		case ANC_TYPE_CG_FLOAT:
+			resultValue.nsObjValue = @(value.cgFloatValue);
+			return;
+		case ANC_TYPE_DOUBLE:
+			resultValue.nsObjValue = @((double)value.doubleValue);
+			break;
+		case ANC_TYPE_STRING:
+			resultValue.nsObjValue = @(value.stringValue);
+			break;
+			
+		default:
+			NSCAssert(0, @"line:%zd operator ‘@’ can not use type: %@",expr.expr.lineNumber, value.type.identifer);
+			break;
+	}
+}
+
+
+static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCDictionaryExpression *expr){
+	NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+	for (ANCDicEntry *entry in expr.entriesExpr) {
+		eval_expression(_self, inter, scope, entry.keyExpr);
+		ANEValue *keyValue = [inter.stack peekStack:0];
+		switch (keyValue.type.typeKind) {
+			case ANC_TYPE_BOOL:
+			case ANC_TYPE_NS_U_INTEGER:
+			case ANC_TYPE_NS_INTEGER:
+			case ANC_TYPE_CG_FLOAT:
+			case ANC_TYPE_DOUBLE:
+			case ANC_TYPE_SEL:
+			case ANC_TYPE_VOID:
+		    case ANC_TYPE_STRUCT:
+			case ANC_TYPE_STRING:
+			case ANC_TYPE_UNKNOWN:
+				NSCAssert(0, @"line:%zd key can not bee type:%@",entry.keyExpr.lineNumber, keyValue.type.identifer);
+				break;
+			default:
+				break;
+		}
+		
+		
+		eval_expression(_self, inter, scope, entry.valueExpr);
+		ANEValue *valueValue = [inter.stack peekStack:0];
+		switch (valueValue.type.typeKind) {
+			case ANC_TYPE_BOOL:
+			case ANC_TYPE_NS_U_INTEGER:
+			case ANC_TYPE_NS_INTEGER:
+			case ANC_TYPE_CG_FLOAT:
+			case ANC_TYPE_DOUBLE:
+			case ANC_TYPE_SEL:
+			case ANC_TYPE_VOID:
+			case ANC_TYPE_STRUCT:
+			case ANC_TYPE_STRING:
+			case ANC_TYPE_UNKNOWN:
+				NSCAssert(0, @"line:%zd value can not bee type:%@",entry.keyExpr.lineNumber, keyValue.type.identifer);
+				break;
+			default:
+				break;
+		}
+		
+#define SET_DIC_KEY_VALUE(sel)\
+		switch (valueValue.type.typeKind) {\
+			case ANC_TYPE_NS_OBJECT:\
+				dic[(id)keyValue.sel] = valueValue.nsObjValue;\
+				break;\
+			case ANC_TYPE_CLASS:\
+				dic[(id)keyValue.sel] = valueValue.classValue;\
+				break;\
+			case ANC_TYPE_NS_BLOCK:\
+				dic[(id)keyValue.sel] = valueValue.nsBlockValue;\
+				break;\
+			case ANC_TYPE_ANANAS_BLOCK:\
+				dic[(id)keyValue.sel] = valueValue.ananasBlockValue;\
+			default:\
+				break;\
+		}
+		
+		switch (keyValue.type.typeKind) {
+			case ANC_TYPE_NS_OBJECT:
+				SET_DIC_KEY_VALUE(nsObjValue)
+				break;
+			case ANC_TYPE_CLASS:
+				SET_DIC_KEY_VALUE(classValue)
+				break;
+			case ANC_TYPE_NS_BLOCK:
+				SET_DIC_KEY_VALUE(nsBlockValue)
+				break;
+			case ANC_TYPE_ANANAS_BLOCK:
+				SET_DIC_KEY_VALUE(ananasBlockValue)
+				break;
+				
+			default:
+				break;
+		}
+		
+		[inter.stack pop];
+		[inter.stack pop];
+	}
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_OBJECT, @"NSDictionary", @"@");
+	resultValue.nsObjValue = dic.copy;
+	[inter.stack push:resultValue];
+	
+}
+
+
+
+
+
 
 
 
@@ -820,7 +1029,22 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 		case ANC_TERNARY_EXPRESSION:
 			eval_ternary_expression(_self, inter, scope, expr);
 			break;
-		
+			
+		case ANC_INDEX_EXPRESSION:
+			eval_index_expression(_self, inter, scope, expr);
+			break;
+		case ANC_AT_EXPRESSION:
+			eval_at_expression(_self, inter, scope, expr);
+			break;
+		case NSC_NEGATIVE_EXPRESSION:
+			eval_negative_expression(_self, inter, scope, expr);
+			break;
+		case ANC_MEMBER_EXPRESSION:
+			break;
+		case ANC_DIC_LITERAL_EXPRESSION:
+			break;
+		case ANC_ARRAY_LITERAL_EXPRESSION:
+			break;
 		default:
 			break;
 	}
