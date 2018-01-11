@@ -30,7 +30,7 @@
 //ANC_TYPE_NS_BLOCK,
 //ANC_TYPE_ANANAS_BLOCK,
 //ANC_TYPE_UNKNOWN
-- (BOOL)isTrue{
+- (BOOL)isSubtantial{
 	switch (self.type.typeKind) {
 		case ANC_TYPE_BOOL:
 			return self.boolValue;
@@ -65,7 +65,34 @@
 	}
 	
 }
+- (BOOL)isMember{
+	ANCTypeSpecifierKind kind = self.type.typeKind;
+	switch (kind) {
+		case ANC_TYPE_BOOL:
+		case ANC_TYPE_NS_U_INTEGER:
+		case ANC_TYPE_NS_INTEGER:
+		case ANC_TYPE_CG_FLOAT:
+		case ANC_TYPE_DOUBLE:
+		default:
+			return NO;
+	}
+}
 
+- (BOOL)isObject{
+	switch (self.type.typeKind) {
+		case ANC_TYPE_NS_OBJECT:
+		case ANC_TYPE_NS_BLOCK:
+		case ANC_TYPE_CLASS:
+		case ANC_TYPE_ANANAS_BLOCK:
+		default:
+			return NO;
+	}
+}
+
+
+- (BOOL)isBaseValue{
+	return ![self isObject];
+}
 @end
 
 @implementation ANEVariable

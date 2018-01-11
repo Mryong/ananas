@@ -25,10 +25,13 @@
 @property (assign, nonatomic) SEL selValue;
 @property (strong, nonatomic) id nsObjValue;
 @property (assign, nonatomic) BOOL isSuper;
-@property (assign, nonatomic) id nsBlockValue;
+@property (strong, nonatomic) id nsBlockValue;
 @property (strong, nonatomic) ANEBlock *ananasBlockValue;
 @property (assign, nonatomic) void *unknownKindValue;
-- (BOOL)isTrue;
+- (BOOL)isSubtantial;
+- (BOOL)isObject;
+- (BOOL)isMember;
+- (BOOL)isBaseValue;
 @end
 
 @interface ANEVariable:NSObject

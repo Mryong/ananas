@@ -218,7 +218,7 @@ static void eval_identifer_expression(ANCInterpreter *inter, ANEScopeChain *scop
 static void eval_ternary_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCTernaryExpression *expr){
 	eval_expression(_self, inter, scope, expr.condition);
 	ANEValue *conValue = [inter.stack pop];
-	if (conValue.isTrue) {
+	if (conValue.isSubtantial) {
 		if (expr.trueExpr) {
 			eval_expression(_self, inter, scope, expr.trueExpr);
 		}else{
@@ -688,13 +688,13 @@ static void eval_logic_and_expression(id _self, ANCInterpreter *inter, ANEScopeC
 	ANEValue *leftValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
-	if (!leftValue.isTrue) {
+	if (!leftValue.isSubtantial) {
 		resultValue.boolValue = NO;
 		[inter.stack pop];
 	}else{
 		eval_expression(_self, inter, scope, expr.right);
 		ANEValue *rightValue = [inter.stack peekStack:0];
-		if (!rightValue.isTrue) {
+		if (!rightValue.isSubtantial) {
 			resultValue.boolValue = NO;
 		}else{
 			resultValue.boolValue = YES;
@@ -709,13 +709,13 @@ static void eval_logic_or_expression(id _self, ANCInterpreter *inter, ANEScopeCh
 	ANEValue *leftValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
-	if (leftValue.isTrue) {
+	if (leftValue.isSubtantial) {
 		resultValue.boolValue = YES;
 		[inter.stack pop];
 	}else{
 		eval_expression(_self, inter, scope, expr.right);
 		ANEValue *rightValue = [inter.stack peekStack:0];
-		if (rightValue.isTrue) {
+		if (rightValue.isSubtantial) {
 			resultValue.boolValue = YES;
 		}else{
 			resultValue.boolValue = NO;
@@ -730,7 +730,7 @@ static void eval_logic_not_expression(id _self, ANCInterpreter *inter, ANEScopeC
 	ANEValue *value = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
-	resultValue.boolValue = !value.isTrue;
+	resultValue.boolValue = !value.isSubtantial;
 	[inter.stack pop];
 	[inter.stack push:resultValue];
 }
@@ -972,6 +972,174 @@ static void eval_array_expression(id _self, ANCInterpreter *inter, ANEScopeChain
 	[inter.stack push:resultValue];
 }
 
+static void eval_member_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCMemberExpression *expr){
+	eval_expression(_self, inter, scope, expr.expr);
+	ANEValue *obj = [inter.stack peekStack:0];
+	if (obj.type.typeKind != ANC_TYPE_NS_OBJECT) {
+		NSCAssert(0, @"line:%zd, %@ is not object",expr.expr.lineNumber, obj.type.identifer);
+	}
+	
+	ANEValue *returnValue = [ANEValue alloc];
+	SEL sel = NSSelectorFromString(expr.memberName);
+	if ([obj.nsObjValue respondsToSelector:sel]) {
+		NSMethodSignature *sig =[_self methodSignatureForSelector:NSSelectorFromString(expr.memberName)];
+		void *returnData = malloc([sig methodReturnLength]);
+		char *returnTypeEncoding = (char *)[sig methodReturnType];
+		size_t len = strlen(returnTypeEncoding);
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+		[invocation setTarget:_self];
+		[invocation setSelector:sel];
+		[invocation invoke];
+		[invocation getReturnValue:returnData];
+		BOOL prefix = YES;
+		while (prefix) {
+			switch (*returnTypeEncoding) {
+				case 'r':
+				case 'n':
+				case 'N':
+				case 'o':
+				case 'O':
+				case 'R':
+				case 'V':
+					returnTypeEncoding++;
+					break;
+				default:
+					prefix = NO;
+					break;
+			}
+		}
+		switch (*returnTypeEncoding) {
+			case 'v': {
+				NSCAssert(0, @"");
+				break;
+			}
+			case 'B':{
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_BOOL, @"BOOL", @"B");
+				returnValue.boolValue = *(BOOL *)returnData;
+				break;
+			}
+			case 'c': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+				returnValue.intValue = *(int8_t *)returnData;
+				break;
+			}
+			case 'C': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER, @"NSUInteger", @"Q");
+				returnValue.uintValue = *(uint8_t *)returnData;
+				break;
+			}
+			case 's': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+				returnValue.intValue = *(int16_t *)returnData;
+				break;
+			}
+			case 'S': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER, @"NSUInteger", @"Q");
+				returnValue.uintValue = *(uint16_t *)returnData;
+				break;
+			}
+			case 'i': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+				returnValue.intValue = *(int32_t *)returnData;
+				break;
+			}
+			case 'I': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER, @"NSUInteger", @"Q");
+				returnValue.uintValue = *(uint32_t *)returnData;
+				break;
+			}
+			case 'l': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+				returnValue.intValue = *(int32_t *)returnData;
+				break;
+			}
+			case 'L': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER, @"NSUInteger", @"Q");
+				returnValue.uintValue = *(uint32_t *)returnData;
+				break;
+			}
+			case 'q':{
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER, @"NSInteger", @"q");
+				returnValue.intValue = *(NSInteger *)returnData;
+				break;
+			}
+			case 'Q': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER, @"NSUInteger", @"Q");
+				returnValue.uintValue = *(NSUInteger *)returnData;
+				break;
+			}
+			case 'f': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_CG_FLOAT, @"CGFloat", @"d");
+				returnValue.cgFloatValue = *(CGFloat *)returnData;
+				break;
+			}
+			case 'd': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_CG_FLOAT, @"CGFloat", @"d");
+				returnValue.cgFloatValue = *(CGFloat *)returnData;
+				break;
+			}
+			case 'D':{
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_DOUBLE, @"long double", @"D");
+				returnValue.cgFloatValue = *(long double *)returnData;
+				break;
+			}
+			case '#': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_CLASS, @"Class", @"#");
+				returnValue.classValue = *(Class *)returnData;
+				break;
+			}
+			case ':': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_SEL, @"SEL", @":");
+				returnValue.selValue = *(SEL *)returnData;
+				break;
+			}
+			case '*': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_STRING, @"char *", @"*");
+				returnValue.stringValue = *(char * *)returnData;
+				break;
+			}
+			case '^': {
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_UNKNOWN, @"void *", @"^");
+				returnValue.stringValue = *(void * *)returnData;
+				break;
+			}
+			case '[':
+			case '(': {
+				NSCAssert(0, @"line:%zd,not supprot c array and union type",expr.expr.lineNumber);
+				break;
+			}
+			case '{':{
+				//TODO
+				break;
+			}
+			case '@': {
+				if (len == 2 && *(returnTypeEncoding + 1) == '?'){
+					returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_BLOCK, @"NSBlock", @"@?");
+					returnValue.nsBlockValue = (__bridge_transfer id)(*(void **)returnData);
+					break;
+				}else{
+					returnValue.type = anc_create_type_specifier(ANC_TYPE_NS_BLOCK, @"id", @"@");
+					returnValue.nsObjValue = (__bridge_transfer id)(*(void **)returnData);
+					break;
+				}
+				break;
+			}
+			default:{
+				returnValue.type = anc_create_type_specifier(ANC_TYPE_UNKNOWN, @"void *", @"^");
+				returnValue.stringValue = *(void * *)returnData;
+				break;
+			}
+		}
+		
+		
+		
+	}else{
+		//TODO
+		
+	}
+	[inter.stack pop];
+	[inter.stack push:returnValue];
+}
 
 
 
@@ -1071,6 +1239,7 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 			eval_negative_expression(_self, inter, scope, expr);
 			break;
 		case ANC_MEMBER_EXPRESSION:
+			eval_member_expression(_self, inter, scope, expr);
 			break;
 		case ANC_DIC_LITERAL_EXPRESSION:
 			eval_dic_expression(_self, inter, scope, expr);

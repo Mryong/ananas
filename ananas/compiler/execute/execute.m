@@ -62,8 +62,8 @@ static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDe
 		ANCExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
 		if (annotationIfConditionExpr) {
 			ANEValue *value = ane_eval_expression(nil ,interpreter, nil, annotationIfConditionExpr);
-			classDefinition.annotationIfExprResult = value.isTrue ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
-			if (!value.isTrue) {
+			classDefinition.annotationIfExprResult = value.isSubtantial ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
+			if (!value.isSubtantial) {
 				return;
 			}
 		}else{
