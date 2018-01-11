@@ -898,16 +898,16 @@ static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 #define SET_DIC_KEY_VALUE(sel)\
 		switch (valueValue.type.typeKind) {\
 			case ANC_TYPE_NS_OBJECT:\
-				dic[(id)keyValue.sel] = valueValue.nsObjValue;\
+				dic[(id<NSCopying>)keyValue.sel] = valueValue.nsObjValue;\
 				break;\
 			case ANC_TYPE_CLASS:\
-				dic[(id)keyValue.sel] = valueValue.classValue;\
+				dic[(id<NSCopying>)keyValue.sel] = valueValue.classValue;\
 				break;\
 			case ANC_TYPE_NS_BLOCK:\
-				dic[(id)keyValue.sel] = valueValue.nsBlockValue;\
+				dic[(id<NSCopying>)keyValue.sel] = valueValue.nsBlockValue;\
 				break;\
 			case ANC_TYPE_ANANAS_BLOCK:\
-				dic[(id)keyValue.sel] = valueValue.ananasBlockValue;\
+				dic[(id<NSCopying>)keyValue.sel] = valueValue.ananasBlockValue;\
 			default:\
 				break;\
 		}
@@ -933,6 +933,7 @@ static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 		[inter.stack pop];
 		[inter.stack pop];
 	}
+#undef SET_DIC_KEY_VALUE
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_OBJECT, @"NSDictionary", @"@");
 	resultValue.nsObjValue = dic.copy;
@@ -940,6 +941,36 @@ static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 	
 }
 
+
+static void eval_array_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCArrayExpression *expr){
+	NSMutableArray *array = [NSMutableArray array];
+	for (ANCExpression *elementExpr in array) {
+		eval_expression(_self, inter, scope, elementExpr);
+		ANEValue *elementValue = [inter.stack peekStack:0];
+		switch (elementExpr.typeSpecifier.typeKind) {
+			case ANC_TYPE_CLASS:
+				[array addObject:elementValue.classValue];
+				break;
+			case ANC_TYPE_NS_OBJECT:
+				[array addObject:elementValue.nsObjValue];
+				break;
+			case ANC_TYPE_NS_BLOCK:
+				[array addObject:elementValue.nsBlockValue];
+				break;
+			case ANC_TYPE_ANANAS_BLOCK:
+				[array addObject:elementValue.ananasBlockValue];
+				break;
+			default:
+				NSCAssert(0, @"line:%zd array element type  can not bee type:%@",elementExpr.lineNumber, elementValue.type.identifer);
+				break;
+		}
+		[inter.stack pop];
+	}
+	ANEValue *resultValue = [ANEValue new];
+	resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_OBJECT, @"NSArray", @"@");
+	resultValue.nsObjValue = array.copy;
+	[inter.stack push:resultValue];
+}
 
 
 
@@ -1042,8 +1073,18 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 		case ANC_MEMBER_EXPRESSION:
 			break;
 		case ANC_DIC_LITERAL_EXPRESSION:
+			eval_dic_expression(_self, inter, scope, expr);
 			break;
 		case ANC_ARRAY_LITERAL_EXPRESSION:
+			eval_array_expression(_self, inter, scope, expr);
+			break;
+		case ANC_INCREMENT_EXPRESSION:
+			break;
+		case ANC_DECREMENT_EXPRESSION:
+			break;
+		case ANC_STRUCT_LITERAL_EXPRESSION:
+			break;
+		case ANC_FUNCTION_CALL_EXPRESSION:
 			break;
 		default:
 			break;
