@@ -344,7 +344,7 @@ non_block_type_specifier: base_type_specifier
 block_type_specifier: IDENTIFIER LP POWER  RP LP type_specifier_list RP
 			{
 				NSString *identifier = (__bridge_transfer NSString *)$1;
-				ANCTypeSpecifier *returnTypeSpecifier = anc_create_type_specifier(ANC_TYPE_UNKNOWN,identifier,@"^v");
+				ANCTypeSpecifier *returnTypeSpecifier = anc_create_type_specifier(ANC_TYPE_POINTER,identifier,@"^v");
 				NSArray *type_specifier_list = (__bridge_transfer NSArray *)$6;
 				ANCTypeSpecifier * block_type_specifier = anc_create_block_type_specifier(returnTypeSpecifier,type_specifier_list);
 				$$ = (__bridge_retained void *)block_type_specifier;
@@ -502,7 +502,7 @@ oc_type_specifier: NS_STRING ASTERISK
 custom_type_specifier: IDENTIFIER
 			{
 				NSString *identifier = (__bridge_transfer NSString *)$1;
-				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_UNKNOWN,identifier,@"^v");
+				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_POINTER,identifier,@"^v");
 			}
 			;
 

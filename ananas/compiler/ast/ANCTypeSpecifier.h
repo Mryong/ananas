@@ -10,6 +10,7 @@
 typedef NS_ENUM(NSUInteger, ANCTypeSpecifierKind) {
 	ANC_TYPE_VOID,
 	ANC_TYPE_BOOL,
+	ANC_TYPE_CHAR,
 	ANC_TYPE_NS_U_INTEGER,
 	ANC_TYPE_NS_INTEGER,
 	ANC_TYPE_CG_FLOAT,
@@ -19,9 +20,10 @@ typedef NS_ENUM(NSUInteger, ANCTypeSpecifierKind) {
 	ANC_TYPE_SEL,
 	ANC_TYPE_NS_OBJECT,
 	ANC_TYPE_STRUCT,
+	ANC_TYPE_STRUCT_LITERAL,
 	ANC_TYPE_NS_BLOCK,
 	ANC_TYPE_ANANAS_BLOCK,
-	ANC_TYPE_UNKNOWN
+	ANC_TYPE_POINTER
 };
 @interface ANCTypeSpecifier : NSObject
 @property (copy, nonatomic) NSString *identifer;

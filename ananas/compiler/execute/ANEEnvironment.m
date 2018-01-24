@@ -34,6 +34,8 @@
 	switch (self.type.typeKind) {
 		case ANC_TYPE_BOOL:
 			return self.boolValue;
+		case ANC_TYPE_CHAR:
+			return self.charValue ? YES : NO;
 		case ANC_TYPE_NS_U_INTEGER:
 			return self.uintValue ? YES : NO;
 		case ANC_TYPE_NS_INTEGER:
@@ -56,13 +58,14 @@
 			return self.nsBlockValue ? YES : NO;
 		case ANC_TYPE_ANANAS_BLOCK:
 			return self.ananasBlockValue ? YES : NO;
-		case ANC_TYPE_UNKNOWN:
-			return self.unknownKindValue ? YES : NO;
+		case ANC_TYPE_POINTER:
+			return self.pointerValue ? YES : NO;
 		case ANC_TYPE_VOID:
 			return NO;
 		default:
 			break;
 	}
+	return NO;
 	
 }
 - (BOOL)isMember{

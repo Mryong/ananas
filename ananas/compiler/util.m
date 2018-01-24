@@ -54,8 +54,8 @@ ANCTypeSpecifier *anc_alloc_type_specifier(ANCTypeSpecifierKind kind, NSString *
 			case ANC_TYPE_STRUCT:
 				typeSpecifier.typeEncoding = @"";
 				break;
-			case ANC_TYPE_UNKNOWN:
-				typeSpecifier.typeEncoding = @"?";
+			case ANC_TYPE_POINTER:
+				typeSpecifier.typeEncoding = @"^";
 				break;
 				
 			default:

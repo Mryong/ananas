@@ -138,9 +138,8 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 
 
 @interface ANCStructpression: ANCExpression
-
-@property (strong, nonatomic) NSMutableArray<ANCExpression *> *keyExpressions;
-@property (strong, nonatomic) NSMutableArray<ANCExpression *> *valueExpressions;
+@property (strong, nonatomic) NSArray<NSString *> *keys;
+@property (strong, nonatomic) NSArray<ANCExpression *> *valueExpressions;
 
 @end
 

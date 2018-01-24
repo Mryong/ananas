@@ -300,8 +300,8 @@ static void replace_getter_setter_method(Class clazz, ANCPropertyDefinition *pro
 			getter_setter_base_type(SEL, :)
 			break;
 		}
-		case ANC_TYPE_UNKNOWN:{
-			getter_setter_base_type(unknownType, ^v)
+		case ANC_TYPE_POINTER:{
+			getter_setter_base_type(unknownType, ^)
 			break;
 		}
 		case ANC_TYPE_CLASS:{

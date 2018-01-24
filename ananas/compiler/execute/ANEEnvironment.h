@@ -16,10 +16,11 @@
 @interface ANEValue : NSObject
 @property (assign, nonatomic) ANCTypeSpecifier *type;
 @property (assign, nonatomic) BOOL boolValue;
+@property (assign, nonatomic) char charValue;
 @property (assign, nonatomic) NSUInteger uintValue;
 @property (assign, nonatomic) NSInteger intValue;
 @property (assign, nonatomic) CGFloat cgFloatValue;
-@property (assign, nonatomic) long double doubleValue;
+@property (assign, nonatomic) double doubleValue;
 @property (assign, nonatomic) const char *stringValue;
 @property (strong, nonatomic) Class classValue;
 @property (assign, nonatomic) SEL selValue;
@@ -27,7 +28,11 @@
 @property (assign, nonatomic) BOOL isSuper;
 @property (strong, nonatomic) id nsBlockValue;
 @property (strong, nonatomic) ANEBlock *ananasBlockValue;
-@property (assign, nonatomic) void *unknownKindValue;
+@property (assign, nonatomic) void *structValue;
+@property (strong, nonatomic) NSDictionary *structLiteralValue;
+@property (assign, nonatomic) void *pointerValue;
+
+
 - (BOOL)isSubtantial;
 - (BOOL)isObject;
 - (BOOL)isMember;
