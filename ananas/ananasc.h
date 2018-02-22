@@ -34,7 +34,7 @@ void anc_compile_err(NSUInteger lineNumber,ANCCompileError error,...);
 
 
 /* util.c */
-ANCTypeSpecifier *anc_alloc_type_specifier(ANCTypeSpecifierKind kind, NSString *identifier, NSString *typeEncoding);
+ANCTypeSpecifier *anc_alloc_type_specifier(ANATypeSpecifierKind kind, NSString *identifier, NSString *typeEncoding);
 
 
 /* create.m */
@@ -45,9 +45,10 @@ NSString *anc_create_identifier(char *str);
 ANCDicEntry *anc_create_dic_entry(ANCExpression *keyExpr, ANCExpression *valueExpr);
 ANCExpression *anc_create_expression(ANCExpressionKind kind);
 void anc_build_block_expr(ANCBlockExpression *expr, ANCTypeSpecifier *returnTypeSpecifier, NSArray<ANCParameter *> *params, ANCBlock *block);
-ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
-ANCTypeSpecifier *anc_create_type_specifier(ANCTypeSpecifierKind kind, NSString *identifier, NSString *typeEncoding);
-ANCTypeSpecifier *anc_create_block_type_specifier(ANCTypeSpecifier *returnTypeSpecifier,NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier);
+ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, const char *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
+ANCTypeSpecifier *anc_create_type_specifier(ANATypeSpecifierKind kind);
+ANCTypeSpecifier *anc_create_struct_type_specifier(NSString *structName);
+
 ANCParameter *anc_create_parameter(ANCTypeSpecifier *type, NSString *name);
 ANCDeclaration *anc_create_declaration(ANCTypeSpecifier *type, NSString *name, ANCExpression *initializer);
 ANCDeclarationStatement *anc_create_declaration_statement(ANCDeclaration *declaration);

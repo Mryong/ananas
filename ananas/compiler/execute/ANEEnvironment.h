@@ -11,32 +11,36 @@
 #import "ANCTypeSpecifier.h"
 #import "ANEBlock.h"
 
+NS_ASSUME_NONNULL_BEGIN
 
 
 @interface ANEValue : NSObject
-@property (assign, nonatomic) ANCTypeSpecifier *type;
-@property (assign, nonatomic) BOOL boolValue;
-@property (assign, nonatomic) char charValue;
-@property (assign, nonatomic) NSUInteger uintValue;
-@property (assign, nonatomic) NSInteger intValue;
-@property (assign, nonatomic) CGFloat cgFloatValue;
-@property (assign, nonatomic) double doubleValue;
-@property (assign, nonatomic) const char *stringValue;
-@property (strong, nonatomic) Class classValue;
-@property (assign, nonatomic) SEL selValue;
-@property (strong, nonatomic) id nsObjValue;
-@property (assign, nonatomic) BOOL isSuper;
-@property (strong, nonatomic) id nsBlockValue;
-@property (strong, nonatomic) ANEBlock *ananasBlockValue;
-@property (assign, nonatomic) void *structValue;
-@property (strong, nonatomic) NSDictionary *structLiteralValue;
-@property (assign, nonatomic) void *pointerValue;
 
+@property (strong, nonatomic) ANCTypeSpecifier *type;
+@property (assign, nonatomic) unsigned long long uintValue;
+@property (assign, nonatomic) long long integerValue;
+@property (assign, nonatomic) double doubleValue;
+@property (strong, nonatomic, nullable) id objectValue;
+@property (strong, nonatomic, nullable) Class classValue;
+@property (assign, nonatomic) SEL selValue;
+@property (assign, nonatomic) const char * cstringValue;
+@property (assign, nonatomic) void *pointerValue;
 
 - (BOOL)isSubtantial;
 - (BOOL)isObject;
 - (BOOL)isMember;
 - (BOOL)isBaseValue;
+
+- (void)assignFrom:(ANEValue *)src;
+
+- (unsigned long long)c2uintValue;
+- (long long)c2integerValue;
+- (double)c2doubleValue;
+- (nullable id)c2objectValue;
+- (void *)c2pointerValue;
+
+- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(char *)typeEncoding inter:(nullable ANCInterpreter *)inter;
+- (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(char *)typeEncoding;
 @end
 
 @interface ANEVariable:NSObject
@@ -77,7 +81,7 @@ typedef NS_ENUM(NSInteger, ANEStatementResultType) {
 @end
 
 
-
+NS_ASSUME_NONNULL_END
 
 
 

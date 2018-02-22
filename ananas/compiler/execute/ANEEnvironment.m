@@ -7,59 +7,38 @@
 //
 
 #import "ANEEnvironment.h"
+#import "util.h"
+#import "ananasc.h"
 
 @implementation ANEValue
 
 - (instancetype)init{
 	if (self = [super init]) {
-		_isSuper = NO;
 	}
 	return self;
 }
-//ANC_TYPE_VOID,
-//ANC_TYPE_BOOL,
-//ANC_TYPE_NS_U_INTEGER,
-//ANC_TYPE_NS_INTEGER,
-//ANC_TYPE_CG_FLOAT,
-//ANC_TYPE_DOUBLE,
-//ANC_TYPE_STRING,//char *
-//ANC_TYPE_CLASS,
-//ANC_TYPE_SEL,
-//ANC_TYPE_OC,
-//ANC_TYPE_STRUCT,
-//ANC_TYPE_NS_BLOCK,
-//ANC_TYPE_ANANAS_BLOCK,
-//ANC_TYPE_UNKNOWN
 - (BOOL)isSubtantial{
-	switch (self.type.typeKind) {
+	switch (_type.typeKind) {
 		case ANC_TYPE_BOOL:
-			return self.boolValue;
-		case ANC_TYPE_CHAR:
-			return self.charValue ? YES : NO;
-		case ANC_TYPE_NS_U_INTEGER:
-			return self.uintValue ? YES : NO;
-		case ANC_TYPE_NS_INTEGER:
-			return self.intValue ? YES : NO;
-		case ANC_TYPE_CG_FLOAT:
-			return self.cgFloatValue ? YES : NO;
+		case ANC_TYPE_U_INT:
+			return _uintValue ? YES : NO;
+		case ANC_TYPE_INT:
+			return _integerValue ? YES : NO;
 		case ANC_TYPE_DOUBLE:
-			return self.doubleValue ? YES : NO;
-		case ANC_TYPE_STRING:
-			return self.stringValue ? YES : NO;
+			return _doubleValue ? YES : NO;
+		case ANC_TYPE_C_STRING:
+			return _cstringValue ? YES : NO;
 		case ANC_TYPE_CLASS:
-			return self.classValue ? YES : NO;
+			return _classValue ? YES : NO;
 		case ANC_TYPE_SEL:
-			return self.selValue ? YES : NO;
-		case ANC_TYPE_NS_OBJECT:
-			return self.nsObjValue ? YES : NO;
+			return _selValue ? YES : NO;
+		case ANC_TYPE_OBJECT:
+		case ANC_TYPE_STRUCT_LITERAL:
+		case ANC_TYPE_BLOCK:
+			return _objectValue ? YES : NO;
 		case ANC_TYPE_STRUCT:
-			return YES;
-		case ANC_TYPE_NS_BLOCK:
-			return self.nsBlockValue ? YES : NO;
-		case ANC_TYPE_ANANAS_BLOCK:
-			return self.ananasBlockValue ? YES : NO;
 		case ANC_TYPE_POINTER:
-			return self.pointerValue ? YES : NO;
+			return _pointerValue ? YES : NO;
 		case ANC_TYPE_VOID:
 			return NO;
 		default:
@@ -69,24 +48,24 @@
 	
 }
 - (BOOL)isMember{
-	ANCTypeSpecifierKind kind = self.type.typeKind;
+	ANATypeSpecifierKind kind = _type.typeKind;
 	switch (kind) {
 		case ANC_TYPE_BOOL:
-		case ANC_TYPE_NS_U_INTEGER:
-		case ANC_TYPE_NS_INTEGER:
-		case ANC_TYPE_CG_FLOAT:
+		case ANC_TYPE_INT:
+		case ANC_TYPE_U_INT:
 		case ANC_TYPE_DOUBLE:
+			return YES;
 		default:
 			return NO;
 	}
 }
 
 - (BOOL)isObject{
-	switch (self.type.typeKind) {
-		case ANC_TYPE_NS_OBJECT:
-		case ANC_TYPE_NS_BLOCK:
+	switch (_type.typeKind) {
+		case ANC_TYPE_OBJECT:
 		case ANC_TYPE_CLASS:
-		case ANC_TYPE_ANANAS_BLOCK:
+		case ANC_TYPE_BLOCK:
+			return YES;
 		default:
 			return NO;
 	}
@@ -96,6 +75,212 @@
 - (BOOL)isBaseValue{
 	return ![self isObject];
 }
+
+- (void)assignFrom:(ANEValue *)src{
+	
+	_type = src.type;
+	_uintValue = src.uintValue;
+	_integerValue = src.integerValue;
+	_doubleValue = src.doubleValue;
+	_classValue = src.classValue;
+	_selValue = src.selValue;
+	_objectValue = src.objectValue;
+	_pointerValue = src.pointerValue;
+	if (src.cstringValue) {
+		char *cstringValue = malloc(strlen(src.cstringValue));
+		strcpy(cstringValue, src.cstringValue);
+		_cstringValue = cstringValue;
+	}
+}
+
+
+
+
+- (unsigned long long)c2uintValue{
+	switch (_type.typeKind) {
+		case ANC_TYPE_BOOL:
+			return _uintValue;
+		case ANC_TYPE_INT:
+			return _integerValue;
+		case ANC_TYPE_U_INT:
+			return _uintValue;
+		case ANC_TYPE_DOUBLE:
+			return _doubleValue;
+		default:
+			return 0;
+	}
+}
+
+- (long long)c2integerValue{
+	switch (_type.typeKind) {
+		case ANC_TYPE_BOOL:
+			return _uintValue;
+		case ANC_TYPE_INT:
+			return _integerValue;
+		case ANC_TYPE_U_INT:
+			return _uintValue;
+		case ANC_TYPE_DOUBLE:
+			return _doubleValue;
+		default:
+			return 0;
+	}
+}
+
+- (double)c2doubleValue{
+	switch (_type.typeKind) {
+		case ANC_TYPE_BOOL:
+			return _uintValue;
+		case ANC_TYPE_INT:
+			return _integerValue;
+		case ANC_TYPE_U_INT:
+			return _uintValue;
+		case ANC_TYPE_DOUBLE:
+			return _doubleValue;
+		default:
+			return 0.0;
+	}
+}
+
+- (id)c2objectValue{
+	switch (_type.typeKind) {
+		case ANC_TYPE_CLASS:
+			return _classValue;
+		case ANC_TYPE_OBJECT:
+		case ANC_TYPE_BLOCK:
+			return _objectValue;
+		case ANC_TYPE_POINTER:
+			return (__bridge_transfer id)_pointerValue;
+		default:
+			return nil;
+	}
+	
+}
+
+- (void *)c2pointerValue{
+	switch (_type.typeKind) {
+		case ANC_TYPE_C_STRING:
+			return (void *)_cstringValue;
+		case ANC_TYPE_POINTER:
+			return _pointerValue;
+		case ANC_TYPE_CLASS:
+			return (__bridge void*)_classValue;
+		case ANC_TYPE_OBJECT:
+		case ANC_TYPE_BLOCK:
+			return (__bridge void*)_objectValue;
+		default:
+			return nil;
+	}
+}
+
+
+- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(char *)typeEncoding inter:(ANCInterpreter *)inter{
+	typeEncoding = removeTypeEncodingPrefix(typeEncoding);
+#define ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(_encode, _type, _sel)\
+case _encode:{\
+_type *ptr = (_type *)cvaluePointer;\
+*ptr = (_type)[self _sel];\
+break;\
+}
+	
+	switch (*typeEncoding) {
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('c', char, c2integerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('i', int, c2integerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('s', short, c2integerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('l', long, c2integerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('q', long long, c2integerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('C', unsigned char, c2uintValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('I', unsigned int, c2uintValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('S', unsigned short, c2uintValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('L', unsigned long, c2uintValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('Q', unsigned long long, c2uintValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('f', float, c2doubleValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('d', double, c2doubleValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('B', BOOL, c2uintValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('*', char *, c2pointerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('^', void *, c2pointerValue)
+		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(':', SEL, selValue)
+		case '@':{
+			NSObject  * __autoreleasing  *ptr = (NSObject * __autoreleasing *)cvaluePointer;
+			*ptr = [self c2objectValue];
+			break;
+		}
+		case '#':{
+			Class *ptr = (Class  *)cvaluePointer;
+			*ptr = [self c2objectValue];
+			break;
+		}
+		case '{':{
+			if (_type.typeKind == ANC_TYPE_STRUCT) {
+				size_t structSize = ananas_struct_size_with_encoding(typeEncoding);
+				memcpy(cvaluePointer, self.pointerValue, structSize);
+			}else if (_type.typeKind == ANC_TYPE_STRUCT_LITERAL){
+				NSString *structName = ananas_struct_name_with_encoding(typeEncoding);
+				ananas_struct_data_with_dic(cvaluePointer, _objectValue, inter.structDeclareDic[structName], inter.structDeclareDic);
+			}
+			break;
+		}
+		case 'v':{
+			break;
+		}
+		default:
+			NSCAssert(0, @"");
+			break;
+	}
+}
+
+
+- (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(char *)typeEncoding{
+	typeEncoding = removeTypeEncodingPrefix(typeEncoding);
+	ANEValue *retValue = [ANEValue new];
+	
+#define ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE(_code,_kind, _type,_sel)\
+case _code:{\
+retValue.type = anc_create_type_specifier(_kind);\
+retValue._sel = *(_type *)cValuePointer;\
+break;\
+}
+	
+	switch (*typeEncoding) {
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('c',ANC_TYPE_INT, char, integerValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('i',ANC_TYPE_INT, int,integerValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('s',ANC_TYPE_INT, short,integerValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('l',ANC_TYPE_INT, long,integerValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('q',ANC_TYPE_INT, long long,integerValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('C',ANC_TYPE_U_INT, unsigned char, uintValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('I',ANC_TYPE_U_INT,  unsigned int, uintValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('S',ANC_TYPE_U_INT, unsigned short, uintValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('L',ANC_TYPE_U_INT,  unsigned long, uintValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('Q',ANC_TYPE_U_INT, unsigned long long,uintValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('B',ANC_TYPE_BOOL, BOOL, uintValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('f',ANC_TYPE_DOUBLE, float, doubleValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('d',ANC_TYPE_DOUBLE, double,doubleValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE(':',ANC_TYPE_SEL, SEL, selValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('^',ANC_TYPE_POINTER,void *, pointerValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('*',ANC_TYPE_C_STRING, char *,cstringValue)
+			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('#',ANC_TYPE_CLASS, Class,classValue)
+		case '@':{
+			retValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+			retValue.objectValue = (__bridge_transfer id)(*(void **)cValuePointer);
+			break;
+		}
+		case '{':{
+			NSString *type = [NSString stringWithUTF8String:typeEncoding];
+			NSString *structName = ananas_struct_name_with_encoding(typeEncoding);
+			retValue.type= anc_create_struct_type_specifier(structName);
+			retValue.pointerValue = cValuePointer;
+			break;
+		}
+			
+		default:
+			NSCAssert(0, @"not suppoert %s", typeEncoding);
+			break;
+	}
+	
+	return retValue;
+}
+
+
+
 @end
 
 @implementation ANEVariable

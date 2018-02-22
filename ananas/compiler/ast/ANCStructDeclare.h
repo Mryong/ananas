@@ -13,7 +13,7 @@
 @property (strong, nonatomic) ANCExpression *annotationIfConditionExpr;
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (copy, nonatomic) NSString *name;
-@property (strong, nonatomic) NSString *typeEncoding;
+@property (assign, nonatomic)const char *typeEncoding;
 @property (strong, nonatomic) NSArray<NSString *> *keys;
 
 @end

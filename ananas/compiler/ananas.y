@@ -5,7 +5,6 @@
 	#import "ananasc.h"
 	#import "anc_ast.h"
 	
-	NSUInteger anc_struct_declare_line_number = 0;
 
 int yyerror(char const *str);
 int yylex(void);
@@ -51,8 +50,7 @@ int yylex(void);
 	ANNOTATION_IF CLASS STRUCT DECLARE SELECTOR
 	RETURN IF ELSE FOR WHILE DO SWITCH CASE DEFAULT BREAK CONTINUE 
 	PROPERTY WEAK STRONG COPY ASSIGN_MEM NONATOMIC ATOMIC  ADDRESS ASTERISK ASTERISK_ASSIGN VOID
-	BOOL_ NS_INTEGER NS_U_INTEGER  CG_FLOAT  DOUBLE CHAR  CLASS_T SEL_T NS_STRING NS_NUMBER NS_ARRAY NS_MUTABLE_ARRAY NS_DICTIONARY NS_MUTABLE_DICTIONARY ID
-	CG_RECT CG_SIZE CG_POINT CG_AFFINE_TRANSFORM NS_RANGE CG_VECTOR UI_OFFSET UI_DEGE_INSETS CA_TRANSFORM_3D
+	BOOL_ U_INT INT    DOUBLE C_STRING  CLASS_ SEL_ ID POINTER BLOCK
 
 
 
@@ -61,16 +59,16 @@ int yylex(void);
 equality_expression relational_expression additive_expression multiplication_expression unary_expression postfix_expression
 primary_expression dic block_body annotation_if
 
-%type <identifier> struct_name selector selector_1 selector_2
+%type <identifier> selector selector_1 selector_2
 
-%type <list> identifier_list dic_entry_list statement_list type_specifier_list protocol_list else_if_list case_list member_definition_list
+%type <list> identifier_list dic_entry_list statement_list protocol_list else_if_list case_list member_definition_list
 method_name method_name_1 method_name_2 expression_list function_param_list 
 
 %type <method_name_item> method_name_item
 %type <dic_entry> dic_entry
 %type <statement> statement if_statement switch_statement for_statement foreach_statement while_statement do_while_statement
 break_statement continue_statement return_statement declaration_statement
-%type <type_specifier> type_specifier non_block_type_specifier base_type_specifier oc_type_specifier struct_type_specifier custom_type_specifier block_type_specifier
+%type <type_specifier> type_specifier
 %type <block_statement> block_statement default_opt
 %type <declare_struct> declare_struct
 %type <property_modifier_list> property_modifier_list property_modifier property_rc_modifier  property_atomic_modifier
@@ -108,12 +106,6 @@ definition:  class_definition
 			}
 			;
 
-struct_name: IDENTIFIER
-			{
-				anc_struct_declare_line_number = anc_get_current_compile_util().currentLineNumber;
-				$$ = $1;
-			}
-			;
 
 annotation_if: /* empty */
 			{
@@ -126,7 +118,7 @@ annotation_if: /* empty */
 			;
 
 
-declare_struct: annotation_if DECLARE STRUCT struct_name LC
+declare_struct: annotation_if DECLARE STRUCT IDENTIFIER LC
 			IDENTIFIER COLON STRING_LITERAL COMMA
 			IDENTIFIER COLON identifier_list
 			RC
@@ -137,11 +129,11 @@ declare_struct: annotation_if DECLARE STRUCT struct_name LC
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$8;
 				NSString *keysKey = (__bridge_transfer NSString *)$10;
 				NSArray *keysValue = (__bridge_transfer NSArray *)$12;
-				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
+				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue.UTF8String, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
-			| annotation_if DECLARE STRUCT struct_name LC
+			| annotation_if DECLARE STRUCT IDENTIFIER LC
 			IDENTIFIER COLON identifier_list COMMA
 			IDENTIFIER COLON STRING_LITERAL
 			RC
@@ -152,7 +144,7 @@ declare_struct: annotation_if DECLARE STRUCT struct_name LC
 				NSArray *keysValue = (__bridge_transfer NSArray *)$8;
 				NSString *typeEncodingKey = (__bridge_transfer NSString *)$10;
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$12;
-				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue, keysKey, keysValue);
+				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue.UTF8String, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -310,203 +302,59 @@ property_atomic_modifier: NONATOMIC
 			}
 			;
 
-
-type_specifier: non_block_type_specifier
-			| block_type_specifier
-			;
-
-type_specifier_list: type_specifier
+type_specifier: VOID
 			{
-				NSMutableArray *list = [NSMutableArray array];
-				ANCTypeSpecifier *type_specifier = (__bridge_transfer ANCTypeSpecifier *)$1;
-				[list addObject:type_specifier];
-				$$ = (__bridge_retained void *)list;
-			}
-			| type_specifier_list COMMA type_specifier
-			{
-				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCTypeSpecifier *type_specifier = (__bridge_transfer ANCTypeSpecifier *)$3;
-				[list addObject:type_specifier];
-				$$ = (__bridge_retained void *)list;
-			}
-			;
-
-
-
-non_block_type_specifier: base_type_specifier
-			| struct_type_specifier
-			| oc_type_specifier
-			| custom_type_specifier
-			;
-
-
-
-block_type_specifier: IDENTIFIER LP POWER  RP LP type_specifier_list RP
-			{
-				NSString *identifier = (__bridge_transfer NSString *)$1;
-				ANCTypeSpecifier *returnTypeSpecifier = anc_create_type_specifier(ANC_TYPE_POINTER,identifier,@"^v");
-				NSArray *type_specifier_list = (__bridge_transfer NSArray *)$6;
-				ANCTypeSpecifier * block_type_specifier = anc_create_block_type_specifier(returnTypeSpecifier,type_specifier_list);
-				$$ = (__bridge_retained void *)block_type_specifier;
-			}
-			|  type_specifier LP POWER  RP LP type_specifier_list RP
-			{
-				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$1;
-				NSArray *type_specifier_list = (__bridge_transfer NSArray *)$6;
-				ANCTypeSpecifier * block_type_specifier = anc_create_block_type_specifier(returnTypeSpecifier,type_specifier_list);
-				$$ = (__bridge_retained void *)block_type_specifier;
-			}
-			;
-
-
-base_type_specifier: VOID
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_VOID,@"void",@"v");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_VOID);
 			}
 			| BOOL_
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_BOOL,@"BOOL",@"B");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_BOOL);
 			}
-			| NS_INTEGER
+			| INT
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_INTEGER,@"NSInteger",@"q");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_INT);
 			}
-			| NS_U_INTEGER
+			| U_INT
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_U_INTEGER,@"NSUInteger",@"Q");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| CG_FLOAT
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_CG_FLOAT,@"CGFloat",@"d");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_U_INT);
 			}
 			| DOUBLE
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_DOUBLE,@"long double",@"D");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_DOUBLE);
 			}
-			| CHAR ASTERISK
+			| C_STRING
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRING,@"char *",@"*");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_C_STRING);
 			}
-			| CLASS_T
+			|ID
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_CLASS,@"Classs",@"#");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OBJECT);
 			}
-			| SEL_T
+			|CLASS_
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_SEL,@"SEL",@":");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_CLASS);
 			}
-			;
-
-struct_type_specifier: CG_RECT
+			|SEL_
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGRect",@"{CGRect={CGPoint=dd}{CGSize=dd}}");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_SEL);
 			}
-			| CG_SIZE
+			| BLOCK
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGSize",@"{CGSize=dd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_BLOCK);
 			}
-			| CG_POINT
+			| POINTER
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGPoint",@"{CGPoint=dd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| CG_AFFINE_TRANSFORM
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGAffineTransform",@"{CGAffineTransform=dddddd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| NS_RANGE
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"NSRange",@"{_NSRange=QQ}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| CG_VECTOR
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CGVector",@"{CGVector=dd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| UI_OFFSET
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"UIOffset",@"{UIOffset=dd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| UI_DEGE_INSETS
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"UIEdgeInsets",@"{UIEdgeInsets=dddd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| CA_TRANSFORM_3D
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT,@"CATransform3D",@"{CATransform3D=dddddddddddddddd}");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			;
-
-
-
-oc_type_specifier: NS_STRING ASTERISK
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSString",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| NS_NUMBER ASTERISK
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSNumber",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| NS_ARRAY ASTERISK
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSArray",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| NS_MUTABLE_ARRAY ASTERISK
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSMutableArray",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| NS_DICTIONARY ASTERISK
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSDictionary",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
-			}
-			| NS_MUTABLE_DICTIONARY ASTERISK
-			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"NSMutableDictionary",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_POINTER);
 			}
 			| IDENTIFIER ASTERISK
 			{
-				NSString *identifier = (__bridge_transfer NSString *)$1;
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,identifier,@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OBJECT);
 			}
-			| ID
+			| STRUCT IDENTIFIER
 			{
-				ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_NS_OBJECT,@"id",@"@");
-				$$ = (__bridge_retained void *)typeSpecifier;
+				$$ =  (__bridge_retained void *)anc_create_struct_type_specifier((__bridge_transfer NSString *)$2);
 			}
 			;
-
-
-custom_type_specifier: IDENTIFIER
-			{
-				NSString *identifier = (__bridge_transfer NSString *)$1;
-				$$ = (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_POINTER,identifier,@"^v");
-			}
-			;
-
-
 
 
 method_definition: instance_method_definition
@@ -891,9 +739,16 @@ primary_expression: IDENTIFIER
 			}
 			| primary_expression DOT selector LP RP
 			{
-				ANCFunctonCallExpression *expr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
-				expr.expr = (__bridge_transfer ANCExpression *)$1;
-				$$ = (__bridge_retained void *)expr;
+				ANCExpression *expr = (__bridge_transfer ANCExpression *)$1;
+				NSString *selector = (__bridge_transfer NSString *)$3;
+				ANCMemberExpression *memberExpr = (ANCMemberExpression *)anc_create_expression(ANC_MEMBER_EXPRESSION);
+				memberExpr.expr = expr;
+				memberExpr.memberName = selector;
+				
+				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				funcCallExpr.expr = memberExpr;
+				
+				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 			| primary_expression DOT selector LP expression_list RP
 			{

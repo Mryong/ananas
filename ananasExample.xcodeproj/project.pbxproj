@@ -28,8 +28,9 @@
 		41D02D7B1FA9C83500E1829A /* test.ana in Resources */ = {isa = PBXBuildFile; fileRef = 41D02D7A1FA9C83500E1829A /* test.ana */; };
 		41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6A1FA9C00700E1829A /* ananas.l */; };
 		41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6B1FA9C00700E1829A /* ananas.y */; };
+		41DD956220230E4000C9DAD2 /* libffi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41DD955F20230E3F00C9DAD2 /* libffi.a */; };
+		41DD95642036B77000C9DAD2 /* util.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DD95632036B77000C9DAD2 /* util.m */; };
 		41E543571FCD312600E6CED5 /* ANCBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E543561FCD312600E6CED5 /* ANCBlock.m */; };
-		41E5435C1FCD56A200E6CED5 /* util.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E5435B1FCD56A200E6CED5 /* util.m */; };
 		41E83EA61FB9671200A48592 /* ANCExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EA51FB9671200A48592 /* ANCExpression.m */; };
 		41E83EA91FB992C200A48592 /* ANCTypeSpecifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EA81FB992C200A48592 /* ANCTypeSpecifier.m */; };
 		41E83EAC1FBD5F8E00A48592 /* ANCClassDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EAB1FBD5F8E00A48592 /* ANCClassDefinition.m */; };
@@ -92,9 +93,21 @@
 		41D02D6A1FA9C00700E1829A /* ananas.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = ananas.l; sourceTree = "<group>"; };
 		41D02D6B1FA9C00700E1829A /* ananas.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = ananas.y; sourceTree = "<group>"; };
 		41D02D7A1FA9C83500E1829A /* test.ana */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.ana; sourceTree = "<group>"; };
+		41DD955720230E3F00C9DAD2 /* ffitarget_arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget_arm64.h; sourceTree = "<group>"; };
+		41DD955820230E3F00C9DAD2 /* ffitarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget.h; sourceTree = "<group>"; };
+		41DD955920230E3F00C9DAD2 /* ffi_arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_arm.h; sourceTree = "<group>"; };
+		41DD955A20230E3F00C9DAD2 /* ffi_i386.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_i386.h; sourceTree = "<group>"; };
+		41DD955B20230E3F00C9DAD2 /* ffitarget_x86_64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget_x86_64.h; sourceTree = "<group>"; };
+		41DD955C20230E3F00C9DAD2 /* ffi_x86_64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_x86_64.h; sourceTree = "<group>"; };
+		41DD955D20230E3F00C9DAD2 /* ffitarget_arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget_arm.h; sourceTree = "<group>"; };
+		41DD955E20230E3F00C9DAD2 /* ffitarget_i386.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget_i386.h; sourceTree = "<group>"; };
+		41DD955F20230E3F00C9DAD2 /* libffi.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libffi.a; sourceTree = "<group>"; };
+		41DD956020230E3F00C9DAD2 /* ffi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi.h; sourceTree = "<group>"; };
+		41DD956120230E3F00C9DAD2 /* ffi_arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_arm64.h; sourceTree = "<group>"; };
+		41DD95632036B77000C9DAD2 /* util.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = util.m; sourceTree = "<group>"; };
+		41DD95652036B78A00C9DAD2 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		41E543551FCD312600E6CED5 /* ANCBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCBlock.h; sourceTree = "<group>"; };
 		41E543561FCD312600E6CED5 /* ANCBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCBlock.m; sourceTree = "<group>"; };
-		41E5435B1FCD56A200E6CED5 /* util.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = util.m; sourceTree = "<group>"; };
 		41E83EA41FB9671200A48592 /* ANCExpression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCExpression.h; sourceTree = "<group>"; };
 		41E83EA51FB9671200A48592 /* ANCExpression.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCExpression.m; sourceTree = "<group>"; };
 		41E83EA71FB992C200A48592 /* ANCTypeSpecifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCTypeSpecifier.h; sourceTree = "<group>"; };
@@ -115,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41DD956220230E4000C9DAD2 /* libffi.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +187,7 @@
 		41D02D191FA8A09300E1829A /* ananasExample */ = {
 			isa = PBXGroup;
 			children = (
+				41DD955620230E3F00C9DAD2 /* libffi */,
 				41D02D4C1FA8A0C900E1829A /* ananas */,
 				41D02D1A1FA8A09300E1829A /* AppDelegate.h */,
 				41D02D1B1FA8A09300E1829A /* AppDelegate.m */,
@@ -214,6 +229,8 @@
 				4156E9EB1FF0E09C0036973A /* ANCContext.m */,
 				4156E9EF1FF0EE050036973A /* execute */,
 				41D02D521FA9A4C400E1829A /* compiler */,
+				41DD95632036B77000C9DAD2 /* util.m */,
+				41DD95652036B78A00C9DAD2 /* util.h */,
 			);
 			path = ananas;
 			sourceTree = SOURCE_ROOT;
@@ -226,10 +243,27 @@
 				41D02D6A1FA9C00700E1829A /* ananas.l */,
 				41D02D6B1FA9C00700E1829A /* ananas.y */,
 				41D02D581FA9A5E000E1829A /* createc.m */,
-				41E5435B1FCD56A200E6CED5 /* util.m */,
 				41CB962A1FCFF43100373143 /* errrorc.m */,
 			);
 			path = compiler;
+			sourceTree = "<group>";
+		};
+		41DD955620230E3F00C9DAD2 /* libffi */ = {
+			isa = PBXGroup;
+			children = (
+				41DD955720230E3F00C9DAD2 /* ffitarget_arm64.h */,
+				41DD955820230E3F00C9DAD2 /* ffitarget.h */,
+				41DD955920230E3F00C9DAD2 /* ffi_arm.h */,
+				41DD955A20230E3F00C9DAD2 /* ffi_i386.h */,
+				41DD955B20230E3F00C9DAD2 /* ffitarget_x86_64.h */,
+				41DD955C20230E3F00C9DAD2 /* ffi_x86_64.h */,
+				41DD955D20230E3F00C9DAD2 /* ffitarget_arm.h */,
+				41DD955E20230E3F00C9DAD2 /* ffitarget_i386.h */,
+				41DD955F20230E3F00C9DAD2 /* libffi.a */,
+				41DD956020230E3F00C9DAD2 /* ffi.h */,
+				41DD956120230E3F00C9DAD2 /* ffi_arm64.h */,
+			);
+			path = libffi;
 			sourceTree = "<group>";
 		};
 		41E83EA31FB9668B00A48592 /* ast */ = {
@@ -412,7 +446,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				41E5435C1FCD56A200E6CED5 /* util.m in Sources */,
 				4156E9EC1FF0E09C0036973A /* ANCContext.m in Sources */,
 				41E83EAF1FBD653900A48592 /* ANCFunctionDefinition.m in Sources */,
 				412E4A1A1FF1056D0074536F /* eval.m in Sources */,
@@ -422,6 +455,7 @@
 				41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */,
 				412E4A6C1FFB86B00074536F /* ANEEnvironment.m in Sources */,
 				41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */,
+				41DD95642036B77000C9DAD2 /* util.m in Sources */,
 				41E83EAC1FBD5F8E00A48592 /* ANCClassDefinition.m in Sources */,
 				41C98B1B1FC6B26500BADBE9 /* ANCInterpreter.m in Sources */,
 				41E83EB21FBD6F6600A48592 /* ANCStatement.m in Sources */,
@@ -612,6 +646,10 @@
 				DEVELOPMENT_TEAM = UZH7RM4G39;
 				INFOPLIST_FILE = ananasExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ananasExample/libffi",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jerry.ananasExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -626,6 +664,10 @@
 				DEVELOPMENT_TEAM = UZH7RM4G39;
 				INFOPLIST_FILE = ananasExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ananasExample/libffi",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jerry.ananasExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";

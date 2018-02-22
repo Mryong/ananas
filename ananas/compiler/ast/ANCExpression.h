@@ -60,12 +60,11 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (assign, nonatomic) ANCExpressionKind expressionKind;
 @property (strong, nonatomic) ANCTypeSpecifier *typeSpecifier;
-@property (assign, nonatomic) BOOL bool_value;
-@property (assign, nonatomic) NSInteger integer_value;
-@property (assign, nonatomic) NSUInteger uinteger_value;
-@property (assign, nonatomic) CGFloat float_value;
-@property (assign, nonatomic) double double_value;
-@property (assign, nonatomic) const char *utf8_string_value;
+@property (assign, nonatomic) BOOL boolValue;
+@property (assign, nonatomic) long long int integerValue;
+@property (assign, nonatomic) unsigned long long  uintValue;
+@property (assign, nonatomic) double doubleValue;
+@property (assign, nonatomic) const char *cstringValue;
 @property (copy, nonatomic) NSString *selectorName;
 @end
 

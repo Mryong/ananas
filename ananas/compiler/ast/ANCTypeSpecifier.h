@@ -7,30 +7,27 @@
 //
 
 #import <Foundation/Foundation.h>
-typedef NS_ENUM(NSUInteger, ANCTypeSpecifierKind) {
+@class ANCInterpreter;
+typedef NS_ENUM(NSUInteger, ANATypeSpecifierKind) {
 	ANC_TYPE_VOID,
 	ANC_TYPE_BOOL,
-	ANC_TYPE_CHAR,
-	ANC_TYPE_NS_U_INTEGER,
-	ANC_TYPE_NS_INTEGER,
-	ANC_TYPE_CG_FLOAT,
+	ANC_TYPE_INT,
+	ANC_TYPE_U_INT,
 	ANC_TYPE_DOUBLE,
-	ANC_TYPE_STRING,//char *
+	ANC_TYPE_C_STRING,
 	ANC_TYPE_CLASS,
 	ANC_TYPE_SEL,
-	ANC_TYPE_NS_OBJECT,
+	ANC_TYPE_OBJECT,
+	ANC_TYPE_BLOCK,
 	ANC_TYPE_STRUCT,
 	ANC_TYPE_STRUCT_LITERAL,
-	ANC_TYPE_NS_BLOCK,
-	ANC_TYPE_ANANAS_BLOCK,
 	ANC_TYPE_POINTER
 };
 @interface ANCTypeSpecifier : NSObject
-@property (copy, nonatomic) NSString *identifer;
-@property (assign, nonatomic) ANCTypeSpecifierKind typeKind;
-@property (copy, nonatomic) NSString *typeEncoding;
+@property (copy, nonatomic) NSString *structName;
+@property (copy, nonatomic) NSString *typeName;
+@property (assign, nonatomic) ANATypeSpecifierKind typeKind;
+- (const char *)typeEncodingWithInterpreter:(ANCInterpreter *)inter;
 
-@property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;//for block type
-@property (strong, nonatomic) NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier;//for block type
 
 @end

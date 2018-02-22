@@ -130,31 +130,15 @@ static void increment_line_number(){
 
 <INITIAL>"void" {return VOID; }
 <INITIAL>"BOOL" {return BOOL_; }
-<INITIAL>"NSInteger" {return NS_INTEGER; }
-<INITIAL>"NSUInteger" {return NS_U_INTEGER; }
-<INITIAL>"CGFloat" {return CG_FLOAT; }
+<INITIAL>"int" {return INT; }
+<INITIAL>"uint" {return U_INT; }
 <INITIAL>"double" {return DOUBLE; }
-<INITIAL>"char" {return CHAR; }
-<INITIAL>"Class" {return CLASS_T; }
-<INITIAL>"SEL" {return SEL_T; }
-
-<INITIAL>"CGRect" {return CG_RECT; }
-<INITIAL>"CGSize" {return CG_SIZE; }
-<INITIAL>"CGPoint" {return CG_POINT; }
-<INITIAL>"CGAffineTransform" {return CG_AFFINE_TRANSFORM; }
-<INITIAL>"NSRange" {return NS_RANGE; }
-<INITIAL>"CGVector" {return CG_VECTOR; }
-<INITIAL>"UIOffset" {return UI_OFFSET; }
-<INITIAL>"UIEdgeInsets" {return UI_DEGE_INSETS; }
-<INITIAL>"CATransform3D" {return CA_TRANSFORM_3D; }
-
-<INITIAL>"NSString" {return NS_STRING; }
-<INITIAL>"NSNumber" {return NS_NUMBER; }
-<INITIAL>"NSArray" {return NS_ARRAY; }
-<INITIAL>"NSMutableArray" {return NS_MUTABLE_ARRAY; }
-<INITIAL>"NSDictionary" {return NS_DICTIONARY; }
-<INITIAL>"NSMutableDictionary" {return NS_MUTABLE_DICTIONARY; }
+<INITIAL>"cstring" {return C_STRING; }
 <INITIAL>"id" {return ID; }
+<INITIAL>"Class" {return CLASS_; }
+<INITIAL>"SEL" {return SEL_; }
+<INITIAL>"block" {return BLOCK; }
+<INITIAL>"pointer" {return POINTER; }
 
 <INITIAL>"self" {
 	ANCExpression *expression = anc_create_expression(ANC_SELF_EXPRESSION);
@@ -175,14 +159,14 @@ static void increment_line_number(){
 }
 <INITIAL>"YES" {
 	ANCExpression *expression = anc_create_expression(ANC_BOOLEAN_EXPRESSION);
-	expression.bool_value = YES;
+	expression.boolValue = YES;
 	yylval.expression = (__bridge_retained void *)expression;
 	return YES_;
 	
 }
 <INITIAL>"NO" {
 	ANCExpression *expression = anc_create_expression(ANC_BOOLEAN_EXPRESSION);
-	expression.bool_value = NO;
+	expression.boolValue = NO;
 	yylval.expression = (__bridge_retained void *)expression;
 	return NO_;
 	
@@ -202,7 +186,7 @@ static void increment_line_number(){
 	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
 	NSInteger val;
 	sscanf(yytext,"%ld",&val);
-	expression.integer_value = val;
+	expression.integerValue = val;
 	yylval.expression = (__bridge_retained void *)expression;
 	return INTETER_LITERAL;
 }
@@ -213,7 +197,7 @@ static void increment_line_number(){
 	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
 	NSInteger val;
 	sscanf(yytext,"%lx",&val);
-	expression.integer_value = val;
+	expression.integerValue = val;
 	yylval.expression = (__bridge_retained void *)expression;
 	return INTETER_LITERAL;
 }
@@ -221,7 +205,7 @@ static void increment_line_number(){
 
 <INITIAL>"0" {
 	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
-	expression.integer_value = 0;
+	expression.integerValue = 0;
 	yylval.expression = (__bridge_retained void *)expression;
 	return INTETER_LITERAL;
 }
@@ -231,7 +215,7 @@ static void increment_line_number(){
 	ANCExpression *expression = anc_create_expression(ANC_DOUBLE_EXPRESSION);
 	double val;
 	sscanf(yytext,"%lf",&val);
-	expression.double_value = val;
+	expression.doubleValue = val;
 	yylval.expression = (__bridge_retained void *)expression;
 	return DOUBLE_LITERAL;
 }
@@ -244,7 +228,7 @@ static void increment_line_number(){
 
 <STRING_LITERAL_STATE>\" {
 	ANCExpression *expression = anc_create_expression(ANC_STRING_EXPRESSION);
-	expression.utf8_string_value = anc_end_string_literal();
+	expression.cstringValue = anc_end_string_literal();
 	yylval.expression = (__bridge_retained void *)expression;
 	BEGIN  INITIAL;
 	return STRING_LITERAL;

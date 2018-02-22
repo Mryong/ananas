@@ -11,7 +11,6 @@
 #import <objc/message.h>
 #include "ananasc.h"
 
-extern NSUInteger anc_struct_declare_line_number;;
 
 static ANCInterpreter *st_current_compile_util;
 
@@ -161,7 +160,7 @@ void anc_build_block_expr(ANCBlockExpression *expr, ANCTypeSpecifier *returnType
 	ANCFunctionDefinition *func = [[ANCFunctionDefinition alloc] init];
 	func.kind = ANCFunctionDefinitionKindBlock;
 	if (!returnTypeSpecifier) {
-		returnTypeSpecifier = anc_create_type_specifier(ANC_TYPE_VOID, @"void", @"v");
+		returnTypeSpecifier = anc_create_type_specifier(ANC_TYPE_VOID);
 	}
 	func.returnTypeSpecifier = returnTypeSpecifier;
 	func.params  = params;
@@ -363,18 +362,18 @@ ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *st
 
 
 
-ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, NSString *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
+ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, const char *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue){
 	if (![typeEncodingKey isEqualToString:@"typeEncoding"]) {
-		anc_compile_err(anc_struct_declare_line_number, ANCCompileErrorStructDeclareLackTypeEncoding);
+		anc_compile_err(0, ANCCompileErrorStructDeclareLackTypeEncoding);
 	}
 	
 	if (![keysKey isEqualToString:@"keys"]) {
-		anc_compile_err(anc_struct_declare_line_number, ANCCompileErrorStructDeclareLackTypeKeys);
+		anc_compile_err(0, ANCCompileErrorStructDeclareLackTypeKeys);
 	}
 	
 	ANCStructDeclare *structDeclare = [[ANCStructDeclare alloc] init];
 	structDeclare.annotationIfConditionExpr = annotaionIfConditionExpr;
-	structDeclare.lineNumber = anc_struct_declare_line_number;
+	structDeclare.lineNumber = 0;
 	structDeclare.name = structName;
 	structDeclare.typeEncoding = typeEncodingValue;
 	structDeclare.keys = keysValue;
@@ -383,21 +382,18 @@ ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionE
 	
 }
 
-ANCTypeSpecifier *anc_create_type_specifier(ANCTypeSpecifierKind kind, NSString *identifier, NSString *typeEncoding){
+ANCTypeSpecifier *anc_create_type_specifier(ANATypeSpecifierKind kind){
 	ANCTypeSpecifier *typeSpecifier = [[ANCTypeSpecifier alloc] init];
 	typeSpecifier.typeKind = kind;
-	typeSpecifier.identifer = identifier;
-	typeSpecifier.typeEncoding = typeEncoding;
 	return typeSpecifier;
 }
 
-ANCTypeSpecifier *anc_create_block_type_specifier(ANCTypeSpecifier *returnTypeSpecifier,NSArray<ANCTypeSpecifier *> *paramsTypeSpecifier){
-	ANCTypeSpecifier *typeSpecifier = [[ANCTypeSpecifier alloc] init];
-	typeSpecifier.typeKind = ANC_TYPE_ANANAS_BLOCK;
-	typeSpecifier.returnTypeSpecifier = returnTypeSpecifier;
-	typeSpecifier.paramsTypeSpecifier = paramsTypeSpecifier;
+ANCTypeSpecifier *anc_create_struct_type_specifier(NSString *structName){
+	ANCTypeSpecifier *typeSpecifier = anc_create_type_specifier(ANC_TYPE_STRUCT);
+	typeSpecifier.structName = structName;
 	return typeSpecifier;
 }
+
 
 ANCParameter *anc_create_parameter(ANCTypeSpecifier *type, NSString *name){
 	ANCParameter *parameter = [[ANCParameter alloc] init];
