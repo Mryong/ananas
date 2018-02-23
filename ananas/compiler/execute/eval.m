@@ -14,6 +14,61 @@
 #import "ffi.h"
 #import "util.h"
 
+
+enum {
+	BLOCK_DEALLOCATING =      (0x0001),
+	BLOCK_REFCOUNT_MASK =     (0xfffe),
+	BLOCK_NEEDS_FREE =        (1 << 24),
+	BLOCK_HAS_COPY_DISPOSE =  (1 << 25),
+	BLOCK_HAS_CTOR =          (1 << 26),
+	BLOCK_IS_GC =             (1 << 27),
+	BLOCK_IS_GLOBAL =         (1 << 28),
+	BLOCK_USE_STRET =         (1 << 29),
+	BLOCK_HAS_SIGNATURE  =    (1 << 30)
+};
+
+struct ANANASSimulateBlock {
+	void *isa;
+	int flags;
+	int reserved;
+	void *invoke;
+	struct ANANASSimulateBlockDescriptor *descriptor;
+	void *wrapper;
+};
+
+struct ANANASSimulateBlockDescriptor {
+	//Block_descriptor_1
+	struct {
+		unsigned long int reserved;
+		unsigned long int size;
+	};
+	
+	//Block_descriptor_2
+	struct {
+		// requires BLOCK_HAS_COPY_DISPOSE
+		void (*copy)(void *dst, const void *src);
+		void (*dispose)(const void *);
+	};
+	
+	//Block_descriptor_3
+	struct {
+		// requires BLOCK_HAS_SIGNATURE
+		const char *signature;
+	};
+};
+
+void copy_helper(struct ANANASSimulateBlock *dst, struct ANANASSimulateBlock *src)
+{
+	// do not copy anything is this funcion! just retain if need.
+	CFRetain(dst->wrapper);
+}
+
+void dispose_helper(struct ANANASSimulateBlock *src)
+{
+	CFRelease(src->wrapper);
+}
+
+
 static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr);
 
 static void eval_bool_exprseeion(ANCInterpreter *inter, ANCExpression *expr){
@@ -51,17 +106,66 @@ static void eval_sel_expression(ANCInterpreter *inter, ANCExpression *expr){
 	[inter.stack push:value];
 }
 
+static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
+	
+}
 
 //TODO
-static void eval_block_expression(ANCInterpreter *inter, ANEScopeChain *outScope, ANCBlockExpression *expr){
+static id create_oc_block(id _self, ANCInterpreter *inter,ANEBlock *ananasBlock){
+	void *blockImp = NULL;
+	const char *typeEncoding = [ananasBlock.func.returnTypeSpecifier typeEncodingWithInterpreter:inter];
+	typeEncoding = ananas_str_append(typeEncoding, "@?");
+	for (ANCParameter *param in ananasBlock.func.params) {
+		const char *paramTypeEncoding = [param.type typeEncodingWithInterpreter:inter];
+		typeEncoding = ananas_str_append(typeEncoding, paramTypeEncoding);
+	}
+	NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:typeEncoding];
+	unsigned int argCount = (unsigned int)[sig numberOfArguments];
+	ffi_type *returnType = ananas_ffi_type_with_type_encoding(sig.methodReturnType);
+	ffi_type **paramTypes = malloc(sizeof(ffi_type *) * argCount);
+	for (int  i = 0 ; i < argCount; i++) {
+		paramTypes[i] = ananas_ffi_type_with_type_encoding([sig getArgumentTypeAtIndex:i]);
+	}
+	
+	ffi_cif cif;
+	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, argCount, returnType, paramTypes);
+	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &blockImp);
+	ffi_prep_closure_loc(closure, &cif, blockInter, (__bridge void *)ananasBlock, blockImp);
+	
+	
+	struct ANANASSimulateBlockDescriptor descriptor = {
+		0,
+		sizeof(struct ANANASSimulateBlock),
+		(void (*)(void *dst, const void *src))copy_helper,
+		(void (*)(const void *src))dispose_helper,
+		typeEncoding
+	};
+	struct ANANASSimulateBlockDescriptor *descriptorPtr = malloc(sizeof(struct ANANASSimulateBlockDescriptor));
+	memcpy(descriptorPtr, &descriptor, sizeof(struct ANANASSimulateBlockDescriptor));
+	
+	struct ANANASSimulateBlock simulateBlock = {
+		&_NSConcreteStackBlock,
+		(BLOCK_HAS_COPY_DISPOSE | BLOCK_HAS_SIGNATURE),
+		0,
+		blockImp,
+		descriptorPtr,
+		(__bridge void*)ananasBlock
+	};
+	void *ptr = Block_copy(&simulateBlock);
+	return (__bridge id)ptr;
+}
+
+
+static void eval_block_expression(id _self, ANCInterpreter *inter, ANEScopeChain *outScope, ANCBlockExpression *expr){
 	ANEValue *value = [ANEValue new];
 	value.type = anc_create_type_specifier(ANC_TYPE_BLOCK);
-	ANEBlock *ananasBlockValue = [[ANEBlock alloc] init];
-	ananasBlockValue.func = expr.func;
+	ANEBlock *ananasBlock = [[ANEBlock alloc] init];
+	ananasBlock.func = expr.func;
 	ANEScopeChain *scope = [ANEScopeChain new];
 	scope.next = outScope;
-	ananasBlockValue.scope = scope;
-	value.objectValue = ananasBlockValue;
+	ananasBlock.scope = scope;
+	id ocBlock = create_oc_block(_self, inter, ananasBlock);
+	value.objectValue = ocBlock;
 	[inter.stack push:value];
 }
 
@@ -79,65 +183,10 @@ static void eval_identifer_expression(ANCInterpreter *inter, ANEScopeChain *scop
 		if (pos.instance) {
 			Ivar ivar = class_getInstanceVariable([pos.instance class], identifier.UTF8String);
 			if (ivar) {
-				ANEValue *value = [[ANEValue alloc] init];
 				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
-				switch (*ivarEncoding) {
-					case '*':{
-						char **ivarValuePointer = (char **)((__bridge void *)(pos.instance) + ivar_getOffset(ivar));
-						value.type = anc_create_type_specifier(ANC_TYPE_C_STRING);
-						value.cstringValue = *ivarValuePointer;
-						break;
-					}
-					case '@':{
-						if (strlen(ivarEncoding) == 2 && *(ivarEncoding +1) == '?') {
-							value.type = anc_create_type_specifier(ANC_TYPE_BLOCK);
-						}else{
-							value.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
-						}
-						break;
-					}
-					case 'B':{
-						NSNumber *num = [pos.instance valueForKey:identifier];
-						value.type = anc_create_type_specifier(ANC_TYPE_BOOL);
-						value.uintValue = [num boolValue];
-						break;
-					}
-					case 'i':
-					case 's':
-					case 'l':
-					case 'q':{
-						NSNumber *num = [pos.instance valueForKey:identifier];
-						value.type = anc_create_type_specifier(ANC_TYPE_INT);
-						value.integerValue = [num integerValue];
-						break;
-					}
-					case 'I':
-					case 'S':
-					case 'L':
-					case 'Q':{
-						NSNumber *num = [pos.instance valueForKey:identifier];
-						value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
-						value.uintValue = [num unsignedIntegerValue];
-						break;
-					}
-					case 'f':
-					case 'd':{
-						NSNumber *num = [pos.instance valueForKey:identifier];
-						value.type = anc_create_type_specifier(ANC_TYPE_DOUBLE);
-						value.doubleValue = [num doubleValue];
-						break;
-					}
-					case '{':{
-						NSValue *value = [pos.instance valueForKey:identifier];
-						//TODO
-						break;
-					}
-					default:
-						NSCAssert(0, @"not support type %s", ivarEncoding);
-						break;
-				}
+				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
+				ANEValue *value = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:ivarEncoding];
 				[inter.stack push:value];
-				
 				return;
 			}
 		}else{
@@ -261,7 +310,10 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 				if (pos.instance) {
 					Ivar ivar	= class_getInstanceVariable([_self class], identiferExpr.identifier.UTF8String);
 					if (ivar) {
-						
+						const char *ivarEncoding = ivar_getTypeEncoding(ivar);
+						void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
+						[operValue assign2CValuePointer:ptr typeEncoding:ivarEncoding inter:inter];
+						return;
 					}
 					
 				}else{
@@ -276,23 +328,18 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 				
 			}
 			
-			
-			Ivar ivar = class_getInstanceVariable([_self class], identiferExpr.identifier.UTF8String);
-			ptrdiff_t offset = ivar_getOffset(ivar);
-			void *ivarPtr = (__bridge void *)_self + offset;
-			
 			break;
 		}
 		case ANC_INDEX_EXPRESSION:{
+			//TODO
 			break;
 		}
 			
 		default:
+			
 			break;
 	}
-	
-	
-	//TODO
+
 }
 
 
@@ -496,7 +543,7 @@ default:\
 NSCAssert(0, @"line:%zd == 、 != 、 < 、 <= 、 > 、 >= can not use between %@ and %@",lineNumber, value1.type.typeName, value2.type.typeName);\
 break;\
 }
-static BOOL equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2){
+BOOL ananas_equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2){
 
 	
 #define object_value_equal(sel)\
@@ -587,7 +634,7 @@ static void eval_eq_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 	eval_expression(_self, inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
-	BOOL equal =  equal_value(expr.left.lineNumber, leftValue, rightValue);
+	BOOL equal =  ananas_equal_value(expr.left.lineNumber, leftValue, rightValue);
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL);
 	resultValue.uintValue = equal;
@@ -601,7 +648,7 @@ static void eval_ne_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 	eval_expression(_self, inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
-	BOOL equal =  equal_value(expr.left.lineNumber, leftValue, rightValue);
+	BOOL equal =  ananas_equal_value(expr.left.lineNumber, leftValue, rightValue);
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL);
 	resultValue.uintValue = !equal;
@@ -745,20 +792,22 @@ static void eval_logic_not_expression(id _self, ANCInterpreter *inter, ANEScopeC
 }
 
 static void eval_increment_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.expr);
-	ANEValue *value = [inter.stack peekStack:0];
-	ANEValue *resultValue = [ANEValue new];
-	switch (value.type.typeKind) {
-		case ANC_TYPE_INT:
-//			resultValue.type = anc_create_type_specifier(ANC_TYPE_NS_INTEGER);
-//			resultValue.integerValue = value.integerValue +
-			break;
-			
-		default:
-			break;
-	}
+	ANCExpression *oneValueExpr = anc_create_expression(ANC_INT_EXPRESSION);
+	oneValueExpr.integerValue = 1;
+	ANCBinaryExpression *addExpr = [[ANCBinaryExpression alloc] initWithExpressionKind:ANC_PLUS_EXPRESSION];
+	addExpr.left = expr.expr;
+	addExpr.right = oneValueExpr;
+	eval_expression(_self, inter, scope, addExpr);
 }
 
+static void eval_decrement_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	ANCExpression *oneValueExpr = anc_create_expression(ANC_INT_EXPRESSION);
+	oneValueExpr.integerValue = 1;
+	ANCBinaryExpression *addExpr = [[ANCBinaryExpression alloc] initWithExpressionKind:ANC_MINUS_EXPRESSION];
+	addExpr.left = expr.expr;
+	addExpr.right = oneValueExpr;
+	eval_expression(_self, inter, scope, addExpr);
+}
 static void eval_negative_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
 	eval_expression(_self, inter, scope, expr.expr);
 	ANEValue *value = [inter.stack pop];
@@ -1068,7 +1117,6 @@ static void eval_member_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 
 
 static ANEValue *invoke(NSUInteger line, id _self, ANCInterpreter *inter, ANEScopeChain *scope, id instance, SEL sel, NSArray<ANCExpression *> *argExprs){
-	
 	NSMethodSignature *sig = [instance methodSignatureForSelector:sel];
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
 	invocation.target = instance;
@@ -1146,7 +1194,12 @@ static ANEValue *invoke(NSUInteger line, id _self, ANCInterpreter *inter, ANESco
 	return retValue;
 }
 
-
+/*
+ abc();
+ a.b.name();
+ a.name()();
+ 
+ */
 
 static void eval_function_call_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr){
 	ANCExpressionKind exprKind = expr.expr.expressionKind;
@@ -1335,7 +1388,7 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 			eval_sel_expression(inter, expr);
 			break;
 		case ANC_BLOCK_EXPRESSION:
-			eval_block_expression(inter, scope, expr);
+			eval_block_expression(_self,inter, scope, expr);
 			break;
 		case ANC_NIL_EXPRESSION:
 			eval_nil_expr(inter);
@@ -1395,7 +1448,6 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 		case ANC_TERNARY_EXPRESSION:
 			eval_ternary_expression(_self, inter, scope, expr);
 			break;
-			
 		case ANC_INDEX_EXPRESSION:
 			eval_index_expression(_self, inter, scope, expr);
 			break;
@@ -1415,8 +1467,10 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 			eval_array_expression(_self, inter, scope, expr);
 			break;
 		case ANC_INCREMENT_EXPRESSION:
+			eval_increment_expression(_self, inter, scope, expr);
 			break;
 		case ANC_DECREMENT_EXPRESSION:
+			eval_decrement_expression(_self, inter, scope, expr);
 			break;
 		case ANC_STRUCT_LITERAL_EXPRESSION:
 			eval_struct_expression(_self, inter, scope, expr);

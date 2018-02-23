@@ -173,8 +173,8 @@
 }
 
 
-- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(char *)typeEncoding inter:(ANCInterpreter *)inter{
-	typeEncoding = removeTypeEncodingPrefix(typeEncoding);
+- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding inter:(ANCInterpreter *)inter{
+	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
 #define ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(_encode, _type, _sel)\
 case _encode:{\
 _type *ptr = (_type *)cvaluePointer;\
@@ -229,8 +229,8 @@ break;\
 }
 
 
-- (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(char *)typeEncoding{
-	typeEncoding = removeTypeEncodingPrefix(typeEncoding);
+- (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding{
+	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
 	ANEValue *retValue = [ANEValue new];
 	
 #define ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE(_code,_kind, _type,_sel)\
@@ -264,7 +264,6 @@ break;\
 			break;
 		}
 		case '{':{
-			NSString *type = [NSString stringWithUTF8String:typeEncoding];
 			NSString *structName = ananas_struct_name_with_encoding(typeEncoding);
 			retValue.type= anc_create_struct_type_specifier(structName);
 			retValue.pointerValue = cValuePointer;
@@ -288,10 +287,47 @@ break;\
 @end
 
 @implementation ANEScopeChain
+- (NSMutableArray<ANEVariable *> *)vars{
+	if (_vars == nil) {
+		_vars = [NSMutableArray array];
+	}
+	return _vars;
+}
+
++ (instancetype)scopeChainWithNext:(ANEScopeChain *)next{
+	ANEScopeChain *scope = [ANEScopeChain new];
+	scope.next = next;
+	return scope;
+}
+
 
 @end
 
 @implementation ANEStatementResult
+
++ (instancetype)normalResult{
+	ANEStatementResult *res = [ANEStatementResult new];
+	res.type = ANEStatementResultTypeNormal;
+	return res;
+}
+
++ (instancetype)returnResult{
+	ANEStatementResult *res = [ANEStatementResult new];
+	res.type = ANEStatementResultTypeReturn;
+	return res;
+}
+
++ (instancetype)breakResult{
+	ANEStatementResult *res = [ANEStatementResult new];
+	res.type = ANEStatementResultTypeBreak;
+	return res;
+}
+
++ (instancetype)continueResult{
+	ANEStatementResult *res = [ANEStatementResult new];
+	res.type = ANEStatementResultTypeContinue;
+	return res;
+}
 
 @end
 

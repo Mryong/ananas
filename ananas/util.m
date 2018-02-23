@@ -11,7 +11,7 @@
 #import "anc_ast.h"
 
 
-const char * ananas_strappend(const char *str1, const char *str2){
+const char * ananas_str_append(const char *str1, const char *str2){
 	size_t len = strlen(str1) + strlen(str2);
 	char *ret = malloc(sizeof(char) * (len + 1));
 	strcpy(ret, str1);

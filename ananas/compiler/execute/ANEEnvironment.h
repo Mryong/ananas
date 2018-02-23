@@ -39,12 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)c2objectValue;
 - (void *)c2pointerValue;
 
-- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(char *)typeEncoding inter:(nullable ANCInterpreter *)inter;
-- (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(char *)typeEncoding;
+- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding inter:(nullable ANCInterpreter *)inter;
+- (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding;
 @end
 
 @interface ANEVariable:NSObject
-@property (assign, nonatomic)BOOL ananasVar;
 @property (copy, nonatomic) NSString *name;
 @property (strong, nonatomic) ANEValue *value;
 @end
@@ -54,13 +53,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSMutableArray<ANEVariable *> *vars;
 @property (strong, nonatomic) ANEScopeChain *next;
 
++ (instancetype)scopeChainWithNext:(ANEScopeChain *)next;
+
 
 
 @end
 
 typedef NS_ENUM(NSInteger, ANEStatementResultType) {
 	ANEStatementResultTypeNormal,
-	ANEStatementResultTypeReutun,
+	ANEStatementResultTypeReturn,
 	ANEStatementResultTypeBreak,
 	ANEStatementResultTypeContinue,
 };
@@ -69,6 +70,10 @@ typedef NS_ENUM(NSInteger, ANEStatementResultType) {
 @interface ANEStatementResult : NSObject
 @property (assign, nonatomic) ANEStatementResultType type;
 @property (strong, nonatomic) ANEValue *reutrnValue;
++ (instancetype)normalResult;
++ (instancetype)returnResult;
++ (instancetype)breakResult;
++ (instancetype)continueResult;
 @end
 
 

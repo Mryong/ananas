@@ -11,21 +11,26 @@
 
 @implementation ANCExpression
 
+- (instancetype)initWithExpressionKind:(ANCExpressionKind)expressionKind{
+	if (self = [self init]) {
+		_expressionKind = expressionKind;
+	}
+	return self;
+}
+
 @end
 
 @implementation ANCIdentifierExpression
-
 @end
 
 @implementation ANCAssignExpression
-
 @end
 
 @implementation ANCBinaryExpression
-
 @end
 
 @implementation ANCTernaryExpression
+
 
 @end
 
@@ -34,11 +39,9 @@
 @end
 
 @implementation ANCMemberExpression
-
 @end
 
 @implementation ANCFunctonCallExpression
-
 @end
 
 @implementation ANCIndexExpression

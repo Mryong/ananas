@@ -59,13 +59,13 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 @interface ANCExpression : NSObject
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (assign, nonatomic) ANCExpressionKind expressionKind;
-@property (strong, nonatomic) ANCTypeSpecifier *typeSpecifier;
 @property (assign, nonatomic) BOOL boolValue;
 @property (assign, nonatomic) long long int integerValue;
 @property (assign, nonatomic) unsigned long long  uintValue;
 @property (assign, nonatomic) double doubleValue;
 @property (assign, nonatomic) const char *cstringValue;
 @property (copy, nonatomic) NSString *selectorName;
+- (instancetype)initWithExpressionKind:(ANCExpressionKind)expressionKind;
 @end
 
 @interface ANCIdentifierExpression: ANCExpression
