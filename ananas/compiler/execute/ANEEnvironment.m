@@ -278,7 +278,11 @@ break;\
 	return retValue;
 }
 
-
++ (instancetype)voidValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_VOID);
+	return value;
+}
 
 @end
 

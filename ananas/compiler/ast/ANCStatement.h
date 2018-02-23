@@ -83,7 +83,7 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 
 @interface ANCForEachStatement: ANCStatement
 @property (assign, nonatomic) ANCDeclaration *declaration;
-@property (strong, nonatomic) ANCExpression *varExpr;
+@property (strong, nonatomic) ANCIdentifierExpression *identifierExpr;
 @property (strong, nonatomic) ANCExpression *arrayExpr;
 @property (strong, nonatomic) ANCBlock *block;
 @end

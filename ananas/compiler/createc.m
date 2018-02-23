@@ -281,7 +281,7 @@ ANCForEachStatement *anc_create_for_each_statement(ANCTypeSpecifier *typeSpecifi
 	}else{
 		ANCIdentifierExpression *varExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
 		varExpr.identifier = varName;
-		statement.varExpr = varExpr;
+		statement.identifierExpr = varExpr;
 	}
 	
 	statement.arrayExpr = arrayExpr;

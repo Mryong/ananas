@@ -16,6 +16,11 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	NSArray *arr;
+	
+//	for (self.myv in arr) {
+//		
+//	}
 	
 }
 

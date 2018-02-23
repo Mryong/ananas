@@ -162,6 +162,108 @@ static ANEStatementResult *execute_for_statement(id _self ,ANCInterpreter *inter
 }
 
 
+static ANEStatementResult *execute_for_each_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, ANCForEachStatement *statement){
+	ANEStatementResult *res;
+	ANEScopeChain *forScope = [ANEScopeChain scopeChainWithNext:scope];
+
+	if (statement.declaration) {
+		execute_declaration(_self, inter, forScope, statement.declaration);
+		ANCIdentifierExpression *identifierExpr = [[ANCIdentifierExpression alloc] init];
+		identifierExpr.expressionKind = ANC_IDENTIFIER_EXPRESSION;
+		identifierExpr.identifier = statement.declaration.name;
+		statement.identifierExpr = identifierExpr;
+	}
+	
+	
+	
+	ANEValue *arrValue = ane_eval_expression(_self, inter, scope, statement.arrayExpr);
+	if (arrValue.type.typeKind != ANC_TYPE_OBJECT) {
+		NSCAssert(0, @"");
+	}
+	
+	for (id var in arrValue.objectValue) {
+		ANEValue *operValue = [[ANEValue alloc] init];
+		operValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+		operValue.objectValue = var;
+		ananas_assign_value_to_identifer_expr(_self, inter, scope, statement.identifierExpr, operValue);
+		
+		res = ane_execute_statement_list(_self, inter, forScope, statement.block.statementList);
+		if (res.type == ANEStatementResultTypeReturn) {
+			break;
+		}else if (res.type == ANEStatementResultTypeBreak) {
+			res.type = ANEStatementResultTypeNormal;
+			break;
+		}else if (res.type == ANEStatementResultTypeContinue){
+			res.type = ANEStatementResultTypeNormal;
+		}
+	}
+	return res ?: [ANEStatementResult normalResult];
+	
+}
+
+static ANEStatementResult *execute_while_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,  ANCWhileStatement *statement){
+	ANEStatementResult *res;
+	ANEScopeChain *whileScope = [ANEScopeChain scopeChainWithNext:scope];
+	for (;;) {
+		ANEValue *conValue = ane_eval_expression(_self, inter, whileScope, statement.condition);
+		if (![conValue isSubtantial]) {
+			break;
+		}
+		res = ane_execute_statement_list(_self, inter, whileScope, statement.block.statementList);
+		if (res.type == ANEStatementResultTypeReturn) {
+			break;
+		}else if (res.type == ANEStatementResultTypeBreak) {
+			res.type = ANEStatementResultTypeNormal;
+			break;
+		}else if (res.type == ANEStatementResultTypeContinue){
+			res.type = ANEStatementResultTypeNormal;
+		}
+	}
+	return res ?: [ANEStatementResult normalResult];
+}
+
+static ANEStatementResult *execute_do_while_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,  ANCDoWhileStatement *statement){
+	ANEStatementResult *res;
+	ANEScopeChain *whileScope = [ANEScopeChain scopeChainWithNext:scope];
+	for (;;) {
+		res = ane_execute_statement_list(_self, inter, whileScope, statement.block.statementList);
+		if (res.type == ANEStatementResultTypeReturn) {
+			break;
+		}else if (res.type == ANEStatementResultTypeBreak) {
+			res.type = ANEStatementResultTypeNormal;
+			break;
+		}else if (res.type == ANEStatementResultTypeContinue){
+			res.type = ANEStatementResultTypeNormal;
+		}
+		ANEValue *conValue = ane_eval_expression(_self, inter, whileScope, statement.condition);
+		if (![conValue isSubtantial]) {
+			break;
+		}
+	}
+	return res ?: [ANEStatementResult normalResult];
+}
+
+
+
+static ANEStatementResult *execute_return_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,  ANCReturnStatement *statement){
+	ANEStatementResult *res = [ANEStatementResult returnResult];
+	if (statement.retValExpr) {
+		res.reutrnValue = ane_eval_expression(_self, inter, scope, statement.retValExpr);
+	}else{
+		res.reutrnValue = [ANEValue voidValue];
+	}
+	return res;
+}
+
+
+static ANEStatementResult *execute_break_statement(){
+	return [ANEStatementResult breakResult];
+}
+
+
+static ANEStatementResult *execute_continue_statement(){
+	return [ANEStatementResult continueResult];
+}
 
 
 
@@ -187,6 +289,30 @@ static  ANEStatementResult *execute_statement(id _self ,ANCInterpreter *inter, A
 		}
 		case ANCStatementKindFor:{
 			res = execute_for_statement(_self, inter, scope, statement);
+			break;
+		}
+		case ANCStatementKindForEach:{
+			res = execute_for_each_statement(_self, inter, scope, statement);
+			break;
+		}
+		case ANCStatementKindWhile:{
+			res = execute_while_statement(_self, inter, scope, statement);
+			break;
+		}
+		case ANCStatementKindDoWhile:{
+			res = execute_do_while_statement(_self, inter, scope, statement);
+			break;
+		}
+		case ANCStatementKindReturn:{
+			res = execute_return_statement(_self, inter, scope, statement);
+			break;
+		}
+		case ANCStatementKindBreak:{
+			res = execute_break_statement();
+			break;
+		}
+		case ANCStatementKindContinue:{
+			res = execute_continue_statement();
 			break;
 		}
 			

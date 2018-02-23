@@ -218,6 +218,31 @@ static void eval_ternary_expression(id _self, ANCInterpreter *inter, ANEScopeCha
 }
 static void eval_function_call_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr);
 
+
+void ananas_assign_value_to_identifer_expr(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCIdentifierExpression *identiferExpr,ANEValue *operValue){
+	for (ANEScopeChain *pos = scope; pos; pos = pos.next) {
+		if (pos.instance) {
+			Ivar ivar	= class_getInstanceVariable([_self class], identiferExpr.identifier.UTF8String);
+			if (ivar) {
+				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
+				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
+				[operValue assign2CValuePointer:ptr typeEncoding:ivarEncoding inter:inter];
+				return;
+			}
+			
+		}else{
+			for (ANEVariable *var in pos.vars) {
+				if ([var.name isEqualToString:identiferExpr.identifier]) {
+					[var.value assignFrom:operValue];
+					return;
+				}
+			}
+		}
+		
+		
+	}
+}
+
 static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCAssignExpression *expr){
 	ANCAssignKind assignKind = expr.assignKind;
 	ANCExpression *leftExpr = expr.left;
@@ -305,29 +330,7 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 			
 			eval_expression(_self, inter, scope, optrExpr);
 			ANEValue *operValue = [inter.stack pop];
-			
-			for (ANEScopeChain *pos = scope; pos; pos = pos.next) {
-				if (pos.instance) {
-					Ivar ivar	= class_getInstanceVariable([_self class], identiferExpr.identifier.UTF8String);
-					if (ivar) {
-						const char *ivarEncoding = ivar_getTypeEncoding(ivar);
-						void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
-						[operValue assign2CValuePointer:ptr typeEncoding:ivarEncoding inter:inter];
-						return;
-					}
-					
-				}else{
-					for (ANEVariable *var in pos.vars) {
-						if ([var.name isEqualToString:identiferExpr.identifier]) {
-							[var.value assignFrom:operValue];
-							return;
-						}
-					}
-				}
-				
-				
-			}
-			
+			ananas_assign_value_to_identifer_expr(_self, inter, scope, identiferExpr, operValue);
 			break;
 		}
 		case ANC_INDEX_EXPRESSION:{
