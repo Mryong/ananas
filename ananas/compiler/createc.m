@@ -204,17 +204,7 @@ ANCElseIf *anc_create_else_if(ANCExpression *condition, ANCBlock *thenBlock){
 
 ANCIfStatement *anc_create_if_statement(ANCExpression *condition,ANCBlock *thenBlock,NSArray<ANCElseIf *> *elseIfList,ANCBlock *elseBlocl){
 	ANCIfStatement *statement = [[ANCIfStatement alloc] init];
-	
-	thenBlock.kind = ANCBlockKindStatement;
-	thenBlock.statement = statement;
-	
-	for (ANCElseIf *elseIf in elseIfList) {
-		elseIf.thenBlock.kind = ANCBlockKindStatement;
-		elseIf.thenBlock.statement = statement;
-	}
-	
-	elseBlocl.kind = ANCBlockKindStatement;
-	elseBlocl.statement = statement;
+
 	
 	statement.kind = ANCStatementKindIf;
 	statement.condition = condition;
@@ -236,14 +226,6 @@ ANCCase *anc_create_case(ANCExpression *expr, ANCBlock *block){
 ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSArray<ANCCase *> *caseList, ANCBlock *defaultBlock){
 	ANCSwitchStatement *statement = [[ANCSwitchStatement alloc] init];
 	
-	for (ANCCase *case_ in caseList) {
-		case_.block.kind = ANCBlockKindStatement;
-		case_.block.statement = statement;
-	}
-	
-	defaultBlock.kind = ANCBlockKindStatement;
-	defaultBlock.statement = statement;
-	
 	statement.kind = ANCStatementKindSwitch;
 	statement.expr = expr;
 	statement.caseList = caseList;
@@ -255,9 +237,6 @@ ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSArray<ANC
 ANCForStatement *anc_create_for_statement(ANCExpression *initializerExpr, ANCDeclaration *declaration,
 										  ANCExpression *condition, ANCExpression *post, ANCBlock *block){
 	ANCForStatement *statement = [[ANCForStatement alloc] init];
-	
-	block.kind = ANCBlockKindStatement;
-	block.statement = statement;
 	
 	statement.kind = ANCStatementKindFor;
 	statement.initializerExpr = initializerExpr;
@@ -272,8 +251,6 @@ ANCForStatement *anc_create_for_statement(ANCExpression *initializerExpr, ANCDec
 ANCForEachStatement *anc_create_for_each_statement(ANCTypeSpecifier *typeSpecifier,NSString *varName, ANCExpression *arrayExpr,ANCBlock *block){
 	ANCForEachStatement *statement = [[ANCForEachStatement alloc] init];
 	
-	block.kind = ANCBlockKindStatement;
-	block.statement = statement;
 	
 	statement.kind = ANCStatementKindForEach;
 	if (typeSpecifier) {
@@ -292,10 +269,6 @@ ANCForEachStatement *anc_create_for_each_statement(ANCTypeSpecifier *typeSpecifi
 
 ANCWhileStatement *anc_create_while_statement(ANCExpression *condition, ANCBlock *block){
 	ANCWhileStatement *statement = [[ANCWhileStatement alloc] init];
-	
-	block.kind = ANCBlockKindStatement;
-	block.statement = statement;
-	
 	statement.kind = ANCStatementKindWhile;
 	statement.condition = condition;
 	statement.block = block;
@@ -304,10 +277,6 @@ ANCWhileStatement *anc_create_while_statement(ANCExpression *condition, ANCBlock
 
 ANCDoWhileStatement *anc_create_do_while_statement(ANCBlock *block, ANCExpression *condition){
 	ANCDoWhileStatement *statement = [[ANCDoWhileStatement alloc] init];
-	
-	block.kind = ANCBlockKindStatement;
-	block.statement = statement;
-	
 	statement.kind = ANCStatementKindDoWhile;
 	statement.block = block;
 	statement.condition = condition;
@@ -349,8 +318,8 @@ ANCBlock *anc_open_block_statement(){
 ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *statementList){
 	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	NSCAssert(block == interpreter.currentBlock, @"block != anc_get_current_compile_util().currentBlock");
-	block.statementList = statementList;
 	interpreter.currentBlock = block.outBlock;
+	block.statementList = statementList;
 	return block;
 }
 
@@ -406,10 +375,6 @@ ANCParameter *anc_create_parameter(ANCTypeSpecifier *type, NSString *name){
 ANCFunctionDefinition *anc_create_function_definition(ANCTypeSpecifier *returnTypeSpecifier,NSString *name ,NSArray<ANCParameter *> *prasms,
 													  ANCBlock *block){
 	ANCFunctionDefinition *functionDefinition = [[ANCFunctionDefinition alloc] init];
-	
-	block.kind = ANCBlockKindeFunction;
-	block.function = functionDefinition;
-	
 	functionDefinition.returnTypeSpecifier = returnTypeSpecifier;
 	functionDefinition.name = name;
 	functionDefinition.params = prasms;
@@ -454,8 +419,6 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	}
 	funcDefinition.name = selector;
 	funcDefinition.params = params;
-	block.kind = ANCBlockKindeFunction;
-	block.function = funcDefinition;
 	funcDefinition.block = block;
 	funcDefinition.methodDefinition = methodDefinition;
 	methodDefinition.functionDefinition = funcDefinition;

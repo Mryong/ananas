@@ -10,6 +10,7 @@
 #import "util.h"
 #import "ananasc.h"
 #import "ANANASStructDeclareTable.h"
+#import <objc/runtime.h>
 
 @implementation ANEValue
 
@@ -384,6 +385,26 @@ break;\
 	return scope;
 }
 
+- (ANEValue *)getValueWithIdentifier:(NSString *)identifier{
+	for (ANEScopeChain *pos = self; pos; pos = pos.next) {
+		if (pos.instance) {
+			Ivar ivar = class_getInstanceVariable([pos.instance class], identifier.UTF8String);
+			if (ivar) {
+				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
+				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
+				ANEValue *value = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:ivarEncoding];
+				return value;
+			}
+		}else{
+			for (ANEVariable *var in pos.vars) {
+				if ([var.name isEqualToString:identifier]) {
+					return var.value;
+				}
+			}
+		}
+	}
+	return nil;
+}
 
 @end
 

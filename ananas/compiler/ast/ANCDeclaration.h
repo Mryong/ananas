@@ -15,5 +15,5 @@
 @property (strong, nonatomic) ANCTypeSpecifier *type;
 @property (copy, nonatomic) NSString *name;
 @property (strong, nonatomic) ANCExpression *initializer;
-@property (assign, nonatomic,getter=isParam) BOOL param;
+//@property (assign, nonatomic,getter=isParam) BOOL param;
 @end

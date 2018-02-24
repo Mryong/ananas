@@ -66,6 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSMutableArray<ANEVariable *> *vars;
 @property (strong, nonatomic) ANEScopeChain *next;
 
+- (ANEValue *)getValueWithIdentifier:(NSString *)identifier;
+
 + (instancetype)scopeChainWithNext:(ANEScopeChain *)next;
 
 

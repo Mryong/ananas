@@ -18,16 +18,9 @@ typedef NS_ENUM(NSInteger, ANCBlockKind) {
 
 
 @interface ANCBlock: NSObject
-@property (assign, nonatomic) ANCBlockKind kind;
 @property (strong, nonatomic) NSArray<ANCStatement *> *statementList;
 @property (strong, nonatomic) NSMutableArray<ANCDeclaration *> *declarations;
-
-
-
 @property (weak, nonatomic) ANCBlock *outBlock;
 
-@property (weak, nonatomic) ANCStatement *statement;
-@property (weak, nonatomic) ANCFunctionDefinition *function;
-@property (weak, nonatomic) ANCBlockExpression *blockExpr;
 
 @end

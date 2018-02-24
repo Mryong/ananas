@@ -46,10 +46,10 @@ static void add_variable(ANEScopeChain *scope, NSString *name, ANEValue *value){
 	[scope.vars addObject:var];
 }
 
-static void execute_declaration(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, ANCDeclaration *declaration){
+static void execute_declaration(ANCInterpreter *inter, ANEScopeChain *scope, ANCDeclaration *declaration){
 	ANEValue *value;
 	if (declaration.initializer) {
-		value = ane_eval_expression(_self, inter, scope, declaration.initializer);
+		value = ane_eval_expression(inter, scope, declaration.initializer);
 	}else{
 		value = default_value_with_type_specifier(inter, declaration.type);
 	}
@@ -60,14 +60,14 @@ static void execute_declaration(id _self ,ANCInterpreter *inter, ANEScopeChain *
 
 
 
-static ANEStatementResult *execute_else_if_list(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,NSArray<ANCElseIf *> *elseIfList,BOOL *executed){
+static ANEStatementResult *execute_else_if_list(ANCInterpreter *inter, ANEScopeChain *scope,NSArray<ANCElseIf *> *elseIfList,BOOL *executed){
 	ANEStatementResult *res;
 	*executed = NO;
 	for (ANCElseIf *elseIf in elseIfList) {
-		ANEValue *conValue = ane_eval_expression(_self, inter, scope, elseIf.condition);
+		ANEValue *conValue = ane_eval_expression(inter, scope, elseIf.condition);
 		if ([conValue isSubtantial]) {
 			ANEScopeChain *conScope = [ANEScopeChain scopeChainWithNext:scope];
-			res = ane_execute_statement_list(_self, inter, conScope, elseIf.thenBlock.statementList);
+			res = ane_execute_statement_list(inter, conScope, elseIf.thenBlock.statementList);
 			*executed = YES;
 			break;
 		}
@@ -75,18 +75,18 @@ static ANEStatementResult *execute_else_if_list(id _self ,ANCInterpreter *inter,
 	return res ?: [ANEStatementResult normalResult];
 }
 
-static ANEStatementResult *execute_if_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, ANCIfStatement *statement){
+static ANEStatementResult *execute_if_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCIfStatement *statement){
 	ANEStatementResult *res;
-	ANEValue *conValue = ane_eval_expression(_self, inter, scope, statement.condition);
+	ANEValue *conValue = ane_eval_expression(inter, scope, statement.condition);
 	if ([conValue isSubtantial]) {
 		ANEScopeChain *conScope = [ANEScopeChain scopeChainWithNext:scope];
-		res = ane_execute_statement_list(_self, inter, conScope, statement.thenBlock.statementList);
+		res = ane_execute_statement_list(inter, conScope, statement.thenBlock.statementList);
 	}else{
 		BOOL executed;
-		res = execute_else_if_list(_self, inter, scope, statement.elseIfList, &executed);
+		res = execute_else_if_list(inter, scope, statement.elseIfList, &executed);
 		if (!executed && statement.elseBlocl) {
 			ANEScopeChain *elseScope = [ANEScopeChain scopeChainWithNext:scope];
-			res = ane_execute_statement_list(_self, inter, elseScope, statement.elseBlocl.statementList);
+			res = ane_execute_statement_list(inter, elseScope, statement.elseBlocl.statementList);
 		}
 	}
 	return res ?: [ANEStatementResult normalResult];
@@ -94,13 +94,13 @@ static ANEStatementResult *execute_if_statement(id _self ,ANCInterpreter *inter,
 }
 
 
-static ANEStatementResult *execute_switch_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, ANCSwitchStatement *statement){
+static ANEStatementResult *execute_switch_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCSwitchStatement *statement){
 	ANEStatementResult *res;
-	ANEValue *value = ane_eval_expression(_self, inter, scope, statement.expr);
+	ANEValue *value = ane_eval_expression(inter, scope, statement.expr);
 	BOOL hasMatch = NO;
 	for (ANCCase *case_ in statement.caseList) {
 		if (!hasMatch) {
-			ANEValue *caseValue = ane_eval_expression(_self, inter, scope, case_.expr);
+			ANEValue *caseValue = ane_eval_expression(inter, scope, case_.expr);
 			BOOL equal = ananas_equal_value(case_.expr.lineNumber, value, caseValue);
 			if (equal) {
 				hasMatch = YES;
@@ -109,7 +109,7 @@ static ANEStatementResult *execute_switch_statement(id _self ,ANCInterpreter *in
 			}
 		}
 		ANEScopeChain *caseScope = [ANEScopeChain scopeChainWithNext:scope];
-		res = ane_execute_statement_list(_self, inter, caseScope, case_.block.statementList);
+		res = ane_execute_statement_list(inter, caseScope, case_.block.statementList);
 		if (res.type != ANEStatementResultTypeNormal) {
 			break;
 		}
@@ -117,7 +117,7 @@ static ANEStatementResult *execute_switch_statement(id _self ,ANCInterpreter *in
 	res = res ?: [ANEStatementResult normalResult];
 	if (res.type == ANEStatementResultTypeNormal) {
 		ANEScopeChain *defaultCaseScope = [ANEScopeChain scopeChainWithNext:scope];
-		res = ane_execute_statement_list(_self, inter, defaultCaseScope, statement.defaultBlock.statementList);
+		res = ane_execute_statement_list(inter, defaultCaseScope, statement.defaultBlock.statementList);
 	}
 	
 	if (res.type == ANEStatementResultTypeBreak) {
@@ -129,21 +129,21 @@ static ANEStatementResult *execute_switch_statement(id _self ,ANCInterpreter *in
 
 
 
-static ANEStatementResult *execute_for_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, ANCForStatement *statement){
+static ANEStatementResult *execute_for_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCForStatement *statement){
 	ANEStatementResult *res;
 	ANEScopeChain *forScope = [ANEScopeChain scopeChainWithNext:scope];
 	if (statement.initializerExpr) {
-		ane_eval_expression(_self, inter, forScope, statement.initializerExpr);
+		ane_eval_expression(inter, forScope, statement.initializerExpr);
 	}else if (statement.declaration){
-		execute_declaration(_self, inter, forScope, statement.declaration);
+		execute_declaration(inter, forScope, statement.declaration);
 	}
 	
 	for (;;) {
-		ANEValue *conValue = ane_eval_expression(_self, inter, forScope, statement.condition);
+		ANEValue *conValue = ane_eval_expression(inter, forScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
-		res = ane_execute_statement_list(_self, inter, forScope, statement.block.statementList);
+		res = ane_execute_statement_list(inter, forScope, statement.block.statementList);
 		if (res.type == ANEStatementResultTypeReturn) {
 			break;
 		}else if (res.type == ANEStatementResultTypeBreak) {
@@ -153,7 +153,7 @@ static ANEStatementResult *execute_for_statement(id _self ,ANCInterpreter *inter
 			res.type = ANEStatementResultTypeNormal;
 		}
 		if (statement.post) {
-			ane_eval_expression(_self, inter, forScope, statement.post);
+			ane_eval_expression(inter, forScope, statement.post);
 		}
 		
 	}
@@ -163,12 +163,12 @@ static ANEStatementResult *execute_for_statement(id _self ,ANCInterpreter *inter
 }
 
 
-static ANEStatementResult *execute_for_each_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, ANCForEachStatement *statement){
+static ANEStatementResult *execute_for_each_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCForEachStatement *statement){
 	ANEStatementResult *res;
 	ANEScopeChain *forScope = [ANEScopeChain scopeChainWithNext:scope];
 
 	if (statement.declaration) {
-		execute_declaration(_self, inter, forScope, statement.declaration);
+		execute_declaration(inter, forScope, statement.declaration);
 		ANCIdentifierExpression *identifierExpr = [[ANCIdentifierExpression alloc] init];
 		identifierExpr.expressionKind = ANC_IDENTIFIER_EXPRESSION;
 		identifierExpr.identifier = statement.declaration.name;
@@ -177,7 +177,7 @@ static ANEStatementResult *execute_for_each_statement(id _self ,ANCInterpreter *
 	
 	
 	
-	ANEValue *arrValue = ane_eval_expression(_self, inter, scope, statement.arrayExpr);
+	ANEValue *arrValue = ane_eval_expression(inter, scope, statement.arrayExpr);
 	if (arrValue.type.typeKind != ANC_TYPE_OBJECT) {
 		NSCAssert(0, @"");
 	}
@@ -186,9 +186,9 @@ static ANEStatementResult *execute_for_each_statement(id _self ,ANCInterpreter *
 		ANEValue *operValue = [[ANEValue alloc] init];
 		operValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
 		operValue.objectValue = var;
-		ananas_assign_value_to_identifer_expr(_self, inter, scope, statement.identifierExpr, operValue);
+		ananas_assign_value_to_identifer_expr(inter, scope, statement.identifierExpr, operValue);
 		
-		res = ane_execute_statement_list(_self, inter, forScope, statement.block.statementList);
+		res = ane_execute_statement_list(inter, forScope, statement.block.statementList);
 		if (res.type == ANEStatementResultTypeReturn) {
 			break;
 		}else if (res.type == ANEStatementResultTypeBreak) {
@@ -202,15 +202,15 @@ static ANEStatementResult *execute_for_each_statement(id _self ,ANCInterpreter *
 	
 }
 
-static ANEStatementResult *execute_while_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,  ANCWhileStatement *statement){
+static ANEStatementResult *execute_while_statement(ANCInterpreter *inter, ANEScopeChain *scope,  ANCWhileStatement *statement){
 	ANEStatementResult *res;
 	ANEScopeChain *whileScope = [ANEScopeChain scopeChainWithNext:scope];
 	for (;;) {
-		ANEValue *conValue = ane_eval_expression(_self, inter, whileScope, statement.condition);
+		ANEValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
-		res = ane_execute_statement_list(_self, inter, whileScope, statement.block.statementList);
+		res = ane_execute_statement_list(inter, whileScope, statement.block.statementList);
 		if (res.type == ANEStatementResultTypeReturn) {
 			break;
 		}else if (res.type == ANEStatementResultTypeBreak) {
@@ -223,11 +223,11 @@ static ANEStatementResult *execute_while_statement(id _self ,ANCInterpreter *int
 	return res ?: [ANEStatementResult normalResult];
 }
 
-static ANEStatementResult *execute_do_while_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,  ANCDoWhileStatement *statement){
+static ANEStatementResult *execute_do_while_statement(ANCInterpreter *inter, ANEScopeChain *scope,  ANCDoWhileStatement *statement){
 	ANEStatementResult *res;
 	ANEScopeChain *whileScope = [ANEScopeChain scopeChainWithNext:scope];
 	for (;;) {
-		res = ane_execute_statement_list(_self, inter, whileScope, statement.block.statementList);
+		res = ane_execute_statement_list(inter, whileScope, statement.block.statementList);
 		if (res.type == ANEStatementResultTypeReturn) {
 			break;
 		}else if (res.type == ANEStatementResultTypeBreak) {
@@ -236,7 +236,7 @@ static ANEStatementResult *execute_do_while_statement(id _self ,ANCInterpreter *
 		}else if (res.type == ANEStatementResultTypeContinue){
 			res.type = ANEStatementResultTypeNormal;
 		}
-		ANEValue *conValue = ane_eval_expression(_self, inter, whileScope, statement.condition);
+		ANEValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
@@ -246,10 +246,10 @@ static ANEStatementResult *execute_do_while_statement(id _self ,ANCInterpreter *
 
 
 
-static ANEStatementResult *execute_return_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope,  ANCReturnStatement *statement){
+static ANEStatementResult *execute_return_statement(ANCInterpreter *inter, ANEScopeChain *scope,  ANCReturnStatement *statement){
 	ANEStatementResult *res = [ANEStatementResult returnResult];
 	if (statement.retValExpr) {
-		res.reutrnValue = ane_eval_expression(_self, inter, scope, statement.retValExpr);
+		res.reutrnValue = ane_eval_expression(inter, scope, statement.retValExpr);
 	}else{
 		res.reutrnValue = [ANEValue voidValueInstance];
 	}
@@ -268,44 +268,44 @@ static ANEStatementResult *execute_continue_statement(){
 
 
 
-static  ANEStatementResult *execute_statement(id _self ,ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCStatement *statement){
+static  ANEStatementResult *execute_statement(ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCStatement *statement){
 	ANEStatementResult *res;
 	switch (statement.kind) {
 		case ANCStatementKindExpression:
-			ane_eval_expression(_self ,inter, scope, [(ANCExpressionStatement *)statement expr]);
+			ane_eval_expression(inter, scope, [(ANCExpressionStatement *)statement expr]);
 			res = [ANEStatementResult normalResult];
 			break;
 		case ANCStatementKindDeclaration:{
-			execute_declaration(_self, inter, scope, [(ANCDeclarationStatement *)statement declaration]);
+			execute_declaration(inter, scope, [(ANCDeclarationStatement *)statement declaration]);
 			res = [ANEStatementResult normalResult];
 			break;
 		}
 		case ANCStatementKindIf:{
-			res = execute_if_statement(_self, inter, scope, statement);
+			res = execute_if_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindSwitch:{
-			res = execute_switch_statement(_self, inter, scope, statement);
+			res = execute_switch_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindFor:{
-			res = execute_for_statement(_self, inter, scope, statement);
+			res = execute_for_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindForEach:{
-			res = execute_for_each_statement(_self, inter, scope, statement);
+			res = execute_for_each_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindWhile:{
-			res = execute_while_statement(_self, inter, scope, statement);
+			res = execute_while_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindDoWhile:{
-			res = execute_do_while_statement(_self, inter, scope, statement);
+			res = execute_do_while_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindReturn:{
-			res = execute_return_statement(_self, inter, scope, statement);
+			res = execute_return_statement(inter, scope, statement);
 			break;
 		}
 		case ANCStatementKindBreak:{
@@ -324,11 +324,11 @@ static  ANEStatementResult *execute_statement(id _self ,ANCInterpreter *inter, A
 }
 
 
-ANEStatementResult *ane_execute_statement_list(id _self, ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList){
+ANEStatementResult *ane_execute_statement_list(ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList){
 	ANEStatementResult *result;
 	if (statementList.count) {
 		for (ANCStatement *statement in statementList) {
-			result = execute_statement(_self,inter, scope, statement);
+			result = execute_statement(inter, scope, statement);
 			if (result.type != ANEStatementResultTypeNormal) {
 				break;
 			}
@@ -340,7 +340,7 @@ ANEStatementResult *ane_execute_statement_list(id _self, ANCInterpreter *inter, 
 }
 
 
-ANEValue * ananas_call_ananas_function(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args){
+ANEValue * ananas_call_ananas_function(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args){
 	NSArray<ANCParameter *> *params = func.params;
 	if (params.count != args.count) {
 		NSCAssert(0, @"");
@@ -352,7 +352,7 @@ ANEValue * ananas_call_ananas_function(id _self, ANCInterpreter *inter, ANEScope
 		i++;
 	}
 	
-	ANEStatementResult *res = ane_execute_statement_list(_self, inter, funScope, func.block.statementList);
+	ANEStatementResult *res = ane_execute_statement_list(inter, funScope, func.block.statementList);
 	if (res.type == ANEStatementResultTypeReturn) {
 		return res.reutrnValue;
 	}else{
@@ -365,7 +365,7 @@ static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDe
 	if (classDefinition.annotationIfExprResult == AnnotationIfExprResultNoComputed) {
 		ANCExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
 		if (annotationIfConditionExpr) {
-			ANEValue *value = ane_eval_expression(nil ,interpreter, interpreter.topScope, annotationIfConditionExpr);
+			ANEValue *value = ane_eval_expression(interpreter, interpreter.topScope, annotationIfConditionExpr);
 			classDefinition.annotationIfExprResult = value.isSubtantial ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
 			if (!value.isSubtantial) {
 				return;
@@ -470,7 +470,7 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 
 static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefinition *prop){
 	if (prop.annotationIfConditionExpr) {
-		ANEValue *conValue = ane_eval_expression(nil, inter, inter.topScope, prop.annotationIfConditionExpr);
+		ANEValue *conValue = ane_eval_expression(inter, inter.topScope, prop.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
 			return;
 		}
@@ -541,7 +541,7 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sele
 		[args addObject:argValue];
 	}
 	
-	ANEValue *retValue = ananas_call_ananas_function(assignSlf, inter, classScope, method.functionDefinition, args);
+	ANEValue *retValue = ananas_call_ananas_function(inter, classScope, method.functionDefinition, args);
 	size_t retLen = [methodSignature methodReturnLength];
 	void *retPtr = malloc(retLen);
 	const char *retTypeEncoding = [methodSignature methodReturnType];
@@ -551,7 +551,7 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sele
 
 static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){
 	if (method.annotationIfConditionExpr) {
-		ANEValue *conValue = ane_eval_expression(nil, interpreter, interpreter.topScope, method.annotationIfConditionExpr);
+		ANEValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, method.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
 			return;
 		}
@@ -615,7 +615,7 @@ void ane_interpret(ANCInterpreter *interpreter){
 	
 	for (__kindof NSObject *top in interpreter.topList) {
 		if ([top isKindOfClass:[ANCStatement class]]) {
-			execute_statement(nil, interpreter, interpreter.topScope, top);
+			execute_statement(interpreter, interpreter.topScope, top);
 		}else if ([top isKindOfClass:[ANCStructDeclare class]]){
 			add_struct_declare(top);
 		}else if ([top isKindOfClass:[ANCClassDefinition class]]){

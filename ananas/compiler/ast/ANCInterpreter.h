@@ -16,7 +16,7 @@
 @property (assign, nonatomic) NSUInteger currentLineNumber;
 @property (strong, nonatomic) NSMutableDictionary<NSString *, ANCStructDeclare *> *structDeclareDic;
 @property (strong, nonatomic) NSMutableDictionary<NSString *, ANCClassDefinition *> *classDefinitionDic;
-//@property (strong, nonatomic) NSMutableDictionary<Class, NSMutableDictionary<NSString *, ANCFunctionDefinition *> *> *functionDefinitionDic;
+
 
 @property (strong, nonatomic) NSMutableArray *topList;
 @property (strong, nonatomic) ANCClassDefinition *currentClassDefinition;

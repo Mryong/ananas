@@ -14,10 +14,10 @@
 
 /* eval.m */
 BOOL ananas_equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2);
-ANEValue *ane_eval_expression(id _self,ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr);
+ANEValue *ane_eval_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr);
 void ane_interpret(ANCInterpreter *inter);
-void ananas_assign_value_to_identifer_expr(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCIdentifierExpression *identiferExpr,ANEValue *operValue);
+void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain *scope, ANCIdentifierExpression *identiferExpr,ANEValue *operValue);
 /*execute.m*/
-ANEStatementResult *ane_execute_statement_list(id _self, ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList);
-ANEValue * ananas_call_ananas_function(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args);
+ANEStatementResult *ane_execute_statement_list(ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList);
+ANEValue * ananas_call_ananas_function(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args);
 #endif /* execute_h */

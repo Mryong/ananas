@@ -14,6 +14,8 @@
 #import "ffi.h"
 #import "util.h"
 #import "ANANASStructDeclareTable.h"
+#import "execute.h"
+#import "CTBlockDescription.h"
 
 
 enum {
@@ -70,7 +72,7 @@ void dispose_helper(struct ANANASSimulateBlock *src)
 }
 
 
-static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr);
+static void eval_expression(ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr);
 
 static void eval_bool_exprseeion(ANCInterpreter *inter, ANCExpression *expr){
 	ANEValue *value = [ANEValue new];
@@ -108,18 +110,27 @@ static void eval_sel_expression(ANCInterpreter *inter, ANCExpression *expr){
 }
 
 static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
-	
+	ANEBlock *anananBlock = (__bridge_transfer ANEBlock *)userdata;
+	ANCInterpreter *inter = anananBlock.inter;
+	ANEScopeChain *scope = anananBlock.scope;
+	ANCFunctionDefinition *func = anananBlock.func;
+	NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:anananBlock.typeEncoding];
+	NSUInteger numberOfArguments = [sig numberOfArguments];
+	NSMutableArray *argValues = [NSMutableArray array];
+	for (NSUInteger i = 1; i < numberOfArguments ; i++) {
+		void *arg = args[i-1];
+		ANEValue *argValue = [[ANEValue alloc] initWithCValuePointer:arg typeEncoding:[sig getArgumentTypeAtIndex:i]];
+		[argValues addObject:argValue];
+		
+	}
+	ANEValue *retValue = ananas_call_ananas_function(inter, scope, func, argValues);
+	[retValue assign2CValuePointer:ret typeEncoding:[sig methodReturnType]];
 }
 
-//TODO
-static id create_oc_block(id _self, ANCInterpreter *inter,ANEBlock *ananasBlock){
+
+static id create_oc_block(ANCInterpreter *inter,ANEBlock *ananasBlock){
 	void *blockImp = NULL;
-	const char *typeEncoding = [ananasBlock.func.returnTypeSpecifier typeEncoding];
-	typeEncoding = ananas_str_append(typeEncoding, "@?");
-	for (ANCParameter *param in ananasBlock.func.params) {
-		const char *paramTypeEncoding = [param.type typeEncoding];
-		typeEncoding = ananas_str_append(typeEncoding, paramTypeEncoding);
-	}
+	const char *typeEncoding = ananasBlock.typeEncoding;
 	NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:typeEncoding];
 	unsigned int argCount = (unsigned int)[sig numberOfArguments];
 	ffi_type *returnType = ananas_ffi_type_with_type_encoding(sig.methodReturnType);
@@ -157,15 +168,24 @@ static id create_oc_block(id _self, ANCInterpreter *inter,ANEBlock *ananasBlock)
 }
 
 
-static void eval_block_expression(id _self, ANCInterpreter *inter, ANEScopeChain *outScope, ANCBlockExpression *expr){
+static void eval_block_expression(ANCInterpreter *inter, ANEScopeChain *outScope, ANCBlockExpression *expr){
 	ANEValue *value = [ANEValue new];
 	value.type = anc_create_type_specifier(ANC_TYPE_BLOCK);
 	ANEBlock *ananasBlock = [[ANEBlock alloc] init];
 	ananasBlock.func = expr.func;
-	ANEScopeChain *scope = [ANEScopeChain new];
-	scope.next = outScope;
+	
+	ANEScopeChain *scope = [ANEScopeChain scopeChainWithNext:outScope];
 	ananasBlock.scope = scope;
-	id ocBlock = create_oc_block(_self, inter, ananasBlock);
+	
+	const char *typeEncoding = [ananasBlock.func.returnTypeSpecifier typeEncoding];
+	typeEncoding = ananas_str_append(typeEncoding, "@?");
+	for (ANCParameter *param in ananasBlock.func.params) {
+		const char *paramTypeEncoding = [param.type typeEncoding];
+		typeEncoding = ananas_str_append(typeEncoding, paramTypeEncoding);
+	}
+	ananasBlock.typeEncoding = typeEncoding;
+	
+	id ocBlock = create_oc_block(inter, ananasBlock);
 	value.objectValue = ocBlock;
 	[inter.stack push:value];
 }
@@ -180,50 +200,33 @@ static void eval_nil_expr(ANCInterpreter *inter){
 
 static void eval_identifer_expression(ANCInterpreter *inter, ANEScopeChain *scope ,ANCIdentifierExpression *expr){
 	NSString *identifier = expr.identifier;
-	for (ANEScopeChain *pos = scope; pos; pos = pos.next) {
-		if (pos.instance) {
-			Ivar ivar = class_getInstanceVariable([pos.instance class], identifier.UTF8String);
-			if (ivar) {
-				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
-				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
-				ANEValue *value = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:ivarEncoding];
-				[inter.stack push:value];
-				return;
-			}
-		}else{
-			for (ANEVariable *var in scope.vars) {
-				if ([var.name isEqualToString:identifier]) {
-					[inter.stack push:var.value];
-					return;
-				}
-			}
-		}
-	}
-	NSCAssert(0, @"not found var %@", identifier);
+	ANEValue *value = [scope getValueWithIdentifier:identifier];
+	NSCAssert(value, @"not found var %@", identifier);
+	[inter.stack push:value];
 }
 
 
-static void eval_ternary_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCTernaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.condition);
+static void eval_ternary_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCTernaryExpression *expr){
+	eval_expression(inter, scope, expr.condition);
 	ANEValue *conValue = [inter.stack pop];
 	if (conValue.isSubtantial) {
 		if (expr.trueExpr) {
-			eval_expression(_self, inter, scope, expr.trueExpr);
+			eval_expression(inter, scope, expr.trueExpr);
 		}else{
 			[inter.stack push:conValue];
 		}
 	}else{
-		eval_expression(_self, inter, scope, expr.falseExpr);
+		eval_expression(inter, scope, expr.falseExpr);
 	}
 	
 }
-static void eval_function_call_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr);
+static void eval_function_call_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr);
 
 
-void ananas_assign_value_to_identifer_expr(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCIdentifierExpression *identiferExpr,ANEValue *operValue){
+void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain *scope, ANCIdentifierExpression *identiferExpr,ANEValue *operValue){
 	for (ANEScopeChain *pos = scope; pos; pos = pos.next) {
 		if (pos.instance) {
-			Ivar ivar	= class_getInstanceVariable([_self class], identiferExpr.identifier.UTF8String);
+			Ivar ivar	= class_getInstanceVariable([pos instance], identiferExpr.identifier.UTF8String);
 			if (ivar) {
 				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
 				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
@@ -244,7 +247,7 @@ void ananas_assign_value_to_identifer_expr(id _self, ANCInterpreter *inter, ANES
 	}
 }
 
-static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCAssignExpression *expr){
+static void eval_assign_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCAssignExpression *expr){
 	ANCAssignKind assignKind = expr.assignKind;
 	ANCExpression *leftExpr = expr.left;
 	ANCExpression *rightExpr = expr.right;
@@ -291,7 +294,7 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 			}
 			
 			
-			eval_function_call_expression(_self, inter, scope, callExpr);
+			eval_function_call_expression(inter, scope, callExpr);
 			break;
 		}
 			
@@ -329,10 +332,10 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 				
 			}
 			
-			eval_expression(_self, inter, scope, optrExpr);
+			eval_expression(inter, scope, optrExpr);
 			ANEValue *operValue = [inter.stack pop];
 
-			ananas_assign_value_to_identifer_expr(_self, inter, scope, identiferExpr, operValue);
+			ananas_assign_value_to_identifer_expr(inter, scope, identiferExpr, operValue);
 			break;
 		}
 		case ANC_INDEX_EXPRESSION:{
@@ -409,9 +412,9 @@ NSCAssert(0, @"line:%zd, " #operationName  " operation not support type: %@",exp
 }
 
 
-static void eval_add_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_add_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
@@ -426,9 +429,9 @@ static void eval_add_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 }
 
 
-static void eval_sub_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_sub_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];\
@@ -439,9 +442,9 @@ static void eval_sub_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 }
 
 
-static void eval_mul_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_mul_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
@@ -452,9 +455,9 @@ static void eval_mul_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 }
 
 
-static void eval_div_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_div_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	switch (rightValue.type.typeKind) {
@@ -487,13 +490,13 @@ static void eval_div_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 
 
 
-static void eval_mod_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
-	eval_expression(_self, inter, scope, expr.left);
+static void eval_mod_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCBinaryExpression  *expr){
+	eval_expression(inter, scope, expr.left);
 	ANEValue *leftValue = [inter.stack peekStack:0];
 	if (leftValue.type.typeKind != ANC_TYPE_INT && leftValue.type.typeKind != ANC_TYPE_U_INT) {
 		NSCAssert(0, @"line:%zd, mod operation not support type: %@",expr.left.lineNumber ,leftValue.type.typeName);
 	}
-	eval_expression(_self, inter, scope, expr.right);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	if (rightValue.type.typeKind != ANC_TYPE_INT && rightValue.type.typeKind != ANC_TYPE_U_INT) {
 		NSCAssert(0, @"line:%zd, mod operation not support type: %@",expr.right.lineNumber ,rightValue.type.typeName);
@@ -634,9 +637,9 @@ default:\
 	return NO;
 }
 
-static void eval_eq_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_eq_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	BOOL equal =  ananas_equal_value(expr.left.lineNumber, leftValue, rightValue);
@@ -648,9 +651,9 @@ static void eval_eq_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 	[inter.stack push:resultValue];
 }
 
-static void eval_ne_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_ne_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	BOOL equal =  ananas_equal_value(expr.left.lineNumber, leftValue, rightValue);
@@ -686,9 +689,9 @@ compare_number_func(le, <=)
 compare_number_func(ge, >)
 compare_number_func(gt, >=)
 
-static void eval_lt_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_lt_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	BOOL lt = lt_value(expr.left.lineNumber, leftValue, rightValue);
@@ -701,9 +704,9 @@ static void eval_lt_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 }
 
 
-static void eval_le_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_le_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	BOOL le = le_value(expr.left.lineNumber, leftValue, rightValue);
@@ -715,9 +718,9 @@ static void eval_le_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 	[inter.stack push:resultValue];
 }
 
-static void eval_ge_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_ge_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	BOOL ge = ge_value(expr.left.lineNumber, leftValue, rightValue);
@@ -730,9 +733,9 @@ static void eval_ge_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 }
 
 
-static void eval_gt_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
-	eval_expression(_self, inter, scope, expr.right);
+static void eval_gt_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
+	eval_expression(inter, scope, expr.right);
 	ANEValue *leftValue = [inter.stack peekStack:1];
 	ANEValue *rightValue = [inter.stack peekStack:0];
 	BOOL gt = gt_value(expr.left.lineNumber, leftValue, rightValue);
@@ -744,8 +747,8 @@ static void eval_gt_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 	[inter.stack push:resultValue];
 }
 
-static void eval_logic_and_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
+static void eval_logic_and_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
 	ANEValue *leftValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL);
@@ -753,7 +756,7 @@ static void eval_logic_and_expression(id _self, ANCInterpreter *inter, ANEScopeC
 		resultValue.uintValue = NO;
 		[inter.stack pop];
 	}else{
-		eval_expression(_self, inter, scope, expr.right);
+		eval_expression(inter, scope, expr.right);
 		ANEValue *rightValue = [inter.stack peekStack:0];
 		if (!rightValue.isSubtantial) {
 			resultValue.uintValue = NO;
@@ -765,8 +768,8 @@ static void eval_logic_and_expression(id _self, ANCInterpreter *inter, ANEScopeC
 	[inter.stack push:resultValue];
 }
 
-static void eval_logic_or_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.left);
+static void eval_logic_or_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCBinaryExpression *expr){
+	eval_expression(inter, scope, expr.left);
 	ANEValue *leftValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL);
@@ -774,7 +777,7 @@ static void eval_logic_or_expression(id _self, ANCInterpreter *inter, ANEScopeCh
 		resultValue.uintValue = YES;
 		[inter.stack pop];
 	}else{
-		eval_expression(_self, inter, scope, expr.right);
+		eval_expression(inter, scope, expr.right);
 		ANEValue *rightValue = [inter.stack peekStack:0];
 		if (rightValue.isSubtantial) {
 			resultValue.uintValue = YES;
@@ -786,8 +789,8 @@ static void eval_logic_or_expression(id _self, ANCInterpreter *inter, ANEScopeCh
 	[inter.stack push:resultValue];
 }
 
-static void eval_logic_not_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.expr);
+static void eval_logic_not_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(inter, scope, expr.expr);
 	ANEValue *value = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_BOOL);
@@ -796,25 +799,25 @@ static void eval_logic_not_expression(id _self, ANCInterpreter *inter, ANEScopeC
 	[inter.stack push:resultValue];
 }
 
-static void eval_increment_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+static void eval_increment_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
 	ANCExpression *oneValueExpr = anc_create_expression(ANC_INT_EXPRESSION);
 	oneValueExpr.integerValue = 1;
 	ANCBinaryExpression *addExpr = [[ANCBinaryExpression alloc] initWithExpressionKind:ANC_PLUS_EXPRESSION];
 	addExpr.left = expr.expr;
 	addExpr.right = oneValueExpr;
-	eval_expression(_self, inter, scope, addExpr);
+	eval_expression(inter, scope, addExpr);
 }
 
-static void eval_decrement_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+static void eval_decrement_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
 	ANCExpression *oneValueExpr = anc_create_expression(ANC_INT_EXPRESSION);
 	oneValueExpr.integerValue = 1;
 	ANCBinaryExpression *addExpr = [[ANCBinaryExpression alloc] initWithExpressionKind:ANC_MINUS_EXPRESSION];
 	addExpr.left = expr.expr;
 	addExpr.right = oneValueExpr;
-	eval_expression(_self, inter, scope, addExpr);
+	eval_expression(inter, scope, addExpr);
 }
-static void eval_negative_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.expr);
+static void eval_negative_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(inter, scope, expr.expr);
 	ANEValue *value = [inter.stack pop];
 	ANEValue *resultValue = [ANEValue new];
 	switch (value.type.typeKind) {
@@ -839,12 +842,12 @@ static void eval_negative_expression(id _self, ANCInterpreter *inter, ANEScopeCh
 }
 
 //todo 支持block 数组
-static void eval_index_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCIndexExpression *expr){
-	eval_expression(_self, inter, scope, expr.indexExpression);
+static void eval_index_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCIndexExpression *expr){
+	eval_expression(inter, scope, expr.indexExpression);
 	ANEValue *indexValue = [inter.stack peekStack:0];
 	ANATypeSpecifierKind kind = indexValue.type.typeKind;
 	
-	eval_expression(_self, inter, scope, expr.arrayExpression);
+	eval_expression(inter, scope, expr.arrayExpression);
 	ANEValue *arrValue = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
@@ -867,8 +870,8 @@ static void eval_index_expression(id _self, ANCInterpreter *inter, ANEScopeChain
 	
 }
 
-static void eval_at_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
-	eval_expression(_self, inter, scope, expr.expr);
+static void eval_at_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
+	eval_expression(inter, scope, expr.expr);
 	ANEValue *value = [inter.stack peekStack:0];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
@@ -894,13 +897,13 @@ static void eval_at_expression(id _self, ANCInterpreter *inter, ANEScopeChain *s
 }
 
 
-static void eval_struct_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCStructpression *expr){
+static void eval_struct_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCStructpression *expr){
 	NSMutableDictionary *structDic = [NSMutableDictionary dictionary];
 	NSUInteger count = expr.keys.count;
 	for (NSUInteger i = 0; i < count; i++) {
 		NSString *key = expr.keys[i];
 		ANCExpression *itemExpr = expr.valueExpressions[i];
-		eval_expression(_self, inter, scope, itemExpr);
+		eval_expression(inter, scope, itemExpr);
 		ANEValue *value = [inter.stack peekStack:0];
 		if (value.isObject) {
 			NSCAssert(0, @"line:%zd, struct can not support object type %@", itemExpr.lineNumber, value.type.typeName );
@@ -950,10 +953,10 @@ static void eval_struct_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 
 
 
-static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCDictionaryExpression *expr){
+static void eval_dic_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCDictionaryExpression *expr){
 	NSMutableDictionary *dic = [NSMutableDictionary dictionary];
 	for (ANCDicEntry *entry in expr.entriesExpr) {
-		eval_expression(_self, inter, scope, entry.keyExpr);
+		eval_expression(inter, scope, entry.keyExpr);
 		ANEValue *keyValue = [inter.stack peekStack:0];
 		if (!keyValue.isObject) {
 			NSCAssert(0, @"line:%zd key can not bee type:%@",entry.keyExpr.lineNumber, keyValue.type.typeName);
@@ -961,7 +964,7 @@ static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 		
 		
 		
-		eval_expression(_self, inter, scope, entry.valueExpr);
+		eval_expression(inter, scope, entry.valueExpr);
 		ANEValue *valueValue = [inter.stack peekStack:0];
 		if (!valueValue.isObject) {
 			NSCAssert(0, @"line:%zd value can not bee type:%@",entry.keyExpr.lineNumber, valueValue.type.typeName);
@@ -980,10 +983,10 @@ static void eval_dic_expression(id _self, ANCInterpreter *inter, ANEScopeChain *
 }
 
 
-static void eval_array_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCArrayExpression *expr){
+static void eval_array_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCArrayExpression *expr){
 	NSMutableArray *array = [NSMutableArray array];
 	for (ANCExpression *elementExpr in array) {
-		eval_expression(_self, inter, scope, elementExpr);
+		eval_expression(inter, scope, elementExpr);
 		ANEValue *elementValue = [inter.stack peekStack:0];
 		if (elementValue.isObject) {
 			[array addObject:elementValue.c2objectValue];
@@ -1086,8 +1089,14 @@ break;\
 	return nil;
 }
 
-static void eval_member_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCMemberExpression *expr){
-	eval_expression(_self, inter, scope, expr.expr);
+static void eval_self_super_expression(ANCInterpreter *inter, ANEScopeChain *scope){
+	ANEValue *value = [scope getValueWithIdentifier:@"self"];
+	NSCAssert(value, @"not found var %@", @"self");
+	[inter.stack push:value];
+}
+
+static void eval_member_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCMemberExpression *expr){
+	eval_expression(inter, scope, expr.expr);
 	ANEValue *obj = [inter.stack peekStack:0];
 	if (obj.type.typeKind == ANC_TYPE_STRUCT) {
 		ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
@@ -1102,12 +1111,12 @@ static void eval_member_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 		NSCAssert(0, @"line:%zd, %@ is not object",expr.expr.lineNumber, obj.type.typeName);
 	}
 	SEL sel = NSSelectorFromString(expr.memberName);
-	NSMethodSignature *sig =[_self methodSignatureForSelector:NSSelectorFromString(expr.memberName)];
+	NSMethodSignature *sig =[obj.objectValue methodSignatureForSelector:NSSelectorFromString(expr.memberName)];
 	void *returnData = malloc([sig methodReturnLength]);
 	char *returnTypeEncoding = (char *)[sig methodReturnType];
 	returnTypeEncoding = removeTypeEncodingPrefix(returnTypeEncoding);
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
-	[invocation setTarget:_self];
+	[invocation setTarget:obj.objectValue];
 	[invocation setSelector:sel];
 	[invocation invoke];
 	[invocation getReturnValue:returnData];
@@ -1122,74 +1131,19 @@ static void eval_member_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 
 
 
-static ANEValue *invoke(NSUInteger line, id _self, ANCInterpreter *inter, ANEScopeChain *scope, id instance, SEL sel, NSArray<ANCExpression *> *argExprs){
+static ANEValue *invoke(NSUInteger line, ANCInterpreter *inter, ANEScopeChain *scope, id instance, SEL sel, NSArray<ANCExpression *> *argExprs){
 	NSMethodSignature *sig = [instance methodSignatureForSelector:sel];
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
 	invocation.target = instance;
 	invocation.selector = sel;
 	NSUInteger argCount = [sig numberOfArguments];
 	for (NSUInteger i = 2; i < argCount; i++) {
-	  	char *type = (char *)[sig getArgumentTypeAtIndex:i];
-		type = removeTypeEncodingPrefix(type);
-		ANCExpression *argExpr = argExprs[i - 2];
-		eval_expression(_self, inter, scope, argExpr);
+		const char *typeEncoding = [sig getArgumentTypeAtIndex:i];
+		void *ptr = malloc(ananas_size_with_encoding(typeEncoding));
+		eval_expression(inter, scope, argExprs[i -1]);
 		ANEValue *argValue = [inter.stack pop];
-		
-		
-#define ANANAS_INVOCATION_SET_ARG_CASE(_code, _type, _sel)\
-	case _code:{\
-		_type value = (_type)argValue._sel;\
-		[invocation setArgument:&value atIndex:i];\
-		break;\
-	}
-
-		
-		switch (*type) {
-			ANANAS_INVOCATION_SET_ARG_CASE('c', char, c2integerValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('s', short, c2integerValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('i', int, c2integerValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('l', long, c2integerValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('q', long long, c2integerValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('C', unsigned char, c2uintValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('S', unsigned short, c2uintValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('I', unsigned int, c2uintValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('L', unsigned long, c2uintValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('Q', unsigned long long, c2uintValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('B', BOOL, c2uintValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('f', float, c2doubleValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('d', double, c2doubleValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('@', id, c2objectValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('#', Class, c2objectValue)
-			ANANAS_INVOCATION_SET_ARG_CASE(':', SEL, selValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('*', char *, c2pointerValue)
-			ANANAS_INVOCATION_SET_ARG_CASE('^', void *, c2pointerValue)
-			case '{':{
-				void *valuePtr = NULL;
-				switch (argValue.type.typeKind) {
-					case ANC_TYPE_STRUCT:
-						valuePtr = argValue.pointerValue;
-						break;
-					case ANC_TYPE_STRUCT_LITERAL:{
-						size_t structSize= ananas_struct_size_with_encoding(type);
-						NSString *structName = ananas_struct_name_with_encoding(type);
-						valuePtr = alloca(structSize);
-						ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
-						ananas_struct_data_with_dic(valuePtr, argValue.objectValue, [table getStructDeclareWithName:structName]);
-					}
-					default:
-						NSCAssert(0, @"");
-						break;
-				} ;
-				
-				[invocation setArgument:valuePtr atIndex:i];
-				break;
-			}
-			default:
-				NSCAssert(0, @"line:%zd, ananas not supprot type: %s",argExpr.lineNumber, type);
-				break;
-		}
-		
-		
+		[argValue assign2CValuePointer:ptr typeEncoding:typeEncoding];
+		[invocation setArgument:ptr atIndex:i];
 	}
 	[invocation invoke];
 	
@@ -1201,33 +1155,26 @@ static ANEValue *invoke(NSUInteger line, id _self, ANCInterpreter *inter, ANESco
 	return retValue;
 }
 
-/*
- abc();
- a.b.name();
- a.name()();
- 
- */
 
-static void eval_function_call_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr){
+
+static void eval_function_call_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr){
 	ANCExpressionKind exprKind = expr.expr.expressionKind;
 	switch (exprKind) {
-		case ANC_IDENTIFIER_EXPRESSION:{
-			break;
-		}
 		case ANC_MEMBER_EXPRESSION:{
 			ANCMemberExpression *memberExpr = (ANCMemberExpression *)expr.expr;
 			ANCExpression *memberObjExpr = memberExpr.expr;
 			SEL sel = NSSelectorFromString(memberExpr.memberName);
 			switch (memberObjExpr.expressionKind) {
 				case ANC_SELF_EXPRESSION:{
-					ANEValue *retValue = invoke(expr.lineNumber, _self, inter, scope, _self, sel, expr.args);
+					id _self = [[scope getValueWithIdentifier:@"self"] objectValue];
+					ANEValue *retValue = invoke(expr.lineNumber, inter, scope,_self, sel, expr.args);
 					[inter.stack push:retValue];
 					break;
 				}
 				case ANC_SUPER_EXPRESSION:{
-					
+					id _self = [[scope getValueWithIdentifier:@"self"] objectValue];
 					Class superClass = class_getSuperclass([_self class]);
-					struct objc_super *superPtr = &(struct objc_super){_self, superClass};
+					struct objc_super *superPtr = &(struct objc_super){superClass};
 					NSMethodSignature *sig = [_self methodSignatureForSelector:sel];
 					NSUInteger argCount = sig.numberOfArguments;
 					
@@ -1242,7 +1189,7 @@ static void eval_function_call_expression(id _self, ANCInterpreter *inter, ANESc
 				
 					for (NSUInteger i = 2; i < argCount; i++) {
 						ANCExpression *argExpr = expr.args[i - 2];
-						eval_expression(_self, inter, scope, argExpr);
+						eval_expression(inter, scope, argExpr);
 						ANEValue *argValue = [inter.stack pop];
 						char *argTypeEncoding = (char *)[sig getArgumentTypeAtIndex:i];
 						argTypeEncoding = removeTypeEncodingPrefix(argTypeEncoding);
@@ -1341,9 +1288,9 @@ break;\
 					break;
 				}
 				default:{
-					eval_expression(_self, inter, scope, memberObjExpr);
+					eval_expression(inter, scope, memberObjExpr);
 					ANEValue *memberObj = [inter.stack pop];
-					ANEValue *retValue = invoke(expr.lineNumber, _self, inter, scope, memberObj, sel, expr.args);
+					ANEValue *retValue = invoke(expr.lineNumber, inter, scope, memberObj, sel, expr.args);
 					[inter.stack push:retValue];
 					break;
 					
@@ -1355,10 +1302,33 @@ break;\
 			
 			break;
 		}
+		case ANC_IDENTIFIER_EXPRESSION:
 		case ANC_FUNCTION_CALL_EXPRESSION:{
-			eval_expression(_self, inter, scope, expr.expr);
-			ANEValue *blockValue = [inter.stack peekStack:0];
+			eval_expression(inter, scope, expr.expr);
+			ANEValue *blockValue = [inter.stack pop];
 			
+			CTBlockDescription *desc = [[CTBlockDescription alloc] initWithBlock:blockValue.objectValue];
+			NSMethodSignature *sig = desc.blockSignature;
+			NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+			[invocation setTarget:blockValue.objectValue];
+			NSUInteger numberOfArguments = [sig numberOfArguments];
+			if (numberOfArguments - 1 != expr.args.count) {
+				NSCAssert(0, @"");
+			}
+			for (NSUInteger i = 1; i < numberOfArguments; i++) {
+				const char *typeEncoding = [sig getArgumentTypeAtIndex:i];
+				void *ptr = malloc(ananas_size_with_encoding(typeEncoding));
+				eval_expression(inter, scope, expr.args[i -1]);
+				ANEValue *argValue = [inter.stack pop];
+				[argValue assign2CValuePointer:ptr typeEncoding:typeEncoding];
+				[invocation setArgument:ptr atIndex:i];
+			}
+			[invocation invoke];
+			const char *retType = [sig methodReturnType];
+			void *retValuePtr = malloc(ananas_size_with_encoding(retType));
+			[invocation getReturnValue:retValuePtr];
+			ANEValue *retValue = [[ANEValue alloc] initWithCValuePointer:retValuePtr typeEncoding:retType];
+			[inter.stack push:retValue];
 			break;
 		}
 			
@@ -1377,7 +1347,7 @@ break;\
 
 
 
-static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr){
+static void eval_expression(ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCExpression *expr){
 	switch (expr.expressionKind) {
 		case ANC_BOOLEAN_EXPRESSION:
 			eval_bool_exprseeion(inter, expr);
@@ -1395,95 +1365,95 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 			eval_sel_expression(inter, expr);
 			break;
 		case ANC_BLOCK_EXPRESSION:
-			eval_block_expression(_self,inter, scope, expr);
+			eval_block_expression(inter, scope, expr);
 			break;
 		case ANC_NIL_EXPRESSION:
 			eval_nil_expr(inter);
 			break;
 		case ANC_SELF_EXPRESSION:
 		case ANC_SUPER_EXPRESSION:
-			NSCAssert(0, @"");
+			eval_self_super_expression(inter, scope);
 			break;
 		case ANC_IDENTIFIER_EXPRESSION:
 			eval_identifer_expression(inter, scope, expr);
 			break;
 		case ANC_ASSIGN_EXPRESSION:
-			eval_assign_expression(_self, inter, scope, expr);
+			eval_assign_expression(inter, scope, expr);
 			break;
 		case ANC_PLUS_EXPRESSION:
-			eval_add_expression(_self, inter, scope, expr);
+			eval_add_expression(inter, scope, expr);
 			break;
 		case ANC_MINUS_EXPRESSION:
-			eval_sub_expression(_self, inter, scope, expr);
+			eval_sub_expression(inter, scope, expr);
 			break;
 		case ANC_MUL_EXPRESSION:
-			eval_mul_expression(_self, inter, scope, expr);
+			eval_mul_expression(inter, scope, expr);
 			break;
 		case ANC_DIV_EXPRESSION:
-			eval_div_expression(_self, inter, scope, expr);
+			eval_div_expression(inter, scope, expr);
 			break;
 		case ANC_MOD_EXPRESSION:
-			eval_mod_expression(_self, inter, scope, expr);
+			eval_mod_expression(inter, scope, expr);
 			break;
 		case ANC_EQ_EXPRESSION:
-			eval_eq_expression(_self, inter, scope, expr);
+			eval_eq_expression(inter, scope, expr);
 			break;
 		case ANC_NE_EXPRESSION:
-			eval_ne_expression(_self, inter, scope, expr);
+			eval_ne_expression(inter, scope, expr);
 			break;
 		case ANC_LT_EXPRESSION:
-			eval_lt_expression(_self, inter, scope, expr);
+			eval_lt_expression(inter, scope, expr);
 			break;
 		case ANC_LE_EXPRESSION:
-			eval_le_expression(_self, inter, scope, expr);
+			eval_le_expression(inter, scope, expr);
 			break;
 		case ANC_GE_EXPRESSION:
-			eval_ge_expression(_self, inter, scope, expr);
+			eval_ge_expression(inter, scope, expr);
 			break;
 		case ANC_GT_EXPRESSION:
-			eval_gt_expression(_self, inter, scope, expr);
+			eval_gt_expression(inter, scope, expr);
 			break;
 		case ANC_LOGICAL_AND_EXPRESSION:
-			eval_logic_and_expression(_self, inter, scope, expr);
+			eval_logic_and_expression(inter, scope, expr);
 			break;
 		case ANC_LOGICAL_OR_EXPRESSION:
-			eval_logic_or_expression(_self, inter, scope, expr);
+			eval_logic_or_expression(inter, scope, expr);
 			break;
 		case ANC_LOGICAL_NOT_EXPRESSION:
-			eval_logic_not_expression(_self, inter, scope, expr);
+			eval_logic_not_expression(inter, scope, expr);
 			break;
 		case ANC_TERNARY_EXPRESSION:
-			eval_ternary_expression(_self, inter, scope, expr);
+			eval_ternary_expression(inter, scope, expr);
 			break;
 		case ANC_INDEX_EXPRESSION:
-			eval_index_expression(_self, inter, scope, expr);
+			eval_index_expression(inter, scope, expr);
 			break;
 		case ANC_AT_EXPRESSION:
-			eval_at_expression(_self, inter, scope, expr);
+			eval_at_expression(inter, scope, expr);
 			break;
 		case NSC_NEGATIVE_EXPRESSION:
-			eval_negative_expression(_self, inter, scope, expr);
+			eval_negative_expression(inter, scope, expr);
 			break;
 		case ANC_MEMBER_EXPRESSION:
-			eval_member_expression(_self, inter, scope, expr);
+			eval_member_expression(inter, scope, expr);
 			break;
 		case ANC_DIC_LITERAL_EXPRESSION:
-			eval_dic_expression(_self, inter, scope, expr);
+			eval_dic_expression(inter, scope, expr);
 			break;
 		case ANC_ARRAY_LITERAL_EXPRESSION:
-			eval_array_expression(_self, inter, scope, expr);
+			eval_array_expression(inter, scope, expr);
 			break;
 		case ANC_INCREMENT_EXPRESSION:
-			eval_increment_expression(_self, inter, scope, expr);
+			eval_increment_expression(inter, scope, expr);
 			break;
 		case ANC_DECREMENT_EXPRESSION:
-			eval_decrement_expression(_self, inter, scope, expr);
+			eval_decrement_expression(inter, scope, expr);
 			break;
 		case ANC_STRUCT_LITERAL_EXPRESSION:
-			eval_struct_expression(_self, inter, scope, expr);
+			eval_struct_expression(inter, scope, expr);
 			break;
 		case ANC_FUNCTION_CALL_EXPRESSION:
-			eval_function_call_expression(_self, inter, scope, expr);
+			eval_function_call_expression(inter, scope, expr);
 			break;
 		default:
 			break;
@@ -1491,8 +1461,8 @@ static void eval_expression(id _self, ANCInterpreter *inter, ANEScopeChain *scop
 	
 }
 
-ANEValue *ane_eval_expression(id _self,ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr){
-	eval_expression(_self ,inter, scope, expr);
+ANEValue *ane_eval_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr){
+	eval_expression(inter, scope, expr);
 	return [inter.stack pop];
 }
 
