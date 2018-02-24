@@ -223,10 +223,10 @@ static void eval_ternary_expression(ANCInterpreter *inter, ANEScopeChain *scope,
 static void eval_function_call_expression(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctonCallExpression *expr);
 
 
-void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain *scope, ANCIdentifierExpression *identiferExpr,ANEValue *operValue){
+void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain *scope, NSString *identifier,ANEValue *operValue){
 	for (ANEScopeChain *pos = scope; pos; pos = pos.next) {
 		if (pos.instance) {
-			Ivar ivar	= class_getInstanceVariable([pos instance], identiferExpr.identifier.UTF8String);
+			Ivar ivar	= class_getInstanceVariable([pos instance],identifier.UTF8String);
 			if (ivar) {
 				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
 				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
@@ -236,13 +236,12 @@ void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain 
 			
 		}else{
 			for (ANEVariable *var in pos.vars) {
-				if ([var.name isEqualToString:identiferExpr.identifier]) {
+				if ([var.name isEqualToString:identifier]) {
 					[var.value assignFrom:operValue];
 					return;
 				}
 			}
 		}
-		
 		
 	}
 }
@@ -298,6 +297,15 @@ static void eval_assign_expression(ANCInterpreter *inter, ANEScopeChain *scope, 
 			break;
 		}
 			
+		case ANC_SELF_EXPRESSION:{
+			NSCAssert(assignKind == ANC_NORMAL_ASSIGN, @"");
+			eval_expression(inter, scope, rightExpr);
+			ANEValue *rightValue = [inter.stack pop];
+			ananas_assign_value_to_identifer_expr(inter, scope,@"self", rightValue);
+			[inter.stack push:rightValue];
+			break;
+		}
+			
 		case ANC_IDENTIFIER_EXPRESSION:{
 			ANCIdentifierExpression *identiferExpr = (ANCIdentifierExpression *)leftExpr;
 			ANCExpression *optrExpr;
@@ -335,16 +343,25 @@ static void eval_assign_expression(ANCInterpreter *inter, ANEScopeChain *scope, 
 			eval_expression(inter, scope, optrExpr);
 			ANEValue *operValue = [inter.stack pop];
 
-			ananas_assign_value_to_identifer_expr(inter, scope, identiferExpr, operValue);
+			ananas_assign_value_to_identifer_expr(inter, scope, identiferExpr.identifier, operValue);
+			[inter.stack push:operValue];
 			break;
 		}
 		case ANC_INDEX_EXPRESSION:{
-			//TODO
+			ANCIndexExpression *indexExpr = (ANCIndexExpression *)leftExpr;
+			eval_expression(inter, scope, rightExpr);
+			ANEValue *rightValue = [inter.stack pop];
+			eval_expression(inter, scope, indexExpr.arrayExpression);
+			ANEValue *arrValue =  [inter.stack pop];
+			eval_expression(inter, scope, indexExpr.indexExpression);
+			ANEValue *indexValue = [inter.stack pop];
+			arrValue.objectValue[indexValue.c2uintValue] = rightValue.objectValue;
+			[inter.stack push:rightValue];
 			break;
 		}
 			
 		default:
-			
+			NSCAssert(0, @"");
 			break;
 	}
 
@@ -623,11 +640,20 @@ default:\
 		}
 		case ANC_TYPE_STRUCT:{
 			if (value2.type.typeKind == ANC_TYPE_STRUCT) {
-				//todo
+				if ([value1.type.structName isEqualToString:value2.type.structName]) {
+					const char *typeEncoding  = [value1.type typeEncoding];
+					size_t size = ananas_size_with_encoding(typeEncoding);
+					return memcmp(value1.pointerValue, value2.pointerValue, size) == 0;
+				}else{
+					return NO;
+				}
 			}else{
 				NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.typeName, value2.type.typeName);
 				break;
 			}
+		}
+		case ANC_TYPE_STRUCT_LITERAL:{
+			return NO;
 		}
 			
 		default:NSCAssert(0, @"line:%zd == and != can not use between %@ and %@",lineNumber, value1.type.typeName, value2.type.typeName);
@@ -841,7 +867,7 @@ static void eval_negative_expression(ANCInterpreter *inter, ANEScopeChain *scope
 	}
 }
 
-//todo 支持block 数组
+
 static void eval_index_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCIndexExpression *expr){
 	eval_expression(inter, scope, expr.indexExpression);
 	ANEValue *indexValue = [inter.stack peekStack:0];
@@ -866,8 +892,6 @@ static void eval_index_expression(ANCInterpreter *inter, ANEScopeChain *scope,AN
 	[inter.stack pop];
 	[inter.stack pop];
 	[inter.stack push:resultValue];
-	
-	
 }
 
 static void eval_at_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
@@ -926,7 +950,7 @@ static void eval_struct_expression(ANCInterpreter *inter, ANEScopeChain *scope, 
 				structDic[key] = [NSValue valueWithPointer:value.selValue];
 				break;
 			case ANC_TYPE_STRUCT:
-				//todo
+				structDic[key] = value;
 				break;
 			case ANC_TYPE_STRUCT_LITERAL:
 				structDic[key] = value.objectValue;
@@ -1065,17 +1089,18 @@ break;\
 				}
 				
 				NSString *subTypeEncoding = [types substringWithRange:NSMakeRange(index, end - index + 1)];
+				size_t size = ananas_struct_size_with_encoding(subTypeEncoding.UTF8String);
 				if(j == index){
 					void *value = structData + postion;
 					ANEValue *retValue = [[ANEValue alloc] init];
 					NSString *subStruct = ananas_struct_name_with_encoding(subTypeEncoding.UTF8String);
-					//todo
 					retValue.type = anc_create_struct_type_specifier(subStruct);
-					retValue.pointerValue = value;
+					retValue.pointerValue = malloc(size);
+					memcmp(retValue.pointerValue, value, size);
 					return retValue;
 				}
 				
-				size_t size = ananas_struct_size_with_encoding(subTypeEncoding.UTF8String);
+				
 				postion += size;
 				i += end - index;
 				break;
