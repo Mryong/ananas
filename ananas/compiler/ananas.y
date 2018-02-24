@@ -66,7 +66,7 @@ method_name method_name_1 method_name_2 expression_list function_param_list
 
 %type <method_name_item> method_name_item
 %type <dic_entry> dic_entry
-%type <statement> statement if_statement switch_statement for_statement foreach_statement while_statement do_while_statement
+%type <statement> statement top_statement if_statement switch_statement for_statement foreach_statement while_statement do_while_statement
 break_statement continue_statement return_statement declaration_statement
 %type <type_specifier> type_specifier
 %type <block_statement> block_statement default_opt
@@ -99,7 +99,7 @@ definition:  class_definition
 				ANCStructDeclare *structDeclare = (__bridge_transfer ANCStructDeclare *)$1;
 				anc_add_struct_declare(structDeclare);
 			}
-			| statement
+			| top_statement
 			{
 				ANCStatement *statement = (__bridge_transfer ANCStatement *)$1;
 				anc_add_statement(statement);
@@ -1224,6 +1224,16 @@ statement:  declaration_statement
 			| break_statement
 			| continue_statement
 			| return_statement
+			| expression SEMICOLON
+			;
+
+top_statement: declaration_statement
+			| if_statement
+			| switch_statement
+			| for_statement
+			| foreach_statement
+			| while_statement
+			| do_while_statement
 			| expression SEMICOLON
 			;
 

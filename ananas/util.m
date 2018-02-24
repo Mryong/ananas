@@ -9,6 +9,7 @@
 
 #import "util.h"
 #import "anc_ast.h"
+#import "ANANASStructDeclareTable.h"
 
 
 const char * ananas_str_append(const char *str1, const char *str2){
@@ -176,7 +177,8 @@ break;
 
 
 
-void ananas_struct_data_with_dic(void *structData,NSDictionary *dic, ANCStructDeclare *declare,NSDictionary *structDeclareDic){
+void ananas_struct_data_with_dic(void *structData,NSDictionary *dic, ANCStructDeclare *declare){
+	NSCAssert(declare, @"");
 	NSArray<NSString *> *keys = declare.keys;
 	NSString *typeEncoding = [NSString stringWithUTF8String:declare.typeEncoding];
 	NSString *types = [typeEncoding substringToIndex:typeEncoding.length-1];
@@ -227,8 +229,9 @@ break;\
 				
 				NSString *subTypeEncoding = [types substringWithRange:NSMakeRange(index, end - index + 1)];
 				size_t size = ananas_struct_size_with_encoding(subTypeEncoding.UTF8String);
-				NSString *subStruct = ananas_struct_name_with_encoding(subTypeEncoding.UTF8String);
-				ananas_struct_data_with_dic(structData + postion, dic[key], structDeclareDic[subStruct],structDeclareDic);
+				NSString *subStructName = ananas_struct_name_with_encoding(subTypeEncoding.UTF8String);
+				ANCStructDeclare *subStructDeclare = [[ANANASStructDeclareTable shareInstance] getStructDeclareWithName:subStructName];
+				ananas_struct_data_with_dic(structData + postion, dic[key],subStructDeclare);
 				postion += size;
 				index += end - index;
 				break;

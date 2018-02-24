@@ -9,6 +9,7 @@
 #import "ANEEnvironment.h"
 #import "util.h"
 #import "ananasc.h"
+#import "ANANASStructDeclareTable.h"
 
 @implementation ANEValue
 
@@ -215,7 +216,8 @@ break;\
 				memcpy(cvaluePointer, self.pointerValue, structSize);
 			}else if (_type.typeKind == ANC_TYPE_STRUCT_LITERAL){
 				NSString *structName = ananas_struct_name_with_encoding(typeEncoding);
-				ananas_struct_data_with_dic(cvaluePointer, _objectValue, inter.structDeclareDic[structName], inter.structDeclareDic);
+				ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
+				ananas_struct_data_with_dic(cvaluePointer, _objectValue, [table getStructDeclareWithName:structName]);
 			}
 			break;
 		}
@@ -278,12 +280,90 @@ break;\
 	return retValue;
 }
 
-+ (instancetype)voidValue{
++ (instancetype)voidValueInstance{
 	ANEValue *value = [[ANEValue alloc] init];
 	value.type = anc_create_type_specifier(ANC_TYPE_VOID);
 	return value;
 }
 
+
++ (instancetype)valueInstanceWithBOOL:(BOOL)boolValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_BOOL);
+	value.uintValue = boolValue;
+	return value;
+}
++ (instancetype)valueInstanceWithUint:(unsigned long long int)uintValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
+	value.uintValue = uintValue;
+	return value;
+}
++ (instancetype)valueInstanceWithInt:(long long int)intValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_INT);
+	value.integerValue = intValue;
+	return value;
+}
++ (instancetype)valueInstanceWithDouble:(double)doubleValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_DOUBLE);
+	value.doubleValue = doubleValue;
+	return value;
+}
++ (instancetype)valueInstanceWithObject:(id)objValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+	value.objectValue = objValue;
+	return value;
+}
++ (instancetype)valueInstanceWithBlock:(id)blockValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_BOOL);
+	value.objectValue = blockValue;
+	return value;
+}
++ (instancetype)valueInstanceWithClass:(Class)clazzValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_CLASS);
+	value.classValue = clazzValue;
+	return value;
+}
++ (instancetype)valueInstanceWithSEL:(SEL)selValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_SEL);
+	value.selValue = selValue;
+	return value;
+}
++ (instancetype)valueInstanceWithCstring:(const char *)cstringValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_C_STRING);
+	value.cstringValue = cstringValue;
+	return value;
+}
+
++ (instancetype)valueInstanceWithPointer:(void *)pointerValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_POINTER);
+	value.pointerValue = pointerValue;
+	return value;
+}
+
++ (instancetype)valueInstanceWithStruct:(void *)structValue typeEncoding:(const char *)typeEncoding{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_SEL);
+	value.type.structName = ananas_struct_name_with_encoding(typeEncoding);
+	size_t size = ananas_struct_size_with_encoding(typeEncoding);
+	value.pointerValue = malloc(size);
+	memcpy(value.pointerValue, structValue, size);
+	return value;
+}
+
+- (void)dealloc{
+	if (_type.typeKind == ANC_TYPE_STRUCT) {
+		free(_pointerValue);
+	}
+}
 @end
 
 @implementation ANEVariable

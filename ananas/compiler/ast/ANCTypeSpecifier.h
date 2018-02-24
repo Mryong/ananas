@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, ANATypeSpecifierKind) {
 @property (copy, nonatomic) NSString *structName;
 @property (copy, nonatomic) NSString *typeName;
 @property (assign, nonatomic) ANATypeSpecifierKind typeKind;
-- (const char *)typeEncodingWithInterpreter:(ANCInterpreter *)inter;
+- (const char *)typeEncoding;
 
 
 @end

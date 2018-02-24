@@ -8,12 +8,14 @@
 
 #import "ANCTypeSpecifier.h"
 #import "ANCInterpreter.h"
+#import "ANANASStructDeclareTable.h"
 
 
 @implementation ANCTypeSpecifier
-- (const char *)typeEncodingWithInterpreter:(ANCInterpreter *)inter{
+- (const char *)typeEncoding{
 	if (self.typeKind == ANC_TYPE_STRUCT || self.typeKind == ANC_TYPE_STRUCT_LITERAL) {
-		return inter.structDeclareDic[self.structName].typeEncoding;
+		ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
+		return [table getStructDeclareWithName:self.structName].typeEncoding;
 	}
 	static NSDictionary *_dic;
 	static dispatch_once_t onceToken;

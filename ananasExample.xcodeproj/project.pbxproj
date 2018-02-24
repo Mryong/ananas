@@ -13,6 +13,8 @@
 		412E4A6C1FFB86B00074536F /* ANEEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A6B1FFB86B00074536F /* ANEEnvironment.m */; };
 		4156E9EC1FF0E09C0036973A /* ANCContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156E9EB1FF0E09C0036973A /* ANCContext.m */; };
 		4156E9F11FF0EE050036973A /* execute.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156E9F01FF0EE050036973A /* execute.m */; };
+		4179D0A720403A52009CB6D3 /* ANANASMethodMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */; };
+		4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */; };
 		41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */; };
 		41C98B1B1FC6B26500BADBE9 /* ANCInterpreter.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B1A1FC6B26500BADBE9 /* ANCInterpreter.m */; };
 		41CB962B1FCFF43100373143 /* errrorc.m in Sources */ = {isa = PBXBuildFile; fileRef = 41CB962A1FCFF43100373143 /* errrorc.m */; };
@@ -67,6 +69,10 @@
 		4156E9EA1FF0E09C0036973A /* ANCContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCContext.h; sourceTree = "<group>"; };
 		4156E9EB1FF0E09C0036973A /* ANCContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCContext.m; sourceTree = "<group>"; };
 		4156E9F01FF0EE050036973A /* execute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = execute.m; sourceTree = "<group>"; };
+		4179D0A520403A52009CB6D3 /* ANANASMethodMapTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANANASMethodMapTable.h; sourceTree = "<group>"; };
+		4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANANASMethodMapTable.m; sourceTree = "<group>"; };
+		4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANANASStructDeclareTable.h; sourceTree = "<group>"; };
+		4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANANASStructDeclareTable.m; sourceTree = "<group>"; };
 		41C98B131FC2D1DA00BADBE9 /* ANCDeclaration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCDeclaration.h; sourceTree = "<group>"; };
 		41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCDeclaration.m; sourceTree = "<group>"; };
 		41C98B191FC6B26500BADBE9 /* ANCInterpreter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCInterpreter.h; sourceTree = "<group>"; };
@@ -244,6 +250,10 @@
 				41D02D6B1FA9C00700E1829A /* ananas.y */,
 				41D02D581FA9A5E000E1829A /* createc.m */,
 				41CB962A1FCFF43100373143 /* errrorc.m */,
+				4179D0A520403A52009CB6D3 /* ANANASMethodMapTable.h */,
+				4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */,
+				4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */,
+				4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */,
 			);
 			path = compiler;
 			sourceTree = "<group>";
@@ -458,6 +468,7 @@
 				41DD95642036B77000C9DAD2 /* util.m in Sources */,
 				41E83EAC1FBD5F8E00A48592 /* ANCClassDefinition.m in Sources */,
 				41C98B1B1FC6B26500BADBE9 /* ANCInterpreter.m in Sources */,
+				4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */,
 				41E83EB21FBD6F6600A48592 /* ANCStatement.m in Sources */,
 				41D02D1F1FA8A09400E1829A /* ViewController.m in Sources */,
 				41E83EB51FBD8C9E00A48592 /* ANCStructDeclare.m in Sources */,
@@ -466,6 +477,7 @@
 				41D02D2A1FA8A09400E1829A /* main.m in Sources */,
 				412E4A221FF1F1960074536F /* ANEBlock.m in Sources */,
 				41D02D1C1FA8A09300E1829A /* AppDelegate.m in Sources */,
+				4179D0A720403A52009CB6D3 /* ANANASMethodMapTable.m in Sources */,
 				4156E9F11FF0EE050036973A /* execute.m in Sources */,
 				41D02D591FA9A5E000E1829A /* createc.m in Sources */,
 			);

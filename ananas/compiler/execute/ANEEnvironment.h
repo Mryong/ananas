@@ -42,8 +42,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding inter:(nullable ANCInterpreter *)inter;
 - (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding;
 
-+ (instancetype)voidValue;
-
++ (instancetype)voidValueInstance;
++ (instancetype)valueInstanceWithBOOL:(BOOL)boolValue;
++ (instancetype)valueInstanceWithUint:(unsigned long long int)uintValue;
++ (instancetype)valueInstanceWithInt:(long long int)intValue;
++ (instancetype)valueInstanceWithDouble:(double)doubleValue;
++ (instancetype)valueInstanceWithObject:(id)objValue;
++ (instancetype)valueInstanceWithBlock:(id)blockValue;
++ (instancetype)valueInstanceWithClass:(Class)clazzValue;
++ (instancetype)valueInstanceWithSEL:(SEL)selValue;
++ (instancetype)valueInstanceWithCstring:(const char *)cstringValue;
++ (instancetype)valueInstanceWithPointer:(void *)pointerValue;
++ (instancetype)valueInstanceWithStruct:(void *)structValue typeEncoding:(const char *)typeEncoding;
 @end
 
 @interface ANEVariable:NSObject

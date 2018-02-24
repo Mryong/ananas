@@ -13,6 +13,7 @@
 #import <objc/message.h>
 #import "ffi.h"
 #import "util.h"
+#import "ANANASStructDeclareTable.h"
 
 
 enum {
@@ -113,10 +114,10 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 //TODO
 static id create_oc_block(id _self, ANCInterpreter *inter,ANEBlock *ananasBlock){
 	void *blockImp = NULL;
-	const char *typeEncoding = [ananasBlock.func.returnTypeSpecifier typeEncodingWithInterpreter:inter];
+	const char *typeEncoding = [ananasBlock.func.returnTypeSpecifier typeEncoding];
 	typeEncoding = ananas_str_append(typeEncoding, "@?");
 	for (ANCParameter *param in ananasBlock.func.params) {
-		const char *paramTypeEncoding = [param.type typeEncodingWithInterpreter:inter];
+		const char *paramTypeEncoding = [param.type typeEncoding];
 		typeEncoding = ananas_str_append(typeEncoding, paramTypeEncoding);
 	}
 	NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:typeEncoding];
@@ -330,6 +331,7 @@ static void eval_assign_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 			
 			eval_expression(_self, inter, scope, optrExpr);
 			ANEValue *operValue = [inter.stack pop];
+
 			ananas_assign_value_to_identifer_expr(_self, inter, scope, identiferExpr, operValue);
 			break;
 		}
@@ -1088,7 +1090,8 @@ static void eval_member_expression(id _self, ANCInterpreter *inter, ANEScopeChai
 	eval_expression(_self, inter, scope, expr.expr);
 	ANEValue *obj = [inter.stack peekStack:0];
 	if (obj.type.typeKind == ANC_TYPE_STRUCT) {
-		ANEValue *value =  get_struct_field_value(obj.pointerValue, inter.structDeclareDic[obj.type.typeName], expr.memberName);
+		ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
+		ANEValue *value =  get_struct_field_value(obj.pointerValue, [table getStructDeclareWithName:obj.type.structName], expr.memberName);
 		[inter.stack pop];
 		[inter.stack push:value];
 		return;
@@ -1170,7 +1173,8 @@ static ANEValue *invoke(NSUInteger line, id _self, ANCInterpreter *inter, ANESco
 						size_t structSize= ananas_struct_size_with_encoding(type);
 						NSString *structName = ananas_struct_name_with_encoding(type);
 						valuePtr = alloca(structSize);
-						ananas_struct_data_with_dic(valuePtr, argValue.objectValue, inter.structDeclareDic[structName], inter.structDeclareDic);
+						ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
+						ananas_struct_data_with_dic(valuePtr, argValue.objectValue, [table getStructDeclareWithName:structName]);
 					}
 					default:
 						NSCAssert(0, @"");

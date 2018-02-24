@@ -12,6 +12,8 @@
 static NSMutableDictionary<NSThread *, ANEStack *> *_stacksDic;
 static NSLock *_lock;
 
+
+
 @implementation ANCInterpreter
 
 - (instancetype)init{
@@ -49,12 +51,7 @@ static NSLock *_lock;
 	return _structDeclareDic;
 }
 
-- (NSMutableDictionary<Class, NSMutableDictionary<NSString *,ANCFunctionDefinition *> *> *)functionDefinitionDic{
-	if (_functionDefinitionDic == nil) {
-		_functionDefinitionDic = [NSMutableDictionary dictionary];
-	}
-	return _functionDefinitionDic;
-}
+
 
 - (NSMutableArray<ANCStatement *> *)topList{
 	if (_topList == nil) {

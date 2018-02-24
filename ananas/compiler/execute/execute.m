@@ -14,6 +14,7 @@
 #import <objc/message.h>
 #import "util.h"
 #import "ffi.h"
+#import "ANANASMethodMapTable.h"
 
 static NSMutableDictionary *_propKeys;
 static const void *propKey(NSString *propName) {
@@ -31,7 +32,7 @@ static ANEValue *default_value_with_type_specifier(ANCInterpreter *inter, ANCTyp
 	ANEValue *value = [[ANEValue alloc] init];
 	value.type = typeSpecifier;
 	if (typeSpecifier.typeKind == ANC_TYPE_STRUCT) {
-		 size_t size = ananas_struct_size_with_encoding([typeSpecifier typeEncodingWithInterpreter:inter]);
+		 size_t size = ananas_struct_size_with_encoding([typeSpecifier typeEncoding]);
 		value.pointerValue = malloc(size);
 	}
 	return value;
@@ -250,7 +251,7 @@ static ANEStatementResult *execute_return_statement(id _self ,ANCInterpreter *in
 	if (statement.retValExpr) {
 		res.reutrnValue = ane_eval_expression(_self, inter, scope, statement.retValExpr);
 	}else{
-		res.reutrnValue = [ANEValue voidValue];
+		res.reutrnValue = [ANEValue voidValueInstance];
 	}
 	return res;
 }
@@ -271,7 +272,7 @@ static  ANEStatementResult *execute_statement(id _self ,ANCInterpreter *inter, A
 	ANEStatementResult *res;
 	switch (statement.kind) {
 		case ANCStatementKindExpression:
-			ane_eval_expression(nil ,inter, scope, [(ANCExpressionStatement *)statement expr]);
+			ane_eval_expression(_self ,inter, scope, [(ANCExpressionStatement *)statement expr]);
 			res = [ANEStatementResult normalResult];
 			break;
 		case ANCStatementKindDeclaration:{
@@ -339,11 +340,32 @@ ANEStatementResult *ane_execute_statement_list(id _self, ANCInterpreter *inter, 
 }
 
 
+ANEValue * ananas_call_ananas_function(id _self, ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args){
+	NSArray<ANCParameter *> *params = func.params;
+	if (params.count != args.count) {
+		NSCAssert(0, @"");
+	}
+	ANEScopeChain *funScope = [ANEScopeChain scopeChainWithNext:scope];
+	NSUInteger i = 0;
+	for (ANCParameter *param in params) {
+		add_variable(funScope, param.name, args[i]);
+		i++;
+	}
+	
+	ANEStatementResult *res = ane_execute_statement_list(_self, inter, funScope, func.block.statementList);
+	if (res.type == ANEStatementResultTypeReturn) {
+		return res.reutrnValue;
+	}else{
+		return [ANEValue voidValueInstance];
+	}
+}
+
+
 static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
 	if (classDefinition.annotationIfExprResult == AnnotationIfExprResultNoComputed) {
 		ANCExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
 		if (annotationIfConditionExpr) {
-			ANEValue *value = ane_eval_expression(nil ,interpreter, nil, annotationIfConditionExpr);
+			ANEValue *value = ane_eval_expression(nil ,interpreter, interpreter.topScope, annotationIfConditionExpr);
 			classDefinition.annotationIfExprResult = value.isSubtantial ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
 			if (!value.isSubtantial) {
 				return;
@@ -397,7 +419,7 @@ void setterInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 }
 static void replace_getter_method(ANCInterpreter *inter ,Class clazz, ANCPropertyDefinition *prop){
 	SEL getterSEL = NSSelectorFromString(prop.name);
-	const char *prtTypeEncoding  = [prop.typeSpecifier typeEncodingWithInterpreter:inter];
+	const char *prtTypeEncoding  = [prop.typeSpecifier typeEncoding];
 	ffi_type *returnType = &ffi_type_void;
 	unsigned int argCount = 2;
 	ffi_type **argTypes = malloc(sizeof(ffi_type *) * argCount);
@@ -407,7 +429,7 @@ static void replace_getter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 	ffi_cif cif;
 	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
 
-	void *imp;
+	void *imp = NULL;
 	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &imp);
 	ffi_prep_closure_loc(closure, &cif, getterInter, (__bridge_retained void *)prop, getterInter);
 	class_replaceMethod(clazz, getterSEL, (IMP)imp, ananas_str_append(prtTypeEncoding, "@:"));
@@ -419,13 +441,13 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 	NSString *str1 = [[prop.name substringWithRange:NSMakeRange(0, 1)] uppercaseString];
 	NSString *str2 = prop.name.length > 1 ? [prop.name substringFromIndex:1] : nil;
 	SEL setterSEL = NSSelectorFromString([NSString stringWithFormat:@"set%@%@:",str1,str2]);
-	const char *prtTypeEncoding  = [prop.typeSpecifier typeEncodingWithInterpreter:inter];
+	const char *prtTypeEncoding  = [prop.typeSpecifier typeEncoding];
 	ffi_type *returnType = &ffi_type_void;
 	unsigned int argCount = 3;
 	ffi_type **argTypes = malloc(sizeof(ffi_type *) * argCount);
 	argTypes[0] = &ffi_type_pointer;
 	argTypes[1] = &ffi_type_pointer;
-	argTypes[2] = ananas_ffi_type_with_type_encoding([prop.typeSpecifier typeEncodingWithInterpreter:inter]);
+	argTypes[2] = ananas_ffi_type_with_type_encoding([prop.typeSpecifier typeEncoding]);
 	if (argTypes[2] == NULL) {
 		NSCAssert(0, @"");
 	}
@@ -433,7 +455,7 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 	ffi_cif cif;
 	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
 	
-	void *imp;
+	void *imp = NULL;
 	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &imp);
 	ffi_prep_closure_loc(closure, &cif, getterInter, (__bridge_retained void *)prop, setterInter);
 	class_replaceMethod(clazz, setterSEL, (IMP)imp, ananas_str_append("v@:", prtTypeEncoding));
@@ -447,8 +469,14 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 
 
 static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefinition *prop){
+	if (prop.annotationIfConditionExpr) {
+		ANEValue *conValue = ane_eval_expression(nil, inter, inter.topScope, prop.annotationIfConditionExpr);
+		if (![conValue isSubtantial]) {
+			return;
+		}
+	}
 	
-	objc_property_attribute_t type = {"T", [prop.typeSpecifier typeEncodingWithInterpreter:inter]};
+	objc_property_attribute_t type = {"T", [prop.typeSpecifier typeEncoding]};
 	objc_property_attribute_t memAttr = {"",""};
 	switch (prop.modifier & ANCPropertyModifierMemMask) {
 		case ANCPropertyModifierMemStrong:
@@ -491,15 +519,39 @@ static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefiniti
 static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation)
 {
 	
+	 BOOL classMethod = object_isClass(assignSlf);
+	
+	ANANASMethodMapTableItem *map = [[ANANASMethodMapTable shareInstance] getMethodMapTableItemWith:classMethod ? assignSlf : [assignSlf class] classMethod:classMethod sel:selector];
+	ANCMethodDefinition *method = map.method;
+	ANCInterpreter *inter = map.inter;
+	
+	ANEScopeChain *classScope = [ANEScopeChain scopeChainWithNext:inter.topScope];
+	classScope.instance = assignSlf;
+	
+	NSMutableArray<ANEValue *> *args = [NSMutableArray array];
+	[args addObject:[ANEValue valueInstanceWithObject:assignSlf]];
+	[args addObject:[ANEValue valueInstanceWithSEL:selector]];
+	[invocation methodSignature];
 	
 	
-	NSLog(@"");
+	ananas_call_ananas_function(assignSlf, inter, classScope, method.functionDefinition, args);
 }
 
 static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){
+	if (method.annotationIfConditionExpr) {
+		ANEValue *conValue = ane_eval_expression(nil, interpreter, interpreter.topScope, method.annotationIfConditionExpr);
+		if (![conValue isSubtantial]) {
+			return;
+		}
+	}
 	ANCFunctionDefinition *func = method.functionDefinition;
-	
 	SEL sel = NSSelectorFromString(func.name);
+	
+	ANANASMethodMapTableItem *item = [[ANANASMethodMapTableItem alloc] initWithClass:clazz inter:interpreter method:method];
+	[[ANANASMethodMapTable shareInstance] addMethodMapTableItem:item];
+	
+	
+	
 	const char *typeEncoding;
 	Method ocMethod;
 	if (method.classMethod) {
@@ -511,10 +563,10 @@ static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDef
 	if (ocMethod) {
 		typeEncoding = method_getTypeEncoding(ocMethod);
 	}else{
-		typeEncoding =[func.returnTypeSpecifier typeEncodingWithInterpreter:interpreter];
+		typeEncoding =[func.returnTypeSpecifier typeEncoding];
 		
 		for (ANCParameter *param in func.params) {
-			const char *paramTypeEncoding = [param.type typeEncodingWithInterpreter:interpreter];
+			const char *paramTypeEncoding = [param.type typeEncoding];
 			typeEncoding = ananas_str_append(typeEncoding, paramTypeEncoding);
 		}
 	}
@@ -527,6 +579,7 @@ static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDef
 static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
 	Class clazz = NSClassFromString(classDefinition.name);
 	for (ANCPropertyDefinition *prop in classDefinition.properties) {
+		
 		replace_prop(interpreter,clazz, prop);
 	}
 	
@@ -540,7 +593,7 @@ static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefin
 	
 }
 
-void add_struct_declare(){
+void add_struct_declare(ANCStructDeclare *structDeclaer){
 	
 }
 
@@ -550,9 +603,9 @@ void ane_interpret(ANCInterpreter *interpreter){
 	
 	for (__kindof NSObject *top in interpreter.topList) {
 		if ([top isKindOfClass:[ANCStatement class]]) {
-			ANEStatementResult *result = execute_statement(nil, interpreter, interpreter.topScope, top);
+			execute_statement(nil, interpreter, interpreter.topScope, top);
 		}else if ([top isKindOfClass:[ANCStructDeclare class]]){
-			add_struct_declare();
+			add_struct_declare(top);
 		}else if ([top isKindOfClass:[ANCClassDefinition class]]){
 			define_class(interpreter, top);
 			fix_class(interpreter,top);

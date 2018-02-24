@@ -491,13 +491,6 @@ ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *mem
 			}else{
 				[instanceMethods addObject:methodDefinition];
 			}
-			Class ocClass =methodDefinition.classMethod ? objc_getMetaClass(classDefinition.name.UTF8String) : NSClassFromString(classDefinition.name);
-			NSMutableDictionary<NSString *, ANCFunctionDefinition *> *classMethodDic = interpreter.functionDefinitionDic[ocClass];
-			if (!classMethodDic) {
-				interpreter.functionDefinitionDic[(id<NSCopying>)ocClass] = [NSMutableDictionary dictionary];
-			}
-			interpreter.functionDefinitionDic[ocClass][methodDefinition.functionDefinition.name] = methodDefinition.functionDefinition;
-			
 		}
 	}
 	classDefinition.properties = propertyDefinition;
@@ -506,10 +499,6 @@ ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *mem
 	interpreter.currentClassDefinition = nil;
 	return classDefinition;
 }
-
-
-
-
 
 void anc_add_struct_declare(ANCStructDeclare *structDeclare){
 	ANCInterpreter *interpreter = anc_get_current_compile_util();
