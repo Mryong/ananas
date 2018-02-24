@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)c2objectValue;
 - (void *)c2pointerValue;
 
-- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding inter:(nullable ANCInterpreter *)inter;
+- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding;
 - (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding;
 
 + (instancetype)voidValueInstance;

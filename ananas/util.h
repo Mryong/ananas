@@ -28,6 +28,7 @@ inline static  char *removeTypeEncodingPrefix(char *typeEncoding){
 
 const char * ananas_str_append(const char *str1, const char *str2);
 ffi_type *ananas_ffi_type_with_type_encoding(const char *typeEncoding);
+size_t ananas_size_with_encoding(const char *typeEncoding);
 size_t ananas_struct_size_with_encoding(const char *typeEncoding);
 NSString * ananas_struct_name_with_encoding(const char *typeEncoding);
 void ananas_struct_data_with_dic(void *structData, NSDictionary *dic, ANCStructDeclare *declare);

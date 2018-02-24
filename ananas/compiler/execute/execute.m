@@ -520,7 +520,6 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sele
 {
 	
 	 BOOL classMethod = object_isClass(assignSlf);
-	
 	ANANASMethodMapTableItem *map = [[ANANASMethodMapTable shareInstance] getMethodMapTableItemWith:classMethod ? assignSlf : [assignSlf class] classMethod:classMethod sel:selector];
 	ANCMethodDefinition *method = map.method;
 	ANCInterpreter *inter = map.inter;
@@ -531,10 +530,23 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sele
 	NSMutableArray<ANEValue *> *args = [NSMutableArray array];
 	[args addObject:[ANEValue valueInstanceWithObject:assignSlf]];
 	[args addObject:[ANEValue valueInstanceWithSEL:selector]];
-	[invocation methodSignature];
+	NSMethodSignature *methodSignature = [invocation methodSignature];
+	NSUInteger numberOfArguments = [methodSignature numberOfArguments];
+	for (NSUInteger i = 2; i < numberOfArguments; i++) {
+		const char *typeEncoding = [methodSignature getArgumentTypeAtIndex:i];
+		size_t size = ananas_size_with_encoding(typeEncoding);
+		void *ptr = malloc(size);
+		[invocation getArgument:ptr atIndex:i];
+		ANEValue *argValue = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:typeEncoding];
+		[args addObject:argValue];
+	}
 	
-	
-	ananas_call_ananas_function(assignSlf, inter, classScope, method.functionDefinition, args);
+	ANEValue *retValue = ananas_call_ananas_function(assignSlf, inter, classScope, method.functionDefinition, args);
+	size_t retLen = [methodSignature methodReturnLength];
+	void *retPtr = malloc(retLen);
+	const char *retTypeEncoding = [methodSignature methodReturnType];
+	[retValue assign2CValuePointer:retPtr typeEncoding:retTypeEncoding];
+	[invocation setReturnValue:retPtr];
 }
 
 static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){

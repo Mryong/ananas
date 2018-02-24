@@ -227,7 +227,7 @@ void ananas_assign_value_to_identifer_expr(id _self, ANCInterpreter *inter, ANES
 			if (ivar) {
 				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
 				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
-				[operValue assign2CValuePointer:ptr typeEncoding:ivarEncoding inter:inter];
+				[operValue assign2CValuePointer:ptr typeEncoding:ivarEncoding];
 				return;
 			}
 			

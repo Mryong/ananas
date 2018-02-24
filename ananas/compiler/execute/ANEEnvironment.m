@@ -174,7 +174,7 @@
 }
 
 
-- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding inter:(ANCInterpreter *)inter{
+- (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding{
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
 #define ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(_encode, _type, _sel)\
 case _encode:{\

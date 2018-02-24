@@ -115,11 +115,11 @@ static ffi_type *_ffi_type_with_type_encoding(NSString *typeEncoding){
 }
 
 static size_t _struct_size_with_encoding(NSString *typeEncoding){
-
+	
 	NSString *types = [typeEncoding substringToIndex:typeEncoding.length-1];
 	NSUInteger location = [types rangeOfString:@"="].location+1;
 	types = [types substringFromIndex:location];
-
+	
 	size_t size = 0;
 	size_t index = 0;
 	const char *encoding = types.UTF8String;
@@ -158,21 +158,71 @@ break;
 						}
 					}
 				}
-
+				
 				NSString *subTypeEncoding = [types substringWithRange:NSMakeRange(index, end - index + 1)];
 				size += _struct_size_with_encoding(subTypeEncoding);
 				index += end - index;
 				break;
 			}
-
+				
 			default:
 				break;
 		}
 		index++;
 	}
-
+	
 #undef STRUCE_SZIE_CASE
 	return size;
+}
+
+size_t ananas_size_with_encoding(const char *typeEncoding){
+	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
+	switch (*typeEncoding) {
+		case 'c':
+			return sizeof(char);
+		case 'i':
+			return sizeof(int);
+		case 's':
+			return sizeof(short);
+		case 'l':
+			return sizeof(long);
+		case 'q':
+			return sizeof(long long int);
+		case 'C':
+			return sizeof(unsigned char);
+		case 'I':
+			return sizeof(unsigned int);
+		case 'S':
+			return sizeof(unsigned short);
+		case 'L':
+			return sizeof(unsigned long);
+		case 'Q':
+			return sizeof(unsigned long long int);
+		case 'f':
+			return sizeof(float);
+		case 'd':
+			return sizeof(double);
+		case 'D':
+			return sizeof(long double);
+		case 'B':
+			return sizeof(BOOL);
+		case '^':
+			return sizeof(void *);
+		case '*':
+			return sizeof(char *);
+		case '@':
+			return sizeof(id);
+		case '#':
+			return sizeof(Class);
+		case ':':
+			return sizeof(SEL);
+		case '{':
+			return _struct_size_with_encoding([NSString stringWithUTF8String:typeEncoding]);
+		default:
+			NSCAssert(0, @"");
+			break;
+	}
+	return 0;
 }
 
 

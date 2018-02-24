@@ -47,7 +47,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "230"
             endingLineNumber = "230"
-            landmarkName = "-assign2CValuePointer:typeEncoding:inter:"
+            landmarkName = "-assign2CValuePointer:typeEncoding:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
