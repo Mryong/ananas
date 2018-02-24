@@ -436,6 +436,17 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	funcDefinition.kind = ANCFunctionDefinitionKindMethod;
 	funcDefinition.returnTypeSpecifier = returnTypeSpecifier;
 	NSMutableArray<ANCParameter *> *params = [NSMutableArray array];
+	ANCParameter *selfParam = [[ANCParameter alloc] init];
+	selfParam.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+	selfParam.name = @"self";
+	
+	ANCParameter *selParam = [[ANCParameter alloc] init];
+	selParam.type = anc_create_type_specifier(ANC_TYPE_SEL);
+	selParam.name = @"_cmd";
+	
+	[params addObject:selfParam];
+	[params addObject:selfParam];
+	
 	NSMutableString *selector = [NSMutableString string];
 	for (ANCMethodNameItem *itme in items) {
 		[selector appendString:itme.name];
