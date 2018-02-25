@@ -16,7 +16,10 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	NSArray *arr;
+	CGRect rect = CGRectMake(0, 0, 100, 100);
+	UIView *view = [[UIView alloc] initWithFrame:rect];
+	view.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
+	[self.view addSubview:view];
 	
 //	for (self.myv in arr) {
 //		
@@ -30,7 +33,11 @@
 }
 
 - (IBAction)btnDidClicked:(UIButton *)sender {
-	[self testReplaceMethod:@"arg"];
+	[self testReplaceMethod:@"hello world"];
+	NSLog(@"==========");
+	
+//	UIView *view = [[UIView alloc] init];
+//	UIView *view = UIView.alloc().init();
 	
 }
 

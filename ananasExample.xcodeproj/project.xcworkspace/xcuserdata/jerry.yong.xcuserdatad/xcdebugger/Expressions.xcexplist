@@ -3,6 +3,44 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "eval_identifer_expression:eval.m">
+      </ContextState>
+      <ContextState
+         contextName = "eval_function_call_expression:eval.m">
+      </ContextState>
+      <ContextState
+         contextName = "invoke:eval.m">
+      </ContextState>
+      <ContextState
+         contextName = "ananas_call_ananas_function:execute.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[ANEValue c2objectValue]:ANEEnvironment.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ane_test:createc.m">
+      </ContextState>
+      <ContextState
+         contextName = "eval_member_expression:eval.m">
+      </ContextState>
+      <ContextState
+         contextName = "eval_at_expression:eval.m">
+      </ContextState>
+      <ContextState
+         contextName = "execute_declaration:execute.m">
+      </ContextState>
+      <ContextState
+         contextName = "ane_execute_statement_list:execute.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[ANEValue .cxx_destruct]:ANEEnvironment.m">
+      </ContextState>
+      <ContextState
          contextName = "anc_append_string:create.m">
          <PersistentStrings>
             <PersistentString

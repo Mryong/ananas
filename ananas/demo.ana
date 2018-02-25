@@ -1,7 +1,12 @@
 class ViewController:UIViewController {
 
 - (void)testReplaceMethod:(NSString *)param{
-
+	//NSLog(param);
+	 //UIView *view = UIView.alloc().init();
+	 struct CGRect rect = CGRectMake(0, 0, 100, 100);
+ UIView *view = UIView.alloc().initWithFrame:(rect);
+NSLog(view);
+	
 }
 
 }

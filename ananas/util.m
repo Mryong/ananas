@@ -179,6 +179,8 @@ break;
 size_t ananas_size_with_encoding(const char *typeEncoding){
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
 	switch (*typeEncoding) {
+		case 'v':
+			return sizeof(void);
 		case 'c':
 			return sizeof(char);
 		case 'i':

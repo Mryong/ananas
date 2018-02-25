@@ -78,7 +78,7 @@ void anc_add_class_definition(ANCClassDefinition *classDefinition);
 void anc_add_struct_declare(ANCStructDeclare *structDeclare);
 void anc_add_statement(ANCStatement *statement);
 
-
+void ane_test(id obj);
 
 
 ANCInterpreter *anc_get_current_compile_util(void);

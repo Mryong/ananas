@@ -9,7 +9,7 @@
 #import "ANCInterpreter.h"
 #import "ANEEnvironment.h"
 
-static NSMutableDictionary<NSThread *, ANEStack *> *_stacksDic;
+static NSMutableDictionary<NSString *, ANEStack *> *_stacksDic;
 static NSLock *_lock;
 
 
@@ -18,7 +18,7 @@ static NSLock *_lock;
 
 - (instancetype)init{
 	if (self = [super init]) {
-		_structDeclareDic = [NSMutableDictionary dictionary];
+		_stacksDic = [NSMutableDictionary dictionary];
 		_lock = [[NSLock alloc] init];
 		_currentLineNumber = 1;
 		_topScope = [[ANEScopeChain alloc] init];
@@ -27,7 +27,7 @@ static NSLock *_lock;
 }
 
 - (ANEStack *)stack{
-	NSThread *currentThread = [NSThread currentThread];
+	NSString *currentThread = [[NSThread currentThread] description];
 	[_lock lock];
 	if (!_stacksDic[currentThread]) {
 		_stacksDic[(id)currentThread] = [[ANEStack alloc] init];

@@ -511,11 +511,11 @@ static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefiniti
 
 
 
-static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation)
+static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sel, NSInvocation *invocation)
 {
 	
-	 BOOL classMethod = object_isClass(assignSlf);
-	ANANASMethodMapTableItem *map = [[ANANASMethodMapTable shareInstance] getMethodMapTableItemWith:classMethod ? assignSlf : [assignSlf class] classMethod:classMethod sel:selector];
+	BOOL classMethod = object_isClass(assignSlf);
+	ANANASMethodMapTableItem *map = [[ANANASMethodMapTable shareInstance] getMethodMapTableItemWith:classMethod ? assignSlf : [assignSlf class] classMethod:classMethod sel:invocation.selector];
 	ANCMethodDefinition *method = map.method;
 	ANCInterpreter *inter = map.inter;
 	
@@ -524,7 +524,7 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sele
 	
 	NSMutableArray<ANEValue *> *args = [NSMutableArray array];
 	[args addObject:[ANEValue valueInstanceWithObject:assignSlf]];
-	[args addObject:[ANEValue valueInstanceWithSEL:selector]];
+	[args addObject:[ANEValue valueInstanceWithSEL:invocation.selector]];
 	NSMethodSignature *methodSignature = [invocation methodSignature];
 	NSUInteger numberOfArguments = [methodSignature numberOfArguments];
 	for (NSUInteger i = 2; i < numberOfArguments; i++) {
@@ -537,11 +537,14 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sele
 	}
 	
 	ANEValue *retValue = ananas_call_ananas_function(inter, classScope, method.functionDefinition, args);
-	size_t retLen = [methodSignature methodReturnLength];
-	void *retPtr = malloc(retLen);
-	const char *retTypeEncoding = [methodSignature methodReturnType];
-	[retValue assign2CValuePointer:retPtr typeEncoding:retTypeEncoding];
-	[invocation setReturnValue:retPtr];
+	if (retValue.type.typeKind != ANC_TYPE_VOID) {
+		size_t retLen = [methodSignature methodReturnLength];
+		void *retPtr = malloc(retLen);
+		const char *retTypeEncoding = [methodSignature methodReturnType];
+		[retValue assign2CValuePointer:retPtr typeEncoding:retTypeEncoding];
+		[invocation setReturnValue:retPtr];
+	}
+	
 }
 
 static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){
@@ -681,6 +684,10 @@ void add_build_in_function(ANCInterpreter *interpreter){
 	interpreter.topScope.vars[@"CATransform3DMakeScale"] = [ANEValue valueInstanceWithBlock:^CATransform3D(CGFloat sx, CGFloat sy, CGFloat sz){
 		return CATransform3DMakeScale(sx, sy, sz);
 	}];
+	
+	interpreter.topScope.vars[@"NSLog"] = [ANEValue valueInstanceWithBlock:^void (id obj){
+		NSLog(@"%@",obj);
+	}];
 
 }
 
@@ -694,6 +701,7 @@ void add_struct_declare(ANCInterpreter *interpreter, ANCStructDeclare *structDec
 	ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
 	[table addStructDeclare:structDeclaer];
 }
+
 
 
 

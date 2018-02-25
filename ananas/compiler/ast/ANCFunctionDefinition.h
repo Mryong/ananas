@@ -29,7 +29,6 @@ typedef NS_ENUM(NSUInteger,ANCFunctionDefinitionKind) {
 @property (assign, nonatomic) NSUInteger lineNumber;
 @property (strong, nonatomic) ANCTypeSpecifier *returnTypeSpecifier;
 @property (assign, nonatomic) ANCFunctionDefinitionKind kind;
-@property (weak, nonatomic) ANCMethodDefinition *methodDefinition;
 @property (copy, nonatomic) NSString *name;//or selecor
 @property (strong, nonatomic) NSArray<ANCParameter *> *params;
 @property (strong, nonatomic) ANCBlock *block;

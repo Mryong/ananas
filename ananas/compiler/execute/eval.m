@@ -110,7 +110,7 @@ static void eval_sel_expression(ANCInterpreter *inter, ANCExpression *expr){
 }
 
 static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
-	ANEBlock *anananBlock = (__bridge_transfer ANEBlock *)userdata;
+	ANEBlock *anananBlock = (__bridge ANEBlock *)userdata;
 	ANCInterpreter *inter = anananBlock.inter;
 	ANEScopeChain *scope = anananBlock.scope;
 	ANCFunctionDefinition *func = anananBlock.func;
@@ -201,6 +201,12 @@ static void eval_nil_expr(ANCInterpreter *inter){
 static void eval_identifer_expression(ANCInterpreter *inter, ANEScopeChain *scope ,ANCIdentifierExpression *expr){
 	NSString *identifier = expr.identifier;
 	ANEValue *value = [scope getValueWithIdentifier:identifier];
+	if (!value) {
+		Class clazz = NSClassFromString(identifier);
+		if (clazz) {
+			value = [ANEValue valueInstanceWithClass:clazz];
+		}
+	}
 	NSCAssert(value, @"not found var %@", identifier);
 	[inter.stack push:value];
 }
@@ -896,7 +902,7 @@ static void eval_index_expression(ANCInterpreter *inter, ANEScopeChain *scope,AN
 
 static void eval_at_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUnaryExpression *expr){
 	eval_expression(inter, scope, expr.expr);
-	ANEValue *value = [inter.stack peekStack:0];
+	ANEValue *value = [inter.stack pop];
 	ANEValue *resultValue = [ANEValue new];
 	resultValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
 	switch (value.type.typeKind) {
@@ -918,6 +924,7 @@ static void eval_at_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCUn
 			NSCAssert(0, @"line:%zd operator ‘@’ can not use type: %@",expr.expr.lineNumber, value.type.typeName);
 			break;
 	}
+	[inter.stack push:resultValue];
 }
 
 
@@ -1132,21 +1139,28 @@ static void eval_member_expression(ANCInterpreter *inter, ANEScopeChain *scope, 
 		
 	}
 	
-	if (obj.type.typeKind != ANC_TYPE_OBJECT) {
+	if (obj.type.typeKind != ANC_TYPE_OBJECT && obj.type.typeKind != ANC_TYPE_CLASS) {
 		NSCAssert(0, @"line:%zd, %@ is not object",expr.expr.lineNumber, obj.type.typeName);
 	}
 	SEL sel = NSSelectorFromString(expr.memberName);
-	NSMethodSignature *sig =[obj.objectValue methodSignatureForSelector:NSSelectorFromString(expr.memberName)];
-	void *returnData = malloc([sig methodReturnLength]);
+	NSMethodSignature *sig =[obj.c2objectValue methodSignatureForSelector:NSSelectorFromString(expr.memberName)];
+	
 	char *returnTypeEncoding = (char *)[sig methodReturnType];
 	returnTypeEncoding = removeTypeEncodingPrefix(returnTypeEncoding);
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
-	[invocation setTarget:obj.objectValue];
+	[invocation setTarget:obj.c2objectValue];
 	[invocation setSelector:sel];
 	[invocation invoke];
-	[invocation getReturnValue:returnData];
-
-	ANEValue *retValue = [[ANEValue alloc] initWithCValuePointer:returnData typeEncoding:returnTypeEncoding];
+	
+	ANEValue *retValue;
+	if (*returnTypeEncoding != 'v') {
+		void *returnData = malloc([sig methodReturnLength]);
+		[invocation getReturnValue:returnData];
+		retValue = [[ANEValue alloc] initWithCValuePointer:returnData typeEncoding:returnTypeEncoding];
+		free(returnData);
+	}else{
+		retValue = [ANEValue voidValueInstance];
+	}
 		
 	[inter.stack pop];
 	[inter.stack push:retValue];
@@ -1165,18 +1179,26 @@ static ANEValue *invoke(NSUInteger line, ANCInterpreter *inter, ANEScopeChain *s
 	for (NSUInteger i = 2; i < argCount; i++) {
 		const char *typeEncoding = [sig getArgumentTypeAtIndex:i];
 		void *ptr = malloc(ananas_size_with_encoding(typeEncoding));
-		eval_expression(inter, scope, argExprs[i -1]);
+		eval_expression(inter, scope, argExprs[i - 2]);
 		ANEValue *argValue = [inter.stack pop];
 		[argValue assign2CValuePointer:ptr typeEncoding:typeEncoding];
 		[invocation setArgument:ptr atIndex:i];
+		free(ptr);
 	}
 	[invocation invoke];
 	
 	char *returnType = (char *)[sig methodReturnType];
 	returnType = removeTypeEncodingPrefix(returnType);
-	void *retValuePointer = alloca([sig methodReturnLength]);
-	[invocation getReturnValue:retValuePointer];
-	ANEValue *retValue = [[ANEValue alloc] initWithCValuePointer:retValuePointer typeEncoding:returnType];
+	ANEValue *retValue;
+	if (*returnType != 'v') {
+		void *retValuePointer = malloc([sig methodReturnLength]);
+		[invocation getReturnValue:retValuePointer];
+		retValue = [[ANEValue alloc] initWithCValuePointer:retValuePointer typeEncoding:returnType];
+		free(retValuePointer);
+	}else{
+		retValue = [ANEValue voidValueInstance];
+	}
+	
 	return retValue;
 }
 
@@ -1315,7 +1337,7 @@ break;\
 				default:{
 					eval_expression(inter, scope, memberObjExpr);
 					ANEValue *memberObj = [inter.stack pop];
-					ANEValue *retValue = invoke(expr.lineNumber, inter, scope, memberObj, sel, expr.args);
+					ANEValue *retValue = invoke(expr.lineNumber, inter, scope, [memberObj c2objectValue], sel, expr.args);
 					[inter.stack push:retValue];
 					break;
 					
@@ -1342,7 +1364,7 @@ break;\
 			}
 			for (NSUInteger i = 1; i < numberOfArguments; i++) {
 				const char *typeEncoding = [sig getArgumentTypeAtIndex:i];
-				void *ptr = malloc(ananas_size_with_encoding(typeEncoding));
+				void *ptr = alloca(ananas_size_with_encoding(typeEncoding));
 				eval_expression(inter, scope, expr.args[i -1]);
 				ANEValue *argValue = [inter.stack pop];
 				[argValue assign2CValuePointer:ptr typeEncoding:typeEncoding];
@@ -1350,9 +1372,17 @@ break;\
 			}
 			[invocation invoke];
 			const char *retType = [sig methodReturnType];
-			void *retValuePtr = malloc(ananas_size_with_encoding(retType));
-			[invocation getReturnValue:retValuePtr];
-			ANEValue *retValue = [[ANEValue alloc] initWithCValuePointer:retValuePtr typeEncoding:retType];
+			retType = removeTypeEncodingPrefix((char *)retType);
+			ANEValue *retValue;
+			if (*retType != 'v') {
+				void *retValuePtr = malloc(ananas_size_with_encoding(retType));
+				[invocation getReturnValue:retValuePtr];
+				retValue = [[ANEValue alloc] initWithCValuePointer:retValuePtr typeEncoding:retType];
+				free(retValuePtr);
+			}else{
+				retValue = [ANEValue voidValueInstance];
+			}
+			
 			[inter.stack push:retValue];
 			break;
 		}

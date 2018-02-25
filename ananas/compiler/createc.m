@@ -77,9 +77,12 @@ void anc_rest_string_literal_buffer(void){
 
 const char *anc_end_string_literal(){
 	anc_append_string_literal('\0');
-	NSMutableString *str = [NSMutableString stringWithUTF8String:st_string_literal_buffer];
+	size_t strLen = strlen(st_string_literal_buffer);
+	char *str = malloc(strLen + 1);
+	strcpy(str, st_string_literal_buffer);
 	anc_rest_string_literal_buffer();
-	return [str UTF8String];
+	
+	return str;
 }
 
 Class anc_expression_class_of_kind(ANCExpressionKind kind){
@@ -185,6 +188,7 @@ ANCDeclarationStatement *anc_create_declaration_statement(ANCDeclaration *declar
 	return statement;
 	
 }
+
 
 
 ANCExpressionStatement *anc_create_expression_statement(ANCExpression *expr){
@@ -410,7 +414,7 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	selParam.name = @"_cmd";
 	
 	[params addObject:selfParam];
-	[params addObject:selfParam];
+	[params addObject:selParam];
 	
 	NSMutableString *selector = [NSMutableString string];
 	for (ANCMethodNameItem *itme in items) {
@@ -420,7 +424,6 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	funcDefinition.name = selector;
 	funcDefinition.params = params;
 	funcDefinition.block = block;
-	funcDefinition.methodDefinition = methodDefinition;
 	methodDefinition.functionDefinition = funcDefinition;
 	return methodDefinition;
 	
@@ -490,16 +493,15 @@ void anc_add_class_definition(ANCClassDefinition *classDefinition){
 void anc_add_statement(ANCStatement *statement){
 	ANCInterpreter *interpreter = anc_get_current_compile_util();
 	[interpreter.topList addObject:statement];
-	
-	
-	
-	
+
 }
 
 
 
 
-
+void ane_test(id obj){
+	NSLog(@"%@",obj);
+}
 
 
 

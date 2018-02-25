@@ -95,6 +95,7 @@ typedef NS_ENUM(NSInteger, ANEStatementResultType) {
 - (ANEValue *)pop;
 - (ANEValue *)peekStack:(NSUInteger)index;
 - (void)shrinkStack:(NSUInteger)shrinkSize;
+- (NSUInteger)size;
 @end
 
 

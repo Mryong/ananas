@@ -151,7 +151,7 @@
 		case ANC_TYPE_BLOCK:
 			return _objectValue;
 		case ANC_TYPE_POINTER:
-			return (__bridge_transfer id)_pointerValue;
+			return (__bridge id)_pointerValue;
 		default:
 			return nil;
 	}
@@ -202,8 +202,8 @@ break;\
 		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('^', void *, c2pointerValue)
 		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(':', SEL, selValue)
 		case '@':{
-			NSObject  * __autoreleasing  *ptr = (NSObject * __autoreleasing *)cvaluePointer;
-			*ptr = [self c2objectValue];
+			void  **ptr =cvaluePointer;
+			*ptr = (__bridge_retained void *)[self c2objectValue];
 			break;
 		}
 		case '#':{
@@ -234,7 +234,7 @@ break;\
 
 - (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding{
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
-	ANEValue *retValue = [ANEValue new];
+	ANEValue *retValue = [[ANEValue alloc] init];
 	
 #define ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE(_code,_kind, _type,_sel)\
 case _code:{\
@@ -263,13 +263,15 @@ break;\
 			ANANASA_C_VALUE_CONVER_TO_ANANAS_VALUE_CASE('#',ANC_TYPE_CLASS, Class,classValue)
 		case '@':{
 			retValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
-			retValue.objectValue = (__bridge_transfer id)(*(void **)cValuePointer);
+			retValue.objectValue = (__bridge id)(*(void **)cValuePointer);
 			break;
 		}
 		case '{':{
 			NSString *structName = ananas_struct_name_with_encoding(typeEncoding);
 			retValue.type= anc_create_struct_type_specifier(structName);
-			retValue.pointerValue = cValuePointer;
+			size_t size = ananas_size_with_encoding(typeEncoding);
+			retValue.pointerValue = malloc(size);
+			memcpy(retValue.pointerValue, cValuePointer, size);
 			break;
 		}
 			
@@ -359,12 +361,15 @@ break;\
 	memcpy(value.pointerValue, structValue, size);
 	return value;
 }
+//
+//- (void)dealloc{
+//	if (_type.typeKind == ANC_TYPE_STRUCT) {
+//		free(_pointerValue);
+//	}
+//}
 
-- (void)dealloc{
-	if (_type.typeKind == ANC_TYPE_STRUCT) {
-		free(_pointerValue);
-	}
-}
+
+
 @end
 
 
@@ -469,5 +474,7 @@ break;\
 - (void)shrinkStack:(NSUInteger)shrinkSize{
 	[_arr removeObjectsInRange:NSMakeRange(_arr.count - shrinkSize, shrinkSize)];
 }
-
+- (NSUInteger)size{
+	return _arr.count;
+}
 @end

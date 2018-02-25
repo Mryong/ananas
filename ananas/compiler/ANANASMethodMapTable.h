@@ -11,8 +11,8 @@
 
 @interface ANANASMethodMapTableItem:NSObject
 @property (strong, nonatomic) Class clazz;
-@property (weak, nonatomic) ANCInterpreter *inter;
-@property (weak, nonatomic) ANCMethodDefinition *method;
+@property (strong, nonatomic) ANCInterpreter *inter;
+@property (strong, nonatomic) ANCMethodDefinition *method;
 
 - (instancetype)initWithClass:(Class)clazz inter:(ANCInterpreter *)inter method:(ANCMethodDefinition *)method;
 @end
