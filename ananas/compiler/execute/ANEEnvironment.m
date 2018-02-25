@@ -367,14 +367,11 @@ break;\
 }
 @end
 
-@implementation ANEVariable
-
-@end
 
 @implementation ANEScopeChain
-- (NSMutableArray<ANEVariable *> *)vars{
+- (NSMutableDictionary<NSString *,ANEValue *> *)vars{
 	if (_vars == nil) {
-		_vars = [NSMutableArray array];
+		_vars = [NSMutableDictionary dictionary];
 	}
 	return _vars;
 }
@@ -396,11 +393,17 @@ break;\
 				return value;
 			}
 		}else{
-			for (ANEVariable *var in pos.vars) {
-				if ([var.name isEqualToString:identifier]) {
-					return var.value;
+			__block ANEValue *value;
+			[pos.vars enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ANEValue * _Nonnull obj, BOOL * _Nonnull stop) {
+				if ([key isEqualToString:identifier]) {
+					value = obj;
+					*stop = YES;
 				}
+			}];
+			if (value) {
+				return value;
 			}
+			
 		}
 	}
 	return nil;

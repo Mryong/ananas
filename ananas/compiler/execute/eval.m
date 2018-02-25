@@ -235,12 +235,12 @@ void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain 
 			}
 			
 		}else{
-			for (ANEVariable *var in pos.vars) {
-				if ([var.name isEqualToString:identifier]) {
-					[var.value assignFrom:operValue];
-					return;
+			[pos.vars enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ANEValue * _Nonnull obj, BOOL * _Nonnull stop) {
+				if ([key isEqualToString:identifier]) {
+					[obj assignFrom:operValue];
+					*stop = YES;
 				}
-			}
+			}];
 		}
 		
 	}
@@ -1096,7 +1096,7 @@ break;\
 					NSString *subStruct = ananas_struct_name_with_encoding(subTypeEncoding.UTF8String);
 					retValue.type = anc_create_struct_type_specifier(subStruct);
 					retValue.pointerValue = malloc(size);
-					memcmp(retValue.pointerValue, value, size);
+					memcpy(retValue.pointerValue, value, size);
 					return retValue;
 				}
 				

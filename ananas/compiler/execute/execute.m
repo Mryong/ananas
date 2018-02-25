@@ -15,6 +15,7 @@
 #import "util.h"
 #import "ffi.h"
 #import "ANANASMethodMapTable.h"
+#import "ANANASStructDeclareTable.h"
 
 static NSMutableDictionary *_propKeys;
 static const void *propKey(NSString *propName) {
@@ -39,12 +40,6 @@ static ANEValue *default_value_with_type_specifier(ANCInterpreter *inter, ANCTyp
 }
 
 
-static void add_variable(ANEScopeChain *scope, NSString *name, ANEValue *value){
-	ANEVariable *var = [[ANEVariable alloc] init];
-	var.name = name;
-	var.value = value;
-	[scope.vars addObject:var];
-}
 
 static void execute_declaration(ANCInterpreter *inter, ANEScopeChain *scope, ANCDeclaration *declaration){
 	ANEValue *value;
@@ -53,7 +48,7 @@ static void execute_declaration(ANCInterpreter *inter, ANEScopeChain *scope, ANC
 	}else{
 		value = default_value_with_type_specifier(inter, declaration.type);
 	}
-	add_variable(scope, declaration.name, value);
+	scope.vars[declaration.name] = value;
 }
 
 
@@ -348,7 +343,7 @@ ANEValue * ananas_call_ananas_function(ANCInterpreter *inter, ANEScopeChain *sco
 	ANEScopeChain *funScope = [ANEScopeChain scopeChainWithNext:scope];
 	NSUInteger i = 0;
 	for (ANCParameter *param in params) {
-		add_variable(funScope, param.name, args[i]);
+		funScope.vars[param.name] = args[i];
 		i++;
 	}
 	
@@ -605,19 +600,116 @@ static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefin
 	
 }
 
-void add_struct_declare(ANCStructDeclare *structDeclaer){
+void add_built_in_struct_declare(){
+	ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
 	
+	ANCStructDeclare *cgPoinerStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGPoint" typeEncoding:"{CGPoint=dd}" keys:@[@"x",@"y"]];
+	[table addStructDeclare:cgPoinerStructDeclare];
+	
+	ANCStructDeclare *cgSizeStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGSize" typeEncoding:"{CGSize=dd}" keys:@[@"width",@"height"]];
+	[table addStructDeclare:cgSizeStructDeclare];
+	
+	ANCStructDeclare *cgRectStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGRect" typeEncoding:"{CGRect={CGPoint=dd}{CGSize=dd}}" keys:@[@"origin",@"size"]];
+	[table addStructDeclare:cgRectStructDeclare];
+	
+	ANCStructDeclare *cgAffineTransformStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGAffineTransform" typeEncoding:"{CGAffineTransform=dddddd}" keys:@[@"a",@"b",@"c", @"d", @"tx", @"ty"]];
+	[table addStructDeclare:cgAffineTransformStructDeclare];
+	
+	ANCStructDeclare *cgVectorStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGVector" typeEncoding:"{CGVector=dd}" keys:@[@"dx",@"dy"]];
+	[table addStructDeclare:cgVectorStructDeclare];
+	//todo _NSRange
+	ANCStructDeclare *nsRangeStructDeclare = [[ANCStructDeclare alloc] initWithName:@"NSRange" typeEncoding:"{_NSRange=QQ}" keys:@[@"location",@"length"]];
+	[table addStructDeclare:nsRangeStructDeclare];
+	
+	ANCStructDeclare *uiOffsetStructDeclare = [[ANCStructDeclare alloc] initWithName:@"UIOffset" typeEncoding:"{UIOffset=dd}" keys:@[@"horizontal",@"vertical"]];
+	[table addStructDeclare:uiOffsetStructDeclare];
+	
+	ANCStructDeclare *uiEdgeInsetsStructDeclare = [[ANCStructDeclare alloc] initWithName:@"UIEdgeInsets" typeEncoding:"{UIEdgeInsets=dddd}" keys:@[@"top",@"left",@"bottom",@"right"]];
+	[table addStructDeclare:uiEdgeInsetsStructDeclare];
+	
+	ANCStructDeclare *caTransform3DStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CATransform3D" typeEncoding:"" keys:@[@"m11",@"m12",@"m13",@"m14",@"m21",@"m22",@"m23",@"m24",@"m31",@"m32",@"m33",@"m34",@"41",@"m42",@"m43",@"m44",]];
+	[table addStructDeclare:caTransform3DStructDeclare];
+
+}
+
+void add_build_in_function(ANCInterpreter *interpreter){
+
+	interpreter.topScope.vars[@"CGPointMake"] = [ANEValue valueInstanceWithBlock:^CGPoint(CGFloat x, CGFloat y){
+		return CGPointMake(x, y);
+	}];
+	
+	interpreter.topScope.vars[@"CGSizeMake"] = [ANEValue valueInstanceWithBlock:^CGSize(CGFloat width, CGFloat height){
+		return CGSizeMake(width, height);
+	}];
+	
+	interpreter.topScope.vars[@"CGRectMake"] = [ANEValue valueInstanceWithBlock:^CGRect (CGFloat x, CGFloat y, CGFloat width, CGFloat height){
+		return CGRectMake(x, y, width, height);
+	}];
+	
+	interpreter.topScope.vars[@"NSMakeRange"] = [ANEValue valueInstanceWithBlock:^NSRange(NSUInteger loc, NSUInteger len){
+		return NSMakeRange(loc, len);
+	}];
+	
+	interpreter.topScope.vars[@"UIOffsetMake"] = [ANEValue valueInstanceWithBlock:^UIOffset(CGFloat horizontal, CGFloat vertical){
+		return UIOffsetMake(horizontal, vertical);
+	}];
+	
+	interpreter.topScope.vars[@"UIEdgeInsetsMake"] = [ANEValue valueInstanceWithBlock:^UIEdgeInsets(CGFloat top, CGFloat left, CGFloat bottom, CGFloat right){
+		return UIEdgeInsetsMake(top, left, bottom, right);
+	}];
+	
+	interpreter.topScope.vars[@"CGVectorMake"] = [ANEValue valueInstanceWithBlock:^CGVector(CGFloat dx, CGFloat dy){
+		return CGVectorMake(dx, dy);
+	}];
+	
+	interpreter.topScope.vars[@"CGAffineTransformMake"] = [ANEValue valueInstanceWithBlock:^ CGAffineTransform(CGFloat a, CGFloat b, CGFloat c, CGFloat d, CGFloat tx, CGFloat ty){
+		return CGAffineTransformMake(a, b, c, d, tx, ty);
+	}];
+	
+	interpreter.topScope.vars[@"CGAffineTransformMakeScale"] = [ANEValue valueInstanceWithBlock:^CGAffineTransform(CGFloat sx, CGFloat sy){
+		return CGAffineTransformMakeScale(sx, sy);
+	}];
+	
+	interpreter.topScope.vars[@"CGAffineTransformMakeRotation"] = [ANEValue valueInstanceWithBlock:^CGAffineTransform(CGFloat angle){
+		return CGAffineTransformMakeRotation(angle);
+	}];
+	
+	interpreter.topScope.vars[@"CGAffineTransformMakeTranslation"] = [ANEValue valueInstanceWithBlock:^CGAffineTransform(CGFloat tx, CGFloat ty){
+		return CGAffineTransformMakeTranslation(tx, ty);
+	}];
+	
+	interpreter.topScope.vars[@"CATransform3DMakeScale"] = [ANEValue valueInstanceWithBlock:^CATransform3D(CGFloat sx, CGFloat sy, CGFloat sz){
+		return CATransform3DMakeScale(sx, sy, sz);
+	}];
+
+}
+
+void add_struct_declare(ANCInterpreter *interpreter, ANCStructDeclare *structDeclaer){
+	if (structDeclaer.annotationIfConditionExpr) {
+		ANEValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, structDeclaer.annotationIfConditionExpr);
+		if (![conValue isSubtantial]) {
+			return;
+		}
+	}
+	ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
+	[table addStructDeclare:structDeclaer];
 }
 
 
 
 void ane_interpret(ANCInterpreter *interpreter){
 	
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		add_built_in_struct_declare();
+	});
+	add_build_in_function(interpreter);
+	
 	for (__kindof NSObject *top in interpreter.topList) {
 		if ([top isKindOfClass:[ANCStatement class]]) {
 			execute_statement(interpreter, interpreter.topScope, top);
 		}else if ([top isKindOfClass:[ANCStructDeclare class]]){
-			add_struct_declare(top);
+			add_struct_declare(interpreter,top);
 		}else if ([top isKindOfClass:[ANCClassDefinition class]]){
 			define_class(interpreter, top);
 			fix_class(interpreter,top);

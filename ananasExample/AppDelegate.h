@@ -17,7 +17,7 @@
 //OBJC_ASSOCIATION_RETAIN = 01401,       /**< Specifies a strong reference to the associated object.
 //										*   The association is made atomically. */
 //OBJC_ASSOCIATION_COPY = 01403          /**<
-@property (strong, atomic) UIWindow *window;//暂时只支持strong，weak, copy, assign/nonatomic,atomic
+@property (strong, nonatomic) UIWindow *window;//暂时只支持strong，weak, copy, assign/nonatomic,atomic
 
 
 @end

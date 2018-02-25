@@ -56,14 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)valueInstanceWithStruct:(void *)structValue typeEncoding:(const char *)typeEncoding;
 @end
 
-@interface ANEVariable:NSObject
-@property (copy, nonatomic) NSString *name;
-@property (strong, nonatomic) ANEValue *value;
-@end
+
 
 @interface ANEScopeChain: NSObject
 @property (strong, nonatomic) id instance;
-@property (strong, nonatomic) NSMutableArray<ANEVariable *> *vars;
+@property (strong, nonatomic) NSMutableDictionary<NSString *,ANEValue *> *vars;
 @property (strong, nonatomic) ANEScopeChain *next;
 
 - (ANEValue *)getValueWithIdentifier:(NSString *)identifier;

@@ -16,4 +16,6 @@
 @property (assign, nonatomic)const char *typeEncoding;
 @property (strong, nonatomic) NSArray<NSString *> *keys;
 
+- (instancetype)initWithName:(NSString *)name typeEncoding:(const char *)typeEncoding keys:(NSArray<NSString *> *)keys;
+
 @end

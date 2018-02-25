@@ -9,6 +9,7 @@
 #import "ANCContext.h"
 #import "ananasc.h"
 #import "execute.h"
+#import <JavaScriptCore/JavaScriptCore.h>
 
 @interface ANCContext()
 @property(nonatomic, strong) ANCInterpreter *interpreter;
@@ -30,7 +31,6 @@
 	ane_interpret(self.interpreter);
 	
 	
-	
 }
 
 - (void)evalAnanasScriptWithSourceString:(NSString *)sourceString{
@@ -38,5 +38,16 @@
 	[self.interpreter compileSoruceWithString:sourceString];
 	ane_interpret(self.interpreter);
 }
+
+- (ANEValue *)objectForKeyedSubscript:(id)key{
+	return _interpreter.topScope.vars[key];
+}
+
+- (void)setObject:(id)object forKeyedSubscript:(NSObject<NSCopying> *)key{
+	_interpreter.topScope.vars[key] = [ANEValue valueInstanceWithObject:object];
+	
+	
+}
+
 
 @end
