@@ -181,7 +181,7 @@ static ANEStatementResult *execute_for_each_statement(ANCInterpreter *inter, ANE
 		ANEValue *operValue = [[ANEValue alloc] init];
 		operValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
 		operValue.objectValue = var;
-		ananas_assign_value_to_identifer_expr(inter, scope, statement.identifierExpr.identifier, operValue);
+		ananas_assign_value_to_identifer_expr(inter, forScope, statement.identifierExpr.identifier, operValue);
 		
 		res = ane_execute_statement_list(inter, forScope, statement.block.statementList);
 		if (res.type == ANEStatementResultTypeReturn) {

@@ -175,6 +175,8 @@
 }
 
 
+
+
 - (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding{
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
 #define ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(_encode, _type, _sel)\
@@ -283,6 +285,77 @@ break;\
 	return retValue;
 }
 
++ (instancetype)defaultValueWithTypeEncoding:(const char *)typeEncoding{
+	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
+	ANEValue *value = [[ANEValue alloc] init];
+	switch (*typeEncoding) {
+		case 'c':
+			value.type = anc_create_type_specifier(ANC_TYPE_INT);
+			break;
+		case 'i':
+			value.type = anc_create_type_specifier(ANC_TYPE_INT);
+			break;
+		case 's':
+			value.type = anc_create_type_specifier(ANC_TYPE_INT);
+			break;
+		case 'l':
+			value.type = anc_create_type_specifier(ANC_TYPE_INT);
+			break;
+		case 'q':
+			value.type = anc_create_type_specifier(ANC_TYPE_INT);
+			break;
+		case 'C':
+			value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
+			break;
+		case 'I':
+			value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
+			break;
+		case 'S':
+			value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
+			break;
+		case 'L':
+			value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
+			break;
+		case 'Q':
+			value.type = anc_create_type_specifier(ANC_TYPE_U_INT);
+			break;
+		case 'B':
+			value.type = anc_create_type_specifier(ANC_TYPE_BOOL);
+			break;
+		case 'f':
+			value.type = anc_create_type_specifier(ANC_TYPE_DOUBLE);
+			break;
+		case 'd':
+			value.type = anc_create_type_specifier(ANC_TYPE_DOUBLE);
+			break;
+		case ':':
+			value.type = anc_create_type_specifier(ANC_TYPE_SEL);
+			break;
+		case '^':
+			value.type = anc_create_type_specifier(ANC_TYPE_POINTER);
+			break;
+		case '*':
+			value.type = anc_create_type_specifier(ANC_TYPE_C_STRING);
+			break;
+		case '#':
+			value.type = anc_create_type_specifier(ANC_TYPE_CLASS);
+			break;
+		case '@':
+			value.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+			break;
+		case '{':
+			value.type = anc_create_struct_type_specifier(ananas_struct_name_with_encoding(typeEncoding));
+			break;
+		case 'v':
+			value.type = anc_create_type_specifier(ANC_TYPE_VOID);
+			break;
+		default:
+			NSCAssert(0, @"");
+			break;
+	}
+	return value;
+}
+
 + (instancetype)voidValueInstance{
 	ANEValue *value = [[ANEValue alloc] init];
 	value.type = anc_create_type_specifier(ANC_TYPE_VOID);
@@ -322,7 +395,7 @@ break;\
 }
 + (instancetype)valueInstanceWithBlock:(id)blockValue{
 	ANEValue *value = [[ANEValue alloc] init];
-	value.type = anc_create_type_specifier(ANC_TYPE_BOOL);
+	value.type = anc_create_type_specifier(ANC_TYPE_BLOCK);
 	value.objectValue = blockValue;
 	return value;
 }
@@ -361,12 +434,63 @@ break;\
 	memcpy(value.pointerValue, structValue, size);
 	return value;
 }
-//
-//- (void)dealloc{
-//	if (_type.typeKind == ANC_TYPE_STRUCT) {
-//		free(_pointerValue);
-//	}
-//}
+
+- (instancetype)nsStringValue{
+	ANEValue *value = [[ANEValue alloc] init];
+	value.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+//	ANC_TYPE_BOOL,
+//	ANC_TYPE_INT,
+//	ANC_TYPE_U_INT,
+//	ANC_TYPE_DOUBLE,
+//	ANC_TYPE_C_STRING,
+//	ANC_TYPE_CLASS,
+//	ANC_TYPE_SEL,
+//	ANC_TYPE_OBJECT,
+//	ANC_TYPE_BLOCK,
+//	ANC_TYPE_STRUCT,
+//	ANC_TYPE_STRUCT_LITERAL,
+//	ANC_TYPE_POINTER
+	switch (_type.typeKind) {
+		case ANC_TYPE_BOOL:
+		case ANC_TYPE_U_INT:
+			value.objectValue = [NSString stringWithFormat:@"%llu",_uintValue];
+			break;
+		case ANC_TYPE_INT:
+			value.objectValue = [NSString stringWithFormat:@"%lld",_integerValue];
+			break;
+		case ANC_TYPE_DOUBLE:
+			value.objectValue = [NSString stringWithFormat:@"%lf",_doubleValue];
+			break;
+		case ANC_TYPE_CLASS:
+		case ANC_TYPE_BLOCK:
+		case ANC_TYPE_OBJECT:
+			value.objectValue = [NSString stringWithFormat:@"%@",self.c2objectValue];
+			break;
+		case ANC_TYPE_SEL:
+			value.objectValue = [NSString stringWithFormat:@"%@",NSStringFromSelector(_selValue)];
+			break;
+		case ANC_TYPE_STRUCT:
+		case ANC_TYPE_POINTER:
+			value.objectValue = [NSString stringWithFormat:@"%p",_pointerValue];
+			break;
+		case ANC_TYPE_STRUCT_LITERAL:
+			value.objectValue = [NSString stringWithFormat:@"%@",_objectValue];
+			break;
+		case ANC_TYPE_C_STRING:
+			value.objectValue = [NSString stringWithFormat:@"%s",_cstringValue];
+			break;
+		default:
+			NSCAssert(0, @"");
+			break;
+	}
+	return value;
+}
+
+- (void)dealloc{
+	if (_type.typeKind == ANC_TYPE_STRUCT) {
+		free(_pointerValue);
+	}
+}
 
 
 

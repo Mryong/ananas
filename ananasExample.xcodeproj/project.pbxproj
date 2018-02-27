@@ -27,7 +27,6 @@
 		41D02D341FA8A09400E1829A /* ananasExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D331FA8A09400E1829A /* ananasExampleTests.m */; };
 		41D02D3F1FA8A09400E1829A /* ananasExampleUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D3E1FA8A09400E1829A /* ananasExampleUITests.m */; };
 		41D02D591FA9A5E000E1829A /* createc.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D581FA9A5E000E1829A /* createc.m */; };
-		41D02D7B1FA9C83500E1829A /* test.ana in Resources */ = {isa = PBXBuildFile; fileRef = 41D02D7A1FA9C83500E1829A /* test.ana */; };
 		41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6A1FA9C00700E1829A /* ananas.l */; };
 		41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6B1FA9C00700E1829A /* ananas.y */; };
 		41DD956220230E4000C9DAD2 /* libffi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41DD955F20230E3F00C9DAD2 /* libffi.a */; };
@@ -101,7 +100,6 @@
 		41D02D581FA9A5E000E1829A /* createc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = createc.m; sourceTree = "<group>"; };
 		41D02D6A1FA9C00700E1829A /* ananas.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = ananas.l; sourceTree = "<group>"; };
 		41D02D6B1FA9C00700E1829A /* ananas.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = ananas.y; sourceTree = "<group>"; };
-		41D02D7A1FA9C83500E1829A /* test.ana */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.ana; sourceTree = "<group>"; };
 		41DD955720230E3F00C9DAD2 /* ffitarget_arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget_arm64.h; sourceTree = "<group>"; };
 		41DD955820230E3F00C9DAD2 /* ffitarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget.h; sourceTree = "<group>"; };
 		41DD955920230E3F00C9DAD2 /* ffi_arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_arm.h; sourceTree = "<group>"; };
@@ -248,7 +246,6 @@
 				4156E9EF1FF0EE050036973A /* execute */,
 				41D02D521FA9A4C400E1829A /* compiler */,
 				41DD95632036B77000C9DAD2 /* util.m */,
-				41DD95652036B78A00C9DAD2 /* util.h */,
 			);
 			path = ananas;
 			sourceTree = SOURCE_ROOT;
@@ -257,7 +254,6 @@
 			isa = PBXGroup;
 			children = (
 				41E83EA31FB9668B00A48592 /* ast */,
-				41D02D7A1FA9C83500E1829A /* test.ana */,
 				41D02D6A1FA9C00700E1829A /* ananas.l */,
 				41D02D6B1FA9C00700E1829A /* ananas.y */,
 				41D02D581FA9A5E000E1829A /* createc.m */,
@@ -266,6 +262,7 @@
 				4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */,
 				4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */,
 				4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */,
+				41DD95652036B78A00C9DAD2 /* util.h */,
 			);
 			path = compiler;
 			sourceTree = "<group>";
@@ -434,7 +431,6 @@
 			files = (
 				41D02D271FA8A09400E1829A /* LaunchScreen.storyboard in Resources */,
 				41D02D241FA8A09400E1829A /* Assets.xcassets in Resources */,
-				41D02D7B1FA9C83500E1829A /* test.ana in Resources */,
 				41D02D221FA8A09400E1829A /* Main.storyboard in Resources */,
 				412E4A691FFB60F20074536F /* demo.ana in Resources */,
 			);

@@ -75,14 +75,14 @@ typedef NS_ENUM(NSInteger, ANCStatementKind) {
 
 @interface ANCForStatement: ANCStatement
 @property (strong, nonatomic) ANCExpression *initializerExpr;
-@property (assign, nonatomic) ANCDeclaration *declaration;
+@property (strong, nonatomic) ANCDeclaration *declaration;
 @property (strong, nonatomic) ANCExpression *condition;
 @property (strong, nonatomic) ANCExpression *post;
 @property (strong, nonatomic) ANCBlock *block;
 @end
 
 @interface ANCForEachStatement: ANCStatement
-@property (assign, nonatomic) ANCDeclaration *declaration;
+@property (strong, nonatomic) ANCDeclaration *declaration;
 @property (strong, nonatomic) ANCIdentifierExpression *identifierExpr;
 @property (strong, nonatomic) ANCExpression *arrayExpr;
 @property (strong, nonatomic) ANCBlock *block;

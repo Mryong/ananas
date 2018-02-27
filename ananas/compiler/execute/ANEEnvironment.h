@@ -42,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)assign2CValuePointer:(void *)cvaluePointer typeEncoding:(const char *)typeEncoding;
 - (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding;
 
++ (instancetype)defaultValueWithTypeEncoding:(const char *)typeEncoding;
 + (instancetype)voidValueInstance;
 + (instancetype)valueInstanceWithBOOL:(BOOL)boolValue;
 + (instancetype)valueInstanceWithUint:(unsigned long long int)uintValue;
@@ -54,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)valueInstanceWithCstring:(const char *)cstringValue;
 + (instancetype)valueInstanceWithPointer:(void *)pointerValue;
 + (instancetype)valueInstanceWithStruct:(void *)structValue typeEncoding:(const char *)typeEncoding;
+
+- (instancetype)nsStringValue;
 @end
 
 

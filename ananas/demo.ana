@@ -1,12 +1,117 @@
 class ViewController:UIViewController {
 
-- (void)testReplaceMethod:(NSString *)param{
-	//NSLog(param);
-	 //UIView *view = UIView.alloc().init();
-	 struct CGRect rect = CGRectMake(0, 0, 100, 100);
- UIView *view = UIView.alloc().initWithFrame:(rect);
-NSLog(view);
-	
+
+
+- (void)sequentialStatementExample{
+NSLog(@"hello world");
+	int a = 1;
+	uint b = 2;
+	double c = 3;
+	double d = a + b * c;
+	self.resultView.text =  @"执行结果: " + d;
 }
+
+- (void)ifStatementExample{
+	int a = 2;
+	int b = 2;
+
+	NSString *text;
+	if(a > b){
+		text = @"执行结果: a > b";
+	}else if (a == b){
+		text = @"执行结果: a == b";
+	}else{
+		text = @"执行结果: a < b";
+	}
+	self.resultView.text = text;
+}
+
+- (void)switchStatementExample{
+	int a = 2;
+	NSString *text;
+	switch(a){
+		case 1:{
+			text = @"match 1";
+			break;
+		}
+		case 2:{}
+		case 3:{
+			text = @"match 2 or 3";
+			break;
+		}
+		case 4:{
+			text = @"match 4";
+			break;
+		}
+		default:{
+			text = @"match default";
+		}
+	}
+	self.resultView.text = text;
+}
+
+- (void)forStatementExample{
+	NSString *text = @"";
+	for(int i = 0; i < 20; i++){
+		text = text + i + @", ";
+		if(i == 10){
+			break;
+		}
+	}
+	self.resultView.text = text;
+}
+
+- (void)forEachStatementExample{
+	NSArray *arr = @[@"a", @"b", @"c", @"d", @"e", @"f", @"g", @"g", @"i", @"j",@"k"];
+	NSString *text = @"";
+	for(id element in arr){
+		text = text + element + @", ";
+		if(element.isEqualToString:(@"i")){
+			break;
+		}
+
+	}
+	self.resultView.text = text;
+}
+
+- (void)whileStatementExample{
+	int a;
+	while(a < 10){
+		if(a == 5){
+			break;
+		}
+		a++;
+	}
+	self.resultView.text = @""+a;
+}
+
+- (void)doWhileStatementExample{
+	int a = 0;
+	do{
+		a++;
+	}while(NO);
+	self.resultView.text = @""+a;
+
+}
+
+- (void)blockStatementExample{
+	block catStringBlock = ^NSString *(NSString *str1, NSString *str2){
+								NSString *result = str1.stringByAppendingString:(str2);
+								return result;
+							};
+	NSString *result = catStringBlock(@"hello ", @"world!");
+	self.resultView.text = result;
+}
+
+
+- (void)testReplaceMethod:(NSString *)param{
+	struct CGRect rect = CGRectMake(0, 0, 100, 100);
+	UIView *view = UIView.alloc().initWithFrame:(rect);
+	view.backgroundColor = UIColor.colorWithRed:green:blue:alpha:(1,0.5,0.5,1);// [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
+	self.view.addSubview:(view);
+	NSLog(view.backgroundColor);
+}
+
+
 
 }

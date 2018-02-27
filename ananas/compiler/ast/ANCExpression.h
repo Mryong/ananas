@@ -24,8 +24,8 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 	ANC_IDENTIFIER_EXPRESSION,
 	ANC_TERNARY_EXPRESSION,
 	ANC_ASSIGN_EXPRESSION,
-	ANC_PLUS_EXPRESSION,
-	ANC_MINUS_EXPRESSION,
+	ANC_ADD_EXPRESSION,
+	ANC_SUB_EXPRESSION,
 	ANC_MUL_EXPRESSION,
 	ANC_DIV_EXPRESSION,
 	ANC_MOD_EXPRESSION,
@@ -75,8 +75,8 @@ typedef NS_ENUM(NSInteger, ANCExpressionKind) {
 
 typedef NS_ENUM(NSInteger, ANCAssignKind) {
 	ANC_NORMAL_ASSIGN,
-	ANC_MINUS_ASSIGN,
-	ANC_PLUS_ASSIGN,
+	ANC_SUB_ASSIGN,
+	ANC_ADD_ASSIGN,
 	ANC_MUL_ASSIGN,
 	ANC_DIV_ASSIGN,
 	ANC_MOD_ASSIGN
@@ -114,6 +114,7 @@ typedef NS_ENUM(NSInteger, ANCAssignKind) {
 
 @property (strong, nonatomic) ANCExpression *expr;
 @property (copy, nonatomic) NSString *memberName;
+@property (assign, nonatomic) BOOL c2methodName;
 
 @end
 

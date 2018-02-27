@@ -46,9 +46,9 @@ int yylex(void);
 %token <expression> NO_
 
 %token COLON SEMICOLON COMMA  LP RP LB RB LC RC  QUESTION DOT ASSIGN AT POWER
-	AND OR NOT EQ NE LT LE GT GE MINUS MINUS_ASSIGN PLUS PLUS_ASSIGN MUL MUL_ASSIGN DIV DIV_ASSIGN MOD MOD_ASSIGN INCREMENT DECREMENT
+	AND OR NOT EQ NE LT LE GT GE SUB SUB_ASSIGN ADD ADD_ASSIGN MUL MUL_ASSIGN DIV DIV_ASSIGN MOD MOD_ASSIGN INCREMENT DECREMENT
 	ANNOTATION_IF CLASS STRUCT DECLARE SELECTOR
-	RETURN IF ELSE FOR WHILE DO SWITCH CASE DEFAULT BREAK CONTINUE 
+	RETURN IF ELSE FOR IN WHILE DO SWITCH CASE DEFAULT BREAK CONTINUE
 	PROPERTY WEAK STRONG COPY ASSIGN_MEM NONATOMIC ATOMIC  ADDRESS ASTERISK ASTERISK_ASSIGN VOID
 	BOOL_ U_INT INT    DOUBLE C_STRING  CLASS_ SEL_ ID POINTER BLOCK
 
@@ -361,7 +361,7 @@ method_definition: instance_method_definition
 			| class_method_definition
 			;
 
-instance_method_definition: annotation_if MINUS LP type_specifier RP method_name block_statement
+instance_method_definition: annotation_if SUB LP type_specifier RP method_name block_statement
 			{
 				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
@@ -372,7 +372,7 @@ instance_method_definition: annotation_if MINUS LP type_specifier RP method_name
 			}
 			;
 
-class_method_definition: annotation_if PLUS LP type_specifier RP method_name  block_statement
+class_method_definition: annotation_if ADD LP type_specifier RP method_name  block_statement
 			{
 				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
@@ -485,13 +485,13 @@ assignment_operator: ASSIGN
 					$$ = ANC_NORMAL_ASSIGN;
 					
 				}
-                | MINUS_ASSIGN
+                | SUB_ASSIGN
 				{
-					$$ = ANC_MINUS_ASSIGN;
+					$$ = ANC_SUB_ASSIGN;
 				}
-                | PLUS_ASSIGN
+                | ADD_ASSIGN
 				{
-					$$ = ANC_PLUS_ASSIGN;
+					$$ = ANC_ADD_ASSIGN;
 				}
                 | MUL_ASSIGN
 				{
@@ -594,16 +594,16 @@ relational_expression: additive_expression
 			;
 
 additive_expression: multiplication_expression
-			| additive_expression PLUS multiplication_expression
+			| additive_expression ADD multiplication_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_PLUS_EXPRESSION);
+				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_ADD_EXPRESSION);
 				expr.left = (__bridge_transfer ANCExpression *)$1;
 				expr.right = (__bridge_transfer ANCExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
-			| additive_expression MINUS multiplication_expression
+			| additive_expression SUB multiplication_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_MINUS_EXPRESSION);
+				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_SUB_EXPRESSION);
 				expr.left = (__bridge_transfer ANCExpression *)$1;
 				expr.right = (__bridge_transfer ANCExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
@@ -642,7 +642,7 @@ unary_expression: postfix_expression
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
-			| MINUS unary_expression
+			| SUB unary_expression
 			{
 				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(NSC_NEGATIVE_EXPRESSION);
 				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
@@ -1130,7 +1130,7 @@ do_while_statement: DO block_statement WHILE LP expression RP SEMICOLON
 			}
 			;
 
-foreach_statement: FOR LP type_specifier IDENTIFIER COLON expression RP block_statement
+foreach_statement: FOR LP type_specifier IDENTIFIER IN expression RP block_statement
 			{
 				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$3;
 				NSString *varName = (__bridge_transfer NSString *)$4;
@@ -1139,7 +1139,7 @@ foreach_statement: FOR LP type_specifier IDENTIFIER COLON expression RP block_st
 				ANCForEachStatement *statement = anc_create_for_each_statement(typeSpecifier, varName, arrayExpr, block);
 				$$ = (__bridge_retained void *)statement;
 			}
-			| FOR  LP IDENTIFIER COLON expression RP block_statement
+			| FOR  LP IDENTIFIER IN expression RP block_statement
 			{
 				NSString *varName = (__bridge_transfer NSString *)$3;
 				ANCExpression *arrayExpr = (__bridge_transfer ANCExpression *)$5;

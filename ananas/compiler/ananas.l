@@ -22,7 +22,7 @@
 	
 	static int string_input(char *buf, int max_size)
 	{
-		int len = st_source_len - st_current_char_index;
+		unsigned int len = st_source_len - st_current_char_index;
 		if(len <= 0){
 			return 0;
 		}
@@ -71,14 +71,14 @@ static void increment_line_number(){
 <INITIAL>">=" {return GE; }   
 
 
-<INITIAL>"-" {return MINUS; }
-<INITIAL>"+" {return PLUS; }
+<INITIAL>"-" {return SUB; }
+<INITIAL>"+" {return ADD; }
 <INITIAL>"*" {return ASTERISK; }
 <INITIAL>"/" {return DIV; }
 <INITIAL>"%" {return MOD; }
 
-<INITIAL>"-=" {return MINUS_ASSIGN; }
-<INITIAL>"+=" {return PLUS_ASSIGN; }
+<INITIAL>"-=" {return SUB_ASSIGN; }
+<INITIAL>"+=" {return ADD_ASSIGN; }
 <INITIAL>"*=" {return ASTERISK_ASSIGN; }
 <INITIAL>"/=" {return DIV_ASSIGN; }
 <INITIAL>"%=" {return MOD_ASSIGN; }
@@ -102,6 +102,7 @@ static void increment_line_number(){
 <INITIAL>"if"  {return IF; }
 <INITIAL>"else"  {return ELSE; }
 <INITIAL>"for"  {return FOR; }
+<INITIAL>"in" {return IN; }
 <INITIAL>"while"  {return WHILE; }
 <INITIAL>"do"  {return DO; }
 <INITIAL>"switch"  {return SWITCH; }

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
-@property (assign, nonatomic) UIView * myv;
+@property (strong, nonatomic) UIView * myv;
 
 @end
 

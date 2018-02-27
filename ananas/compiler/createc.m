@@ -106,8 +106,8 @@ Class anc_expression_class_of_kind(ANCExpressionKind kind){
 			return [ANCAssignExpression class];
 		case ANC_TERNARY_EXPRESSION:
 			return [ANCTernaryExpression class];
-		case ANC_PLUS_EXPRESSION:
-		case ANC_MINUS_EXPRESSION:
+		case ANC_ADD_EXPRESSION:
+		case ANC_SUB_EXPRESSION:
 		case ANC_MUL_EXPRESSION:
 		case ANC_DIV_EXPRESSION:
 		case ANC_MOD_EXPRESSION:
@@ -168,6 +168,7 @@ void anc_build_block_expr(ANCBlockExpression *expr, ANCTypeSpecifier *returnType
 	func.returnTypeSpecifier = returnTypeSpecifier;
 	func.params  = params;
 	func.block = block;
+	expr.func = func;
 	
 }
 
@@ -389,10 +390,14 @@ ANCFunctionDefinition *anc_create_function_definition(ANCTypeSpecifier *returnTy
 ANCMethodNameItem *anc_create_method_name_item(NSString *name, ANCTypeSpecifier *typeSpecifier, NSString *paramName){
 	ANCMethodNameItem *item = [[ANCMethodNameItem alloc] init];
 	item.name = name;
-	ANCParameter *param = [[ANCParameter alloc] init];
-	param.type = typeSpecifier;
-	param.name = paramName;
-	item.param = param;
+	if (typeSpecifier && paramName) {
+		ANCParameter *param = [[ANCParameter alloc] init];
+		param.type = typeSpecifier;
+		param.name = paramName;
+		item.param = param;
+	}
+	
+	
 	return item;
 	
 }
@@ -419,7 +424,10 @@ ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfCond
 	NSMutableString *selector = [NSMutableString string];
 	for (ANCMethodNameItem *itme in items) {
 		[selector appendString:itme.name];
-		[params addObject:itme.param];
+		if (itme.param) {
+			[params addObject:itme.param];
+		}
+		
 	}
 	funcDefinition.name = selector;
 	funcDefinition.params = params;

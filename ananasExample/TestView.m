@@ -18,4 +18,8 @@
 }
 */
 
+- (void)dealloc{
+	NSLog(@"=========");
+}
+
 @end

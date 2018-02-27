@@ -13,7 +13,7 @@
 @interface ANEBlock : NSObject
 @property (strong, nonatomic) ANEScopeChain *scope;
 @property (strong, nonatomic) ANCFunctionDefinition *func;
-@property (strong, nonatomic) ANCInterpreter *inter;
+@property (weak, nonatomic) ANCInterpreter *inter;
 @property (assign, nonatomic) const char *typeEncoding;
-
+- (id)ocBlock;
 @end

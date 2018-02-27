@@ -7,42 +7,129 @@
 //
 
 #import "ViewController.h"
+#import <objc/runtime.h>
 
-@interface ViewController ()
+static NSString * const cellIdentifier = @"cell";
 
+@interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
+@property (weak, nonatomic) IBOutlet UITextView *resultView;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (strong, nonatomic) NSArray *titles;
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	CGRect rect = CGRectMake(0, 0, 100, 100);
-	UIView *view = [[UIView alloc] initWithFrame:rect];
-	view.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
-	[self.view addSubview:view];
+	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellIdentifier];
+}
+
+#pragma mark - UITableViewDelegate,UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+	return self.titles.count;;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+	NSInteger row = indexPath.row;
+	cell.textLabel.text = self.titles[row];
+	return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];
+	NSInteger row = indexPath.row;
+	switch (row) {
+		case 0://顺序语句示例
+			[self sequentialStatementExample];
+			break;
+		case 1://if语句示例
+			[self ifStatementExample];
+			break;
+		case 2://switch语句示例
+			[self switchStatementExample];
+			break;
+		case 3://for语句示例
+			[self forStatementExample];
+			break;
+		case 4://forEach语句示例
+			[self forEachStatementExample];
+			break;
+		case 5://while语句示例
+			[self whileStatementExample];
+			break;
+		case 6://do while语句示例
+			[self doWhileStatementExample];
+			break;
+		case 7://block语句示例
+			[self blockStatementExample];
+			break;
+		case 8://参数传递示例
+			[self paramPassingExampleWithBOOLArg:YES intArg:1 uintArg:2 structArg:CGRectMake(100, 200, 300, 400) blockArg:^id(id arg) {
+				return @"oc block return value";
+			} objArg:@"string object"];
+			break;
+		case 9://返回值示例
+			[self returnBlockExample];
+			break;
+			
+		default:
+			break;
+	}
 	
-//	for (self.myv in arr) {
-//		
-//	}
+	
+	
 	
 }
 
-
-- (void)didReceiveMemoryWarning {
-	[super didReceiveMemoryWarning];
+- (NSArray *)titles{
+	if (_titles == nil) {
+		_titles = @[@"顺序语句示例",@"if语句示例",@"switch语句示例",@"for语句示例",@"forEach语句示例",@"while语句示例",
+					@"do while语句示例",@"block语句示例",@"参数传递示例",@"返回值示例"];
+	}
+	return _titles;
 }
 
-- (IBAction)btnDidClicked:(UIButton *)sender {
-	[self testReplaceMethod:@"hello world"];
-	NSLog(@"==========");
-	
-//	UIView *view = [[UIView alloc] init];
-//	UIView *view = UIView.alloc().init();
+- (void)sequentialStatementExample{
 	
 }
 
-- (void)testReplaceMethod:(NSString *)param{
+- (void)ifStatementExample{
 	
 }
+
+- (void)switchStatementExample{
+	
+}
+
+- (void)forStatementExample{
+	
+}
+
+- (void)forEachStatementExample{
+	
+}
+
+- (void)whileStatementExample{
+	
+}
+
+- (void)doWhileStatementExample{
+	
+}
+
+- (void)blockStatementExample{
+	
+}
+
+- (void)paramPassingExampleWithBOOLArg:(BOOL)BOOLArg intArg:(NSInteger) intArg uintArg:(NSUInteger)uintArg structArg:(CGRect)structArg blockArg:(id (^)(id arg))blockArg objArg:(id)objArg {
+	
+}
+- (NSString *(^)(NSString *,NSString *))returnBlockExample{
+	return nil;
+}
+
+
+
 
 @end
