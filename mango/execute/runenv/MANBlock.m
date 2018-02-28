@@ -93,6 +93,26 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	struct ANANASSimulateBlockDescriptor *_descriptor;
 }
 
++ (const char *)typeEncodingForBlock:(id)block{
+	struct MANSimulateBlock *blockRef = (__bridge struct MANSimulateBlock *)block;
+	int flags = blockRef->flags;
+	
+	if (flags & BLOCK_HAS_SIGNATURE) {
+		void *signatureLocation = blockRef->descriptor;
+		signatureLocation += sizeof(unsigned long int);
+		signatureLocation += sizeof(unsigned long int);
+		
+		if (flags & BLOCK_HAS_COPY_DISPOSE) {
+			signatureLocation += sizeof(void(*)(void *dst, void *src));
+			signatureLocation += sizeof(void (*)(void *src));
+		}
+		
+		const char *signature = (*(const char **)signatureLocation);
+		return signature;
+	}
+	return NULL;
+}
+
 - (id)ocBlock{
 	return [self blockPtr];
 }

@@ -35,8 +35,6 @@
 		41D6AFFB1FAC3B930043AB4A /* mango.y in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6B1FA9C00700E1829A /* mango.y */; };
 		41DD956220230E4000C9DAD2 /* libffi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41DD955F20230E3F00C9DAD2 /* libffi.a */; };
 		41DD95642036B77000C9DAD2 /* util.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DD95632036B77000C9DAD2 /* util.m */; };
-		41DF5B3B20418DEE0042E639 /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DF5B3720418DED0042E639 /* CTBlockDescription.m */; };
-		41DF5B3C20418DEE0042E639 /* CTObjectiveCRuntimeAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DF5B3820418DED0042E639 /* CTObjectiveCRuntimeAdditions.m */; };
 		41E543571FCD312600E6CED5 /* MANBlockBody.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E543561FCD312600E6CED5 /* MANBlockBody.m */; };
 		41E83EA61FB9671200A48592 /* MANExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EA51FB9671200A48592 /* MANExpression.m */; };
 		41E83EA91FB992C200A48592 /* MANTypeSpecifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E83EA81FB992C200A48592 /* MANTypeSpecifier.m */; };
@@ -125,10 +123,6 @@
 		41DD956120230E3F00C9DAD2 /* ffi_arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_arm64.h; sourceTree = "<group>"; };
 		41DD95632036B77000C9DAD2 /* util.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = util.m; sourceTree = "<group>"; };
 		41DD95652036B78A00C9DAD2 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
-		41DF5B3720418DED0042E639 /* CTBlockDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
-		41DF5B3820418DED0042E639 /* CTObjectiveCRuntimeAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTObjectiveCRuntimeAdditions.m; sourceTree = "<group>"; };
-		41DF5B3920418DED0042E639 /* CTBlockDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
-		41DF5B3A20418DED0042E639 /* CTObjectiveCRuntimeAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTObjectiveCRuntimeAdditions.h; sourceTree = "<group>"; };
 		41E543551FCD312600E6CED5 /* MANBlockBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MANBlockBody.h; sourceTree = "<group>"; };
 		41E543561FCD312600E6CED5 /* MANBlockBody.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MANBlockBody.m; sourceTree = "<group>"; };
 		41E83EA41FB9671200A48592 /* MANExpression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MANExpression.h; sourceTree = "<group>"; };
@@ -229,7 +223,6 @@
 		41D02D191FA8A09300E1829A /* ananasExample */ = {
 			isa = PBXGroup;
 			children = (
-				41DF5B3620418DED0042E639 /* CTObjectiveCRuntimeAdditions */,
 				41DD955620230E3F00C9DAD2 /* libffi */,
 				41D02D4C1FA8A0C900E1829A /* mango */,
 				41D02D1A1FA8A09300E1829A /* AppDelegate.h */,
@@ -307,17 +300,6 @@
 				41DD956120230E3F00C9DAD2 /* ffi_arm64.h */,
 			);
 			path = libffi;
-			sourceTree = "<group>";
-		};
-		41DF5B3620418DED0042E639 /* CTObjectiveCRuntimeAdditions */ = {
-			isa = PBXGroup;
-			children = (
-				41DF5B3920418DED0042E639 /* CTBlockDescription.h */,
-				41DF5B3720418DED0042E639 /* CTBlockDescription.m */,
-				41DF5B3A20418DED0042E639 /* CTObjectiveCRuntimeAdditions.h */,
-				41DF5B3820418DED0042E639 /* CTObjectiveCRuntimeAdditions.m */,
-			);
-			path = CTObjectiveCRuntimeAdditions;
 			sourceTree = "<group>";
 		};
 		41E83EA31FB9668B00A48592 /* ast */ = {
@@ -502,7 +484,6 @@
 				41175CD02046D1B800E75108 /* execute.m in Sources */,
 				41E83EAF1FBD653900A48592 /* MANFunctionDefinition.m in Sources */,
 				41E543571FCD312600E6CED5 /* MANBlockBody.m in Sources */,
-				41DF5B3B20418DEE0042E639 /* CTBlockDescription.m in Sources */,
 				41D6AFFA1FAC3B930043AB4A /* mango.l in Sources */,
 				41CB962B1FCFF43100373143 /* errrorc.m in Sources */,
 				41C98B151FC2D1DA00BADBE9 /* MANDeclaration.m in Sources */,
@@ -512,7 +493,6 @@
 				41175CCE2046D1B800E75108 /* built-in.m in Sources */,
 				41E83EAC1FBD5F8E00A48592 /* MANClassDefinition.m in Sources */,
 				41C98B1B1FC6B26500BADBE9 /* MANInterpreter.m in Sources */,
-				41DF5B3C20418DEE0042E639 /* CTObjectiveCRuntimeAdditions.m in Sources */,
 				41175CD12046D1B800E75108 /* MANBlock.m in Sources */,
 				4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */,
 				41E83EB21FBD6F6600A48592 /* MANStatement.m in Sources */,

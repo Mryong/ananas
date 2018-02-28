@@ -16,4 +16,5 @@
 @property (weak, nonatomic) MANInterpreter *inter;
 @property (assign, nonatomic) const char *typeEncoding;
 - (id)ocBlock;
++ (const char *)typeEncodingForBlock:(id)block;
 @end

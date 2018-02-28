@@ -14,7 +14,6 @@
 #import "man_ast.h"
 #import "execute.h"
 #import "create.h"
-#import "CTBlockDescription.h"
 
 static void eval_expression(MANInterpreter *inter, MANScopeChain *scope, __kindof MANExpression *expr);
 
@@ -1289,8 +1288,8 @@ break;\
 			MANValue *blockValue = [inter.stack pop];
 			
 			
-			CTBlockDescription *desc = [[CTBlockDescription alloc] initWithBlock:blockValue.c2objectValue];
-			NSMethodSignature *sig = desc.blockSignature;
+			const char *blockTypeEncoding = [MANBlock typeEncodingForBlock:blockValue.c2objectValue];
+			NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:blockTypeEncoding];
 			NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
 			[invocation setTarget:blockValue.objectValue];
 			
