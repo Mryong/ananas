@@ -20,7 +20,8 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	NSURL *scriptUrl = [NSURL URLWithString:@"file:///Users/yongpengliang/Documents/ananas/ananas/demo.ana"];
+	NSString *path = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"mg"];
+	NSURL *scriptUrl = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@",path]];
 	MMANontext *context = [[MMANontext alloc] init];
 	[context evalAnanasScriptWithURL:scriptUrl];
 	return YES;

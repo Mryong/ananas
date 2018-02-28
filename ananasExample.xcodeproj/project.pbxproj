@@ -16,7 +16,7 @@
 		41175CDC2046DDD300E75108 /* MANStatementResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CDB2046DDD300E75108 /* MANStatementResult.m */; };
 		41175CDF2046DDFD00E75108 /* MANStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CDE2046DDFD00E75108 /* MANStack.m */; };
 		41175CE52046E92000E75108 /* MANContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CE42046E92000E75108 /* MANContext.m */; };
-		412E4A691FFB60F20074536F /* demo.ana in Resources */ = {isa = PBXBuildFile; fileRef = 412E4A681FFB60F20074536F /* demo.ana */; };
+		412E4A691FFB60F20074536F /* demo.mg in Resources */ = {isa = PBXBuildFile; fileRef = 412E4A681FFB60F20074536F /* demo.mg */; };
 		4179D0A720403A52009CB6D3 /* ANANASMethodMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */; };
 		4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */; };
 		41C98B151FC2D1DA00BADBE9 /* MANDeclaration.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B141FC2D1DA00BADBE9 /* MANDeclaration.m */; };
@@ -82,7 +82,7 @@
 		41175CE02046DF5400E75108 /* runenv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runenv.h; sourceTree = "<group>"; };
 		41175CE32046E92000E75108 /* MANContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MANContext.h; sourceTree = "<group>"; };
 		41175CE42046E92000E75108 /* MANContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MANContext.m; sourceTree = "<group>"; };
-		412E4A681FFB60F20074536F /* demo.ana */ = {isa = PBXFileReference; lastKnownFileType = text; path = demo.ana; sourceTree = "<group>"; };
+		412E4A681FFB60F20074536F /* demo.mg */ = {isa = PBXFileReference; lastKnownFileType = text; path = demo.mg; sourceTree = "<group>"; };
 		4179D0A520403A52009CB6D3 /* ANANASMethodMapTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANANASMethodMapTable.h; sourceTree = "<group>"; };
 		4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANANASMethodMapTable.m; sourceTree = "<group>"; };
 		4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANANASStructDeclareTable.h; sourceTree = "<group>"; };
@@ -231,11 +231,12 @@
 			children = (
 				41DF5B3620418DED0042E639 /* CTObjectiveCRuntimeAdditions */,
 				41DD955620230E3F00C9DAD2 /* libffi */,
-				41D02D4C1FA8A0C900E1829A /* ananas */,
+				41D02D4C1FA8A0C900E1829A /* mango */,
 				41D02D1A1FA8A09300E1829A /* AppDelegate.h */,
 				41D02D1B1FA8A09300E1829A /* AppDelegate.m */,
 				41D02D1D1FA8A09400E1829A /* ViewController.h */,
 				41D02D1E1FA8A09400E1829A /* ViewController.m */,
+				412E4A681FFB60F20074536F /* demo.mg */,
 				41D02D201FA8A09400E1829A /* Main.storyboard */,
 				41D02D231FA8A09400E1829A /* Assets.xcassets */,
 				41D02D251FA8A09400E1829A /* LaunchScreen.storyboard */,
@@ -263,19 +264,18 @@
 			path = ananasExampleUITests;
 			sourceTree = "<group>";
 		};
-		41D02D4C1FA8A0C900E1829A /* ananas */ = {
+		41D02D4C1FA8A0C900E1829A /* mango */ = {
 			isa = PBXGroup;
 			children = (
 				41DD95652036B78A00C9DAD2 /* util.h */,
 				41DD95632036B77000C9DAD2 /* util.m */,
-				412E4A681FFB60F20074536F /* demo.ana */,
 				41D02D571FA9A53500E1829A /* mango.h */,
 				41175CE32046E92000E75108 /* MANContext.h */,
 				41175CE42046E92000E75108 /* MANContext.m */,
 				41175CC42046D1B800E75108 /* execute */,
 				41D02D521FA9A4C400E1829A /* compiler */,
 			);
-			path = ananas;
+			path = mango;
 			sourceTree = SOURCE_ROOT;
 		};
 		41D02D521FA9A4C400E1829A /* compiler */ = {
@@ -456,7 +456,7 @@
 				41D02D271FA8A09400E1829A /* LaunchScreen.storyboard in Resources */,
 				41D02D241FA8A09400E1829A /* Assets.xcassets in Resources */,
 				41D02D221FA8A09400E1829A /* Main.storyboard in Resources */,
-				412E4A691FFB60F20074536F /* demo.ana in Resources */,
+				412E4A691FFB60F20074536F /* demo.mg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
