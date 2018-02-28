@@ -7,9 +7,8 @@
 //
 
 #import "ANCContext.h"
-#import "ananasc.h"
+#import "create.h"
 #import "execute.h"
-#import <JavaScriptCore/JavaScriptCore.h>
 
 @interface ANCContext()
 @property(nonatomic, strong) ANCInterpreter *interpreter;

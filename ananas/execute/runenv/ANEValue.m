@@ -1,16 +1,16 @@
 //
-//  ANEEnvironment.m
+//  ANEValue.m
 //  ananasExample
 //
-//  Created by jerry.yong on 2018/1/2.
+//  Created by jerry.yong on 2018/2/28.
 //  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
-#import "ANEEnvironment.h"
-#import "util.h"
-#import "ananasc.h"
+#import "ANEValue.h"
+#import "ANCTypeSpecifier.h"
 #import "ANANASStructDeclareTable.h"
-#import <objc/runtime.h>
+#import "create.h"
+#import "util.h"
 
 @implementation ANEValue
 
@@ -187,22 +187,22 @@ break;\
 }
 	
 	switch (*typeEncoding) {
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('c', char, c2integerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('i', int, c2integerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('s', short, c2integerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('l', long, c2integerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('q', long long, c2integerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('C', unsigned char, c2uintValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('I', unsigned int, c2uintValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('S', unsigned short, c2uintValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('L', unsigned long, c2uintValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('Q', unsigned long long, c2uintValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('f', float, c2doubleValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('d', double, c2doubleValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('B', BOOL, c2uintValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('*', char *, c2pointerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('^', void *, c2pointerValue)
-		ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(':', SEL, selValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('c', char, c2integerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('i', int, c2integerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('s', short, c2integerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('l', long, c2integerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('q', long long, c2integerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('C', unsigned char, c2uintValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('I', unsigned int, c2uintValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('S', unsigned short, c2uintValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('L', unsigned long, c2uintValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('Q', unsigned long long, c2uintValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('f', float, c2doubleValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('d', double, c2doubleValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('B', BOOL, c2uintValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('*', char *, c2pointerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE('^', void *, c2pointerValue)
+			ANANAS_ASSIGN_2_C_VALUE_POINTER_CASE(':', SEL, selValue)
 		case '@':{
 			void  **ptr =cvaluePointer;
 			*ptr = (__bridge_retained void *)[self c2objectValue];
@@ -484,109 +484,3 @@ break;\
 
 @end
 
-
-@implementation ANEScopeChain
-- (NSMutableDictionary<NSString *,ANEValue *> *)vars{
-	if (_vars == nil) {
-		_vars = [NSMutableDictionary dictionary];
-	}
-	return _vars;
-}
-
-+ (instancetype)scopeChainWithNext:(ANEScopeChain *)next{
-	ANEScopeChain *scope = [ANEScopeChain new];
-	scope.next = next;
-	return scope;
-}
-
-- (ANEValue *)getValueWithIdentifier:(NSString *)identifier{
-	for (ANEScopeChain *pos = self; pos; pos = pos.next) {
-		if (pos.instance) {
-			Ivar ivar = class_getInstanceVariable([pos.instance class], identifier.UTF8String);
-			if (ivar) {
-				const char *ivarEncoding = ivar_getTypeEncoding(ivar);
-				void *ptr = (__bridge void *)(pos.instance) +  ivar_getOffset(ivar);
-				ANEValue *value = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:ivarEncoding];
-				return value;
-			}
-		}else{
-			__block ANEValue *value;
-			[pos.vars enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ANEValue * _Nonnull obj, BOOL * _Nonnull stop) {
-				if ([key isEqualToString:identifier]) {
-					value = obj;
-					*stop = YES;
-				}
-			}];
-			if (value) {
-				return value;
-			}
-			
-		}
-	}
-	return nil;
-}
-
-@end
-
-@implementation ANEStatementResult
-
-+ (instancetype)normalResult{
-	ANEStatementResult *res = [ANEStatementResult new];
-	res.type = ANEStatementResultTypeNormal;
-	return res;
-}
-
-+ (instancetype)returnResult{
-	ANEStatementResult *res = [ANEStatementResult new];
-	res.type = ANEStatementResultTypeReturn;
-	return res;
-}
-
-+ (instancetype)breakResult{
-	ANEStatementResult *res = [ANEStatementResult new];
-	res.type = ANEStatementResultTypeBreak;
-	return res;
-}
-
-+ (instancetype)continueResult{
-	ANEStatementResult *res = [ANEStatementResult new];
-	res.type = ANEStatementResultTypeContinue;
-	return res;
-}
-
-@end
-
-
-@implementation ANEStack{
-	NSMutableArray<ANEValue *> *_arr;
-}
-
-- (instancetype)init{
-	if (self = [super init]) {
-		_arr = [NSMutableArray array];
-	}
-	return self;
-}
-
-- (void)push:(ANEValue *)value{
-	[_arr addObject:value];
-}
-
-- (ANEValue *)pop{
-	ANEValue *value = [_arr  lastObject];
-	[_arr removeLastObject];
-	return value;
-}
-
-- (ANEValue *)peekStack:(NSUInteger)index{
-	ANEValue *value = _arr[_arr.count - 1 - index];
-	return value;
-}
-
-- (void)shrinkStack:(NSUInteger)shrinkSize{
-	[_arr removeObjectsInRange:NSMakeRange(_arr.count - shrinkSize, shrinkSize)];
-}
-- (NSUInteger)size{
-	return _arr.count;
-}
-@end

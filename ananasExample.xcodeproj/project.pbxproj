@@ -7,12 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		41175CC32046821000E75108 /* built-in.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC22046821000E75108 /* built-in.m */; };
-		412E4A1A1FF1056D0074536F /* eval.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A191FF1056D0074536F /* eval.m */; };
+		41175CCD2046D1B800E75108 /* eval.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC52046D1B800E75108 /* eval.m */; };
+		41175CCE2046D1B800E75108 /* built-in.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC62046D1B800E75108 /* built-in.m */; };
+		41175CD02046D1B800E75108 /* execute.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC82046D1B800E75108 /* execute.m */; };
+		41175CD12046D1B800E75108 /* ANEBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC92046D1B800E75108 /* ANEBlock.m */; };
+		41175CD62046DD1B00E75108 /* ANEValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CD52046DD1B00E75108 /* ANEValue.m */; };
+		41175CD92046DD8F00E75108 /* ANEScopeChain.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CD82046DD8F00E75108 /* ANEScopeChain.m */; };
+		41175CDC2046DDD300E75108 /* ANEStatementResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CDB2046DDD300E75108 /* ANEStatementResult.m */; };
+		41175CDF2046DDFD00E75108 /* ANEStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CDE2046DDFD00E75108 /* ANEStack.m */; };
 		412E4A691FFB60F20074536F /* demo.ana in Resources */ = {isa = PBXBuildFile; fileRef = 412E4A681FFB60F20074536F /* demo.ana */; };
-		412E4A6C1FFB86B00074536F /* ANEEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 412E4A6B1FFB86B00074536F /* ANEEnvironment.m */; };
 		4156E9EC1FF0E09C0036973A /* ANCContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156E9EB1FF0E09C0036973A /* ANCContext.m */; };
-		4156E9F11FF0EE050036973A /* execute.m in Sources */ = {isa = PBXBuildFile; fileRef = 4156E9F01FF0EE050036973A /* execute.m */; };
 		4179D0A720403A52009CB6D3 /* ANANASMethodMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */; };
 		4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */; };
 		41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */ = {isa = PBXBuildFile; fileRef = 41C98B141FC2D1DA00BADBE9 /* ANCDeclaration.m */; };
@@ -26,12 +30,11 @@
 		41D02D2A1FA8A09400E1829A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D291FA8A09400E1829A /* main.m */; };
 		41D02D341FA8A09400E1829A /* ananasExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D331FA8A09400E1829A /* ananasExampleTests.m */; };
 		41D02D3F1FA8A09400E1829A /* ananasExampleUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D3E1FA8A09400E1829A /* ananasExampleUITests.m */; };
-		41D02D591FA9A5E000E1829A /* createc.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D581FA9A5E000E1829A /* createc.m */; };
+		41D02D591FA9A5E000E1829A /* create.m in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D581FA9A5E000E1829A /* create.m */; };
 		41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6A1FA9C00700E1829A /* ananas.l */; };
 		41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */ = {isa = PBXBuildFile; fileRef = 41D02D6B1FA9C00700E1829A /* ananas.y */; };
 		41DD956220230E4000C9DAD2 /* libffi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41DD955F20230E3F00C9DAD2 /* libffi.a */; };
 		41DD95642036B77000C9DAD2 /* util.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DD95632036B77000C9DAD2 /* util.m */; };
-		41DF5B3520415A3E0042E639 /* ANEBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DF5B3420415A3D0042E639 /* ANEBlock.m */; };
 		41DF5B3B20418DEE0042E639 /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DF5B3720418DED0042E639 /* CTBlockDescription.m */; };
 		41DF5B3C20418DEE0042E639 /* CTObjectiveCRuntimeAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 41DF5B3820418DED0042E639 /* CTObjectiveCRuntimeAdditions.m */; };
 		41E543571FCD312600E6CED5 /* ANCBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 41E543561FCD312600E6CED5 /* ANCBlock.m */; };
@@ -61,15 +64,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		41175CC22046821000E75108 /* built-in.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "built-in.m"; sourceTree = "<group>"; };
-		412E4A191FF1056D0074536F /* eval.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = eval.m; sourceTree = "<group>"; };
-		412E4A261FF2024B0074536F /* execute.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = execute.h; sourceTree = "<group>"; };
+		41175CC52046D1B800E75108 /* eval.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = eval.m; sourceTree = "<group>"; };
+		41175CC62046D1B800E75108 /* built-in.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "built-in.m"; sourceTree = "<group>"; };
+		41175CC82046D1B800E75108 /* execute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = execute.m; sourceTree = "<group>"; };
+		41175CC92046D1B800E75108 /* ANEBlock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANEBlock.m; sourceTree = "<group>"; };
+		41175CCA2046D1B800E75108 /* ANEBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANEBlock.h; sourceTree = "<group>"; };
+		41175CCB2046D1B800E75108 /* execute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = execute.h; sourceTree = "<group>"; };
+		41175CD22046D24E00E75108 /* create.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = create.h; sourceTree = "<group>"; };
+		41175CD42046DD1B00E75108 /* ANEValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEValue.h; sourceTree = "<group>"; };
+		41175CD52046DD1B00E75108 /* ANEValue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEValue.m; sourceTree = "<group>"; };
+		41175CD72046DD8F00E75108 /* ANEScopeChain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEScopeChain.h; sourceTree = "<group>"; };
+		41175CD82046DD8F00E75108 /* ANEScopeChain.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEScopeChain.m; sourceTree = "<group>"; };
+		41175CDA2046DDD300E75108 /* ANEStatementResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEStatementResult.h; sourceTree = "<group>"; };
+		41175CDB2046DDD300E75108 /* ANEStatementResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEStatementResult.m; sourceTree = "<group>"; };
+		41175CDD2046DDFD00E75108 /* ANEStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEStack.h; sourceTree = "<group>"; };
+		41175CDE2046DDFD00E75108 /* ANEStack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEStack.m; sourceTree = "<group>"; };
+		41175CE02046DF5400E75108 /* runenv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runenv.h; sourceTree = "<group>"; };
 		412E4A681FFB60F20074536F /* demo.ana */ = {isa = PBXFileReference; lastKnownFileType = text; path = demo.ana; sourceTree = "<group>"; };
-		412E4A6A1FFB86B00074536F /* ANEEnvironment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEEnvironment.h; sourceTree = "<group>"; };
-		412E4A6B1FFB86B00074536F /* ANEEnvironment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEEnvironment.m; sourceTree = "<group>"; };
 		4156E9EA1FF0E09C0036973A /* ANCContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANCContext.h; sourceTree = "<group>"; };
 		4156E9EB1FF0E09C0036973A /* ANCContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANCContext.m; sourceTree = "<group>"; };
-		4156E9F01FF0EE050036973A /* execute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = execute.m; sourceTree = "<group>"; };
 		4179D0A520403A52009CB6D3 /* ANANASMethodMapTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANANASMethodMapTable.h; sourceTree = "<group>"; };
 		4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANANASMethodMapTable.m; sourceTree = "<group>"; };
 		4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANANASStructDeclareTable.h; sourceTree = "<group>"; };
@@ -95,8 +108,8 @@
 		41D02D3A1FA8A09400E1829A /* ananasExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ananasExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D02D3E1FA8A09400E1829A /* ananasExampleUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ananasExampleUITests.m; sourceTree = "<group>"; };
 		41D02D401FA8A09400E1829A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		41D02D571FA9A53500E1829A /* ananasc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ananasc.h; sourceTree = "<group>"; };
-		41D02D581FA9A5E000E1829A /* createc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = createc.m; sourceTree = "<group>"; };
+		41D02D571FA9A53500E1829A /* mango.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mango.h; sourceTree = "<group>"; };
+		41D02D581FA9A5E000E1829A /* create.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = create.m; sourceTree = "<group>"; };
 		41D02D6A1FA9C00700E1829A /* ananas.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = ananas.l; sourceTree = "<group>"; };
 		41D02D6B1FA9C00700E1829A /* ananas.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = ananas.y; sourceTree = "<group>"; };
 		41DD955720230E3F00C9DAD2 /* ffitarget_arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffitarget_arm64.h; sourceTree = "<group>"; };
@@ -112,8 +125,6 @@
 		41DD956120230E3F00C9DAD2 /* ffi_arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffi_arm64.h; sourceTree = "<group>"; };
 		41DD95632036B77000C9DAD2 /* util.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = util.m; sourceTree = "<group>"; };
 		41DD95652036B78A00C9DAD2 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
-		41DF5B3320415A3D0042E639 /* ANEBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANEBlock.h; sourceTree = "<group>"; };
-		41DF5B3420415A3D0042E639 /* ANEBlock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANEBlock.m; sourceTree = "<group>"; };
 		41DF5B3720418DED0042E639 /* CTBlockDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
 		41DF5B3820418DED0042E639 /* CTObjectiveCRuntimeAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTObjectiveCRuntimeAdditions.m; sourceTree = "<group>"; };
 		41DF5B3920418DED0042E639 /* CTBlockDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
@@ -161,20 +172,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4156E9EF1FF0EE050036973A /* execute */ = {
+		41175CC42046D1B800E75108 /* execute */ = {
 			isa = PBXGroup;
 			children = (
-				412E4A261FF2024B0074536F /* execute.h */,
-				4156E9F01FF0EE050036973A /* execute.m */,
-				412E4A191FF1056D0074536F /* eval.m */,
-				41DF5B3320415A3D0042E639 /* ANEBlock.h */,
-				41DF5B3420415A3D0042E639 /* ANEBlock.m */,
-				412E4A6A1FFB86B00074536F /* ANEEnvironment.h */,
-				412E4A6B1FFB86B00074536F /* ANEEnvironment.m */,
-				41175CC22046821000E75108 /* built-in.m */,
+				41175CD32046DCDF00E75108 /* runenv */,
+				41175CC52046D1B800E75108 /* eval.m */,
+				41175CC62046D1B800E75108 /* built-in.m */,
+				41175CC82046D1B800E75108 /* execute.m */,
+				41175CCB2046D1B800E75108 /* execute.h */,
 			);
-			name = execute;
-			path = compiler/execute;
+			path = execute;
+			sourceTree = "<group>";
+		};
+		41175CD32046DCDF00E75108 /* runenv */ = {
+			isa = PBXGroup;
+			children = (
+				4179D0A520403A52009CB6D3 /* ANANASMethodMapTable.h */,
+				4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */,
+				4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */,
+				4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */,
+				41175CC92046D1B800E75108 /* ANEBlock.m */,
+				41175CCA2046D1B800E75108 /* ANEBlock.h */,
+				41175CD42046DD1B00E75108 /* ANEValue.h */,
+				41175CD52046DD1B00E75108 /* ANEValue.m */,
+				41175CD72046DD8F00E75108 /* ANEScopeChain.h */,
+				41175CD82046DD8F00E75108 /* ANEScopeChain.m */,
+				41175CDA2046DDD300E75108 /* ANEStatementResult.h */,
+				41175CDB2046DDD300E75108 /* ANEStatementResult.m */,
+				41175CDD2046DDFD00E75108 /* ANEStack.h */,
+				41175CDE2046DDFD00E75108 /* ANEStack.m */,
+				41175CE02046DF5400E75108 /* runenv.h */,
+			);
+			path = runenv;
 			sourceTree = "<group>";
 		};
 		41D02D0E1FA8A09300E1829A = {
@@ -240,10 +269,10 @@
 				41DD95652036B78A00C9DAD2 /* util.h */,
 				41DD95632036B77000C9DAD2 /* util.m */,
 				412E4A681FFB60F20074536F /* demo.ana */,
-				41D02D571FA9A53500E1829A /* ananasc.h */,
+				41D02D571FA9A53500E1829A /* mango.h */,
 				4156E9EA1FF0E09C0036973A /* ANCContext.h */,
 				4156E9EB1FF0E09C0036973A /* ANCContext.m */,
-				4156E9EF1FF0EE050036973A /* execute */,
+				41175CC42046D1B800E75108 /* execute */,
 				41D02D521FA9A4C400E1829A /* compiler */,
 			);
 			path = ananas;
@@ -255,12 +284,9 @@
 				41E83EA31FB9668B00A48592 /* ast */,
 				41D02D6A1FA9C00700E1829A /* ananas.l */,
 				41D02D6B1FA9C00700E1829A /* ananas.y */,
-				41D02D581FA9A5E000E1829A /* createc.m */,
+				41D02D581FA9A5E000E1829A /* create.m */,
 				41CB962A1FCFF43100373143 /* errrorc.m */,
-				4179D0A520403A52009CB6D3 /* ANANASMethodMapTable.h */,
-				4179D0A620403A52009CB6D3 /* ANANASMethodMapTable.m */,
-				4179D0A820412CBD009CB6D3 /* ANANASStructDeclareTable.h */,
-				4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */,
+				41175CD22046D24E00E75108 /* create.h */,
 			);
 			path = compiler;
 			sourceTree = "<group>";
@@ -474,32 +500,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				4156E9EC1FF0E09C0036973A /* ANCContext.m in Sources */,
+				41175CD02046D1B800E75108 /* execute.m in Sources */,
 				41E83EAF1FBD653900A48592 /* ANCFunctionDefinition.m in Sources */,
-				412E4A1A1FF1056D0074536F /* eval.m in Sources */,
 				41E543571FCD312600E6CED5 /* ANCBlock.m in Sources */,
 				41DF5B3B20418DEE0042E639 /* CTBlockDescription.m in Sources */,
 				41D6AFFA1FAC3B930043AB4A /* ananas.l in Sources */,
 				41CB962B1FCFF43100373143 /* errrorc.m in Sources */,
 				41C98B151FC2D1DA00BADBE9 /* ANCDeclaration.m in Sources */,
-				412E4A6C1FFB86B00074536F /* ANEEnvironment.m in Sources */,
 				41D6AFFB1FAC3B930043AB4A /* ananas.y in Sources */,
+				41175CDC2046DDD300E75108 /* ANEStatementResult.m in Sources */,
 				41DD95642036B77000C9DAD2 /* util.m in Sources */,
+				41175CCE2046D1B800E75108 /* built-in.m in Sources */,
 				41E83EAC1FBD5F8E00A48592 /* ANCClassDefinition.m in Sources */,
 				41C98B1B1FC6B26500BADBE9 /* ANCInterpreter.m in Sources */,
 				41DF5B3C20418DEE0042E639 /* CTObjectiveCRuntimeAdditions.m in Sources */,
+				41175CD12046D1B800E75108 /* ANEBlock.m in Sources */,
 				4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */,
 				41E83EB21FBD6F6600A48592 /* ANCStatement.m in Sources */,
 				41D02D1F1FA8A09400E1829A /* ViewController.m in Sources */,
+				41175CD62046DD1B00E75108 /* ANEValue.m in Sources */,
 				41E83EB51FBD8C9E00A48592 /* ANCStructDeclare.m in Sources */,
 				41E83EA91FB992C200A48592 /* ANCTypeSpecifier.m in Sources */,
 				41E83EA61FB9671200A48592 /* ANCExpression.m in Sources */,
+				41175CCD2046D1B800E75108 /* eval.m in Sources */,
 				41D02D2A1FA8A09400E1829A /* main.m in Sources */,
 				41D02D1C1FA8A09300E1829A /* AppDelegate.m in Sources */,
-				41DF5B3520415A3E0042E639 /* ANEBlock.m in Sources */,
 				4179D0A720403A52009CB6D3 /* ANANASMethodMapTable.m in Sources */,
-				4156E9F11FF0EE050036973A /* execute.m in Sources */,
-				41175CC32046821000E75108 /* built-in.m in Sources */,
-				41D02D591FA9A5E000E1829A /* createc.m in Sources */,
+				41175CD92046DD8F00E75108 /* ANEScopeChain.m in Sources */,
+				41D02D591FA9A5E000E1829A /* create.m in Sources */,
+				41175CDF2046DDFD00E75108 /* ANEStack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

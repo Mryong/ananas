@@ -7,9 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ANANASStructDeclareTable.h"
 #import "anc_ast.h"
-#import "ANEEnvironment.h"
+#import "runenv.h"
 
 static void add_built_in_struct_declare(){
 	ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];

@@ -9,8 +9,7 @@
 
 #import "util.h"
 #import "anc_ast.h"
-#import "ANANASStructDeclareTable.h"
-#import "ANEEnvironment.h"
+#import "runenv.h"
 
 
 const char * ananas_str_append(const char *str1, const char *str2){

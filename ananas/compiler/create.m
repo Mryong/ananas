@@ -6,10 +6,8 @@
 //  Copyright © 2017年 xiaodongdan. All rights reserved.
 //
 
-#include <stdio.h>
-#import <objc/runtime.h>
-#import <objc/message.h>
-#include "ananasc.h"
+#import "create.h"
+
 
 
 static ANCInterpreter *st_current_compile_util;

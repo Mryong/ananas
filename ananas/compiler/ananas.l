@@ -2,10 +2,12 @@
 	#undef YY_INPUT
 	#define YY_INPUT(buf, result, max_size) (result = string_input(buf, max_size))
 	#include <Foundation/Foundation.h>
-	#include "ananasc.h"
+	#include "create.h"
 	#include "y.tab.h"
 	#import "ANCExpression.h"
-	
+#define smaller(a, b) ((a) < (b) ? (a) : (b))
+#define larger(a, b) ((a) > (b) ? (a) : (b))
+
 	
 	static char const *st_source_string;
 	static unsigned long st_current_char_index;

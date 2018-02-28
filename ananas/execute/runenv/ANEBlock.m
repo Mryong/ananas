@@ -9,7 +9,6 @@
 #import "ANEBlock.h"
 #import "ffi.h"
 #import "util.h"
-#import "ANEEnvironment.h"
 #import "execute.h"
 
 enum {

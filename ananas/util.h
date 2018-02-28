@@ -12,7 +12,6 @@
 #import "ffi.h"
 @class ANCStructDeclare;
 
-
 inline static  char *removeTypeEncodingPrefix(char *typeEncoding){
 	while (*typeEncoding == 'r' || // const
 		   *typeEncoding == 'n' || // in
@@ -32,4 +31,5 @@ size_t ananas_size_with_encoding(const char *typeEncoding);
 size_t ananas_struct_size_with_encoding(const char *typeEncoding);
 NSString * ananas_struct_name_with_encoding(const char *typeEncoding);
 void ananas_struct_data_with_dic(void *structData, NSDictionary *dic, ANCStructDeclare *declare);
+
 #endif /* util_h */

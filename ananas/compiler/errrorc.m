@@ -7,7 +7,7 @@
 //
 
 #include <Foundation/Foundation.h>
-#import "ananasc.h"
+#import "create.h"
 
 void anc_compile_err(NSUInteger lineNumber,ANCCompileError error,...){
 	NSLog(@"编译错误。。。。");

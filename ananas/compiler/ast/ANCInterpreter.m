@@ -7,7 +7,7 @@
 //
 
 #import "ANCInterpreter.h"
-#import "ANEEnvironment.h"
+#import "runenv.h"
 
 static NSMutableDictionary<NSString *, ANEStack *> *_stacksDic;
 static NSLock *_lock;

@@ -1,20 +1,15 @@
 //
-//  ananasc.h
+//  create.h
 //  ananasExample
 //
-//  Created by jerry.yong on 2017/11/1.
-//  Copyright © 2017年 yongpengliang. All rights reserved.
+//  Created by jerry.yong on 2018/2/28.
+//  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
-#ifndef ananasc_h
-#define ananasc_h
+#ifndef create_h
+#define create_h
 #import "anc_ast.h"
-#import <Foundation/Foundation.h>
-#import <CoreFoundation/CoreFoundation.h>
 
-
-#define smaller(a, b) ((a) < (b) ? (a) : (b))
-#define larger(a, b) ((a) > (b) ? (a) : (b))
 
 typedef NS_ENUM(NSUInteger, ANCCompileError) {
 	ANCCompileErrorStructDeclareRedefinition,
@@ -25,19 +20,8 @@ typedef NS_ENUM(NSUInteger, ANCCompileError) {
 	ANCRedefinitionPropertyInChildClass,
 	ANCParameterRedefinition,
 	
-	
 };
 
-
-/* errorc.c */
-void anc_compile_err(NSUInteger lineNumber,ANCCompileError error,...);
-
-
-/* util.c */
-ANCTypeSpecifier *anc_alloc_type_specifier(ANATypeSpecifierKind kind, NSString *identifier, NSString *typeEncoding);
-
-
-/* create.m */
 void anc_open_string_literal_buf(void);
 void anc_append_string_literal(int letter);
 const char* anc_end_string_literal(void);
@@ -85,6 +69,6 @@ ANCInterpreter *anc_get_current_compile_util(void);
 void anc_set_current_compile_util(ANCInterpreter *interpreter);
 
 
+void anc_compile_err(NSUInteger lineNumber,ANCCompileError error,...);
 
-
-#endif /* ananasc_h */
+#endif /* create_h */

@@ -1,18 +1,16 @@
 //
-//  ANEEnvironment.h
+//  ANEValue.h
 //  ananasExample
 //
-//  Created by jerry.yong on 2018/1/2.
+//  Created by jerry.yong on 2018/2/28.
 //  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import "ANCTypeSpecifier.h"
-#import "ANEBlock.h"
+@class ANCTypeSpecifier;
+
 
 NS_ASSUME_NONNULL_BEGIN
-
 
 @interface ANEValue : NSObject
 
@@ -58,52 +56,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)nsStringValue;
 @end
-
-
-
-@interface ANEScopeChain: NSObject
-@property (strong, nonatomic) id instance;
-@property (strong, nonatomic) NSMutableDictionary<NSString *,ANEValue *> *vars;
-@property (strong, nonatomic) ANEScopeChain *next;
-
-- (ANEValue *)getValueWithIdentifier:(NSString *)identifier;
-
-+ (instancetype)scopeChainWithNext:(ANEScopeChain *)next;
-
-
-
-@end
-
-typedef NS_ENUM(NSInteger, ANEStatementResultType) {
-	ANEStatementResultTypeNormal,
-	ANEStatementResultTypeReturn,
-	ANEStatementResultTypeBreak,
-	ANEStatementResultTypeContinue,
-};
-
-
-@interface ANEStatementResult : NSObject
-@property (assign, nonatomic) ANEStatementResultType type;
-@property (strong, nonatomic) ANEValue *reutrnValue;
-+ (instancetype)normalResult;
-+ (instancetype)returnResult;
-+ (instancetype)breakResult;
-+ (instancetype)continueResult;
-@end
-
-
-@interface ANEStack : NSObject
-
-- (void)push:(ANEValue *)value;
-- (ANEValue *)pop;
-- (ANEValue *)peekStack:(NSUInteger)index;
-- (void)shrinkStack:(NSUInteger)shrinkSize;
-- (NSUInteger)size;
-@end
-
-
 NS_ASSUME_NONNULL_END
-
-
-
-

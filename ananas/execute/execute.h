@@ -8,8 +8,8 @@
 
 #ifndef execute_h
 #define execute_h
+#import "runenv.h"
 
-#import "ANEEnvironment.h"
 /*built-in.m*/
 void ananas_add_built_in(ANCInterpreter *inter);
 /* eval.m */
