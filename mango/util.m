@@ -287,7 +287,7 @@ break;\
 				if ([subStruct isKindOfClass:[NSDictionary class]]) {
 					mango_struct_data_with_dic(structData + postion, dic[key],subStructDeclare);
 				}else{
-					memcpy(structData+postion, [(ANEValue *)subStruct pointerValue], size);
+					memcpy(structData+postion, [(MANValue *)subStruct pointerValue], size);
 				}
 				
 				postion += size;

@@ -76,11 +76,11 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	NSMutableArray *argValues = [NSMutableArray array];
 	for (NSUInteger i = 1; i < numberOfArguments ; i++) {
 		void *arg = args[i];
-		ANEValue *argValue = [[ANEValue alloc] initWithCValuePointer:arg typeEncoding:[sig getArgumentTypeAtIndex:i]];
+		MANValue *argValue = [[MANValue alloc] initWithCValuePointer:arg typeEncoding:[sig getArgumentTypeAtIndex:i]];
 		[argValues addObject:argValue];
 		
 	}
-	ANEValue *retValue = mango_call_mango_function(inter, scope, func, argValues);
+	MANValue *retValue = mango_call_mango_function(inter, scope, func, argValues);
 	[retValue assign2CValuePointer:ret typeEncoding:[sig methodReturnType]];
 }
 

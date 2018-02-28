@@ -38,12 +38,12 @@
 	ane_interpret(self.interpreter);
 }
 
-- (ANEValue *)objectForKeyedSubscript:(id)key{
+- (MANValue *)objectForKeyedSubscript:(id)key{
 	return _interpreter.topScope.vars[key];
 }
 
 - (void)setObject:(id)object forKeyedSubscript:(NSObject<NSCopying> *)key{
-	_interpreter.topScope.vars[key] = [ANEValue valueInstanceWithObject:object];
+	_interpreter.topScope.vars[key] = [MANValue valueInstanceWithObject:object];
 	
 	
 }

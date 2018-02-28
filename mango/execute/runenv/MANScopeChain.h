@@ -7,16 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-@class ANEValue;
+@class MANValue;
 
 NS_ASSUME_NONNULL_BEGIN
 @interface MANScopeChain: NSObject
 @property (strong, nonatomic) id instance;
-@property (strong, nonatomic) NSMutableDictionary<NSString *,ANEValue *> *vars;
+@property (strong, nonatomic) NSMutableDictionary<NSString *,MANValue *> *vars;
 @property (strong, nonatomic) MANScopeChain *next;
 
 + (instancetype)scopeChainWithNext:(MANScopeChain *)next;
-- (ANEValue *)getValueWithIdentifier:(NSString *)identifier;
+- (MANValue *)getValueWithIdentifier:(NSString *)identifier;
 
 @end
 NS_ASSUME_NONNULL_END

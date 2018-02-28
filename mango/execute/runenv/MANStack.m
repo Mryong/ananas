@@ -9,7 +9,7 @@
 #import "MANStack.h"
 
 @implementation MANStack{
-	NSMutableArray<ANEValue *> *_arr;
+	NSMutableArray<MANValue *> *_arr;
 }
 
 - (instancetype)init{
@@ -19,18 +19,18 @@
 	return self;
 }
 
-- (void)push:(ANEValue *)value{
+- (void)push:(MANValue *)value{
 	[_arr addObject:value];
 }
 
-- (ANEValue *)pop{
-	ANEValue *value = [_arr  lastObject];
+- (MANValue *)pop{
+	MANValue *value = [_arr  lastObject];
 	[_arr removeLastObject];
 	return value;
 }
 
-- (ANEValue *)peekStack:(NSUInteger)index{
-	ANEValue *value = _arr[_arr.count - 1 - index];
+- (MANValue *)peekStack:(NSUInteger)index{
+	MANValue *value = _arr[_arr.count - 1 - index];
 	return value;
 }
 

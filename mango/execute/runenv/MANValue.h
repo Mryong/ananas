@@ -1,5 +1,5 @@
 //
-//  ANEValue.h
+//  MANValue .h
 //  ananasExample
 //
 //  Created by jerry.yong on 2018/2/28.
@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ANEValue : NSObject
+@interface MANValue : NSObject
 
 @property (strong, nonatomic) MANTypeSpecifier *type;
 @property (assign, nonatomic) unsigned long long uintValue;
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isMember;
 - (BOOL)isBaseValue;
 
-- (void)assignFrom:(ANEValue *)src;
+- (void)assignFrom:(MANValue *)src;
 
 - (unsigned long long)c2uintValue;
 - (long long)c2integerValue;

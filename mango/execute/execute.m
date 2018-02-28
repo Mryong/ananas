@@ -27,8 +27,8 @@ static const void *propKey(NSString *propName) {
 }
 
 
-static ANEValue *default_value_with_type_specifier(MANInterpreter *inter, MANTypeSpecifier *typeSpecifier){
-	ANEValue *value = [[ANEValue alloc] init];
+static MANValue *default_value_with_type_specifier(MANInterpreter *inter, MANTypeSpecifier *typeSpecifier){
+	MANValue *value = [[MANValue alloc] init];
 	value.type = typeSpecifier;
 	if (typeSpecifier.typeKind == MAN_TYPE_STRUCT) {
 		 size_t size = mango_struct_size_with_encoding([typeSpecifier typeEncoding]);
@@ -40,7 +40,7 @@ static ANEValue *default_value_with_type_specifier(MANInterpreter *inter, MANTyp
 
 
 static void execute_declaration(MANInterpreter *inter, MANScopeChain *scope, MANDeclaration *declaration){
-	ANEValue *value;
+	MANValue *value;
 	if (declaration.initializer) {
 		value = ane_eval_expression(inter, scope, declaration.initializer);
 	}else{
@@ -57,7 +57,7 @@ static MANStatementResult *execute_else_if_list(MANInterpreter *inter, MANScopeC
 	MANStatementResult *res;
 	*executed = NO;
 	for (MANElseIf *elseIf in elseIfList) {
-		ANEValue *conValue = ane_eval_expression(inter, scope, elseIf.condition);
+		MANValue *conValue = ane_eval_expression(inter, scope, elseIf.condition);
 		if ([conValue isSubtantial]) {
 			MANScopeChain *conScope = [MANScopeChain scopeChainWithNext:scope];
 			res = ane_execute_statement_list(inter, conScope, elseIf.thenBlock.statementList);
@@ -70,7 +70,7 @@ static MANStatementResult *execute_else_if_list(MANInterpreter *inter, MANScopeC
 
 static MANStatementResult *execute_if_statement(MANInterpreter *inter, MANScopeChain *scope, MANIfStatement *statement){
 	MANStatementResult *res;
-	ANEValue *conValue = ane_eval_expression(inter, scope, statement.condition);
+	MANValue *conValue = ane_eval_expression(inter, scope, statement.condition);
 	if ([conValue isSubtantial]) {
 		MANScopeChain *conScope = [MANScopeChain scopeChainWithNext:scope];
 		res = ane_execute_statement_list(inter, conScope, statement.thenBlock.statementList);
@@ -89,11 +89,11 @@ static MANStatementResult *execute_if_statement(MANInterpreter *inter, MANScopeC
 
 static MANStatementResult *execute_switch_statement(MANInterpreter *inter, MANScopeChain *scope, MANSwitchStatement *statement){
 	MANStatementResult *res;
-	ANEValue *value = ane_eval_expression(inter, scope, statement.expr);
+	MANValue *value = ane_eval_expression(inter, scope, statement.expr);
 	BOOL hasMatch = NO;
 	for (MANCase *case_ in statement.caseList) {
 		if (!hasMatch) {
-			ANEValue *caseValue = ane_eval_expression(inter, scope, case_.expr);
+			MANValue *caseValue = ane_eval_expression(inter, scope, case_.expr);
 			BOOL equal = mango_equal_value(case_.expr.lineNumber, value, caseValue);
 			if (equal) {
 				hasMatch = YES;
@@ -132,7 +132,7 @@ static MANStatementResult *execute_for_statement(MANInterpreter *inter, MANScope
 	}
 	
 	for (;;) {
-		ANEValue *conValue = ane_eval_expression(inter, forScope, statement.condition);
+		MANValue *conValue = ane_eval_expression(inter, forScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
@@ -170,13 +170,13 @@ static MANStatementResult *execute_for_each_statement(MANInterpreter *inter, MAN
 	
 	
 	
-	ANEValue *arrValue = ane_eval_expression(inter, scope, statement.arrayExpr);
+	MANValue *arrValue = ane_eval_expression(inter, scope, statement.arrayExpr);
 	if (arrValue.type.typeKind != MAN_TYPE_OBJECT) {
 		NSCAssert(0, @"");
 	}
 	
 	for (id var in arrValue.objectValue) {
-		ANEValue *operValue = [[ANEValue alloc] init];
+		MANValue *operValue = [[MANValue alloc] init];
 		operValue.type = anc_create_type_specifier(MAN_TYPE_OBJECT);
 		operValue.objectValue = var;
 		mango_assign_value_to_identifer_expr(inter, forScope, statement.identifierExpr.identifier, operValue);
@@ -199,7 +199,7 @@ static MANStatementResult *execute_while_statement(MANInterpreter *inter, MANSco
 	MANStatementResult *res;
 	MANScopeChain *whileScope = [MANScopeChain scopeChainWithNext:scope];
 	for (;;) {
-		ANEValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
+		MANValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
@@ -229,7 +229,7 @@ static MANStatementResult *execute_do_while_statement(MANInterpreter *inter, MAN
 		}else if (res.type == MANStatementResultTypeContinue){
 			res.type = MANStatementResultTypeNormal;
 		}
-		ANEValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
+		MANValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
@@ -244,7 +244,7 @@ static MANStatementResult *execute_return_statement(MANInterpreter *inter, MANSc
 	if (statement.retValExpr) {
 		res.reutrnValue = ane_eval_expression(inter, scope, statement.retValExpr);
 	}else{
-		res.reutrnValue = [ANEValue voidValueInstance];
+		res.reutrnValue = [MANValue voidValueInstance];
 	}
 	return res;
 }
@@ -333,7 +333,7 @@ MANStatementResult *ane_execute_statement_list(MANInterpreter *inter, MANScopeCh
 }
 
 
-ANEValue * mango_call_mango_function(MANInterpreter *inter, MANScopeChain *scope, MANFunctionDefinition *func, NSArray<ANEValue *> *args){
+MANValue * mango_call_mango_function(MANInterpreter *inter, MANScopeChain *scope, MANFunctionDefinition *func, NSArray<MANValue *> *args){
 	NSArray<MANParameter *> *params = func.params;
 	if (params.count != args.count) {
 		NSCAssert(0, @"");
@@ -349,7 +349,7 @@ ANEValue * mango_call_mango_function(MANInterpreter *inter, MANScopeChain *scope
 	if (res.type == MANStatementResultTypeReturn) {
 		return res.reutrnValue;
 	}else{
-		return [ANEValue voidValueInstance];
+		return [MANValue voidValueInstance];
 	}
 }
 
@@ -358,7 +358,7 @@ static void define_class(MANInterpreter *interpreter,MANClassDefinition *classDe
 	if (classDefinition.annotationIfExprResult == AnnotationIfExprResultNoComputed) {
 		MANExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
 		if (annotationIfConditionExpr) {
-			ANEValue *value = ane_eval_expression(interpreter, interpreter.topScope, annotationIfConditionExpr);
+			MANValue *value = ane_eval_expression(interpreter, interpreter.topScope, annotationIfConditionExpr);
 			classDefinition.annotationIfExprResult = value.isSubtantial ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
 			if (!value.isSubtantial) {
 				return;
@@ -401,33 +401,82 @@ static void define_class(MANInterpreter *interpreter,MANClassDefinition *classDe
 
 
 void getterInter(ffi_cif *cif, void *ret, void **args, void *userdata){
-	
-
+	MANPropertyDefinition *propDef = (__bridge MANPropertyDefinition *)userdata;
+	id _self = (__bridge id)(*(void **)args[0]);
+	NSString *propName = propDef.name;
+	MANValue *value = objc_getAssociatedObject(_self, propKey(propName));
+	value = value?:[[MANValue alloc] init];
+	const char *type = [propDef.typeSpecifier typeEncoding];
+	[value assign2CValuePointer:ret typeEncoding:type];
 }
 
 
 void setterInter(ffi_cif *cif, void *ret, void **args, void *userdata){
+	MANPropertyDefinition *propDef = (__bridge MANPropertyDefinition *)userdata;
+	id _self = (__bridge id)(*(void **)args[0]);
+	const char *type = [propDef.typeSpecifier typeEncoding];
+	MANValue *value = [[MANValue alloc] initWithCValuePointer:args[2] typeEncoding:type];
+	NSString *propName = propDef.name;
+	
+	objc_AssociationPolicy associationPolicy = OBJC_ASSOCIATION_RETAIN_NONATOMIC;
+	MANPropertyModifier modifier = propDef.modifier;
+	switch (modifier & MANPropertyModifierMemMask) {
+		case MANPropertyModifierMemStrong:
+			switch (modifier & MANPropertyModifierAtomicMask) {
+				case MANPropertyModifierAtomic:
+					associationPolicy = OBJC_ASSOCIATION_RETAIN;
+					break;
+				case MANPropertyModifierNonatomic:
+					associationPolicy = OBJC_ASSOCIATION_RETAIN_NONATOMIC;
+					break;
+				default:
+					break;
+			}
+			break;
+		case MANPropertyModifierMemWeak:
+		case MANPropertyModifierMemAssign:
+			associationPolicy = OBJC_ASSOCIATION_ASSIGN;
+			break;
+			
+		case MANPropertyModifierMemCopy:
+			switch (modifier & MANPropertyModifierAtomicMask) {
+				case MANPropertyModifierAtomic:
+					associationPolicy = OBJC_ASSOCIATION_COPY;
+					break;
+				case MANPropertyModifierNonatomic:
+					associationPolicy = OBJC_ASSOCIATION_COPY_NONATOMIC;
+					break;
+				default:
+					break;
+			}
+			break;
+			
+		default:
+			break;
+	}
+	objc_setAssociatedObject(_self, propKey(propName), value, associationPolicy);
+	
+	
 	
 	
 }
 static void replace_getter_method(MANInterpreter *inter ,Class clazz, MANPropertyDefinition *prop){
 	SEL getterSEL = NSSelectorFromString(prop.name);
-	const char *prtTypeEncoding  = [prop.typeSpecifier typeEncoding];
-	ffi_type *returnType = &ffi_type_void;
+	const char *retTypeEncoding  = [prop.typeSpecifier typeEncoding];
+	ffi_type *returnType = mango_ffi_type_with_type_encoding(retTypeEncoding);
 	unsigned int argCount = 2;
 	ffi_type **argTypes = malloc(sizeof(ffi_type *) * argCount);
 	argTypes[0] = &ffi_type_pointer;
 	argTypes[1] = &ffi_type_pointer;
 
-	ffi_cif cif;
-	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
 
 	void *imp = NULL;
-	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &imp);
-	ffi_prep_closure_loc(closure, &cif, getterInter, (__bridge_retained void *)prop, getterInter);
-	class_replaceMethod(clazz, getterSEL, (IMP)imp, mango_str_append(prtTypeEncoding, "@:"));
-
+	ffi_cif *cifPtr = malloc(sizeof(ffi_cif));
+	ffi_prep_cif(cifPtr, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
+	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), (void **)&imp);
+	ffi_prep_closure_loc(closure, cifPtr, getterInter, (__bridge void *)prop, imp);
 	
+	class_replaceMethod(clazz, getterSEL, (IMP)imp, mango_str_append(retTypeEncoding, "@:"));
 }
 
 static void replace_setter_method(MANInterpreter *inter ,Class clazz, MANPropertyDefinition *prop){
@@ -444,26 +493,21 @@ static void replace_setter_method(MANInterpreter *inter ,Class clazz, MANPropert
 	if (argTypes[2] == NULL) {
 		NSCAssert(0, @"");
 	}
-	
-	ffi_cif cif;
-	ffi_prep_cif(&cif, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
-	
-	void *imp = NULL;
-	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &imp);
-	ffi_prep_closure_loc(closure, &cif, getterInter, (__bridge_retained void *)prop, setterInter);
-	class_replaceMethod(clazz, setterSEL, (IMP)imp, mango_str_append("v@:", prtTypeEncoding));
-	
-	
-	
 
+	void *imp = NULL;
+	ffi_cif *cifPtr = malloc(sizeof(ffi_cif));
+	ffi_prep_cif(cifPtr, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
+	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), (void **)&imp);
+	ffi_prep_closure_loc(closure, cifPtr, setterInter, (__bridge void *)prop, imp);
 	
+	class_replaceMethod(clazz, setterSEL, (IMP)imp, mango_str_append("v@:", prtTypeEncoding));
 }
 
 
 
 static void replace_prop(MANInterpreter *inter ,Class clazz, MANPropertyDefinition *prop){
 	if (prop.annotationIfConditionExpr) {
-		ANEValue *conValue = ane_eval_expression(inter, inter.topScope, prop.annotationIfConditionExpr);
+		MANValue *conValue = ane_eval_expression(inter, inter.topScope, prop.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
 			return;
 		}
@@ -520,9 +564,9 @@ static void mango_forward_invocation(__unsafe_unretained id assignSlf, SEL sel, 
 	MANScopeChain *classScope = [MANScopeChain scopeChainWithNext:inter.topScope];
 	classScope.instance = assignSlf;
 	
-	NSMutableArray<ANEValue *> *args = [NSMutableArray array];
-	[args addObject:[ANEValue valueInstanceWithObject:assignSlf]];
-	[args addObject:[ANEValue valueInstanceWithSEL:invocation.selector]];
+	NSMutableArray<MANValue *> *args = [NSMutableArray array];
+	[args addObject:[MANValue valueInstanceWithObject:assignSlf]];
+	[args addObject:[MANValue valueInstanceWithSEL:invocation.selector]];
 	NSMethodSignature *methodSignature = [invocation methodSignature];
 	NSUInteger numberOfArguments = [methodSignature numberOfArguments];
 	for (NSUInteger i = 2; i < numberOfArguments; i++) {
@@ -530,11 +574,11 @@ static void mango_forward_invocation(__unsafe_unretained id assignSlf, SEL sel, 
 		size_t size = mango_size_with_encoding(typeEncoding);
 		void *ptr = malloc(size);
 		[invocation getArgument:ptr atIndex:i];
-		ANEValue *argValue = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:typeEncoding];
+		MANValue *argValue = [[MANValue alloc] initWithCValuePointer:ptr typeEncoding:typeEncoding];
 		[args addObject:argValue];
 	}
 	
-	ANEValue *retValue = mango_call_mango_function(inter, classScope, method.functionDefinition, args);
+	MANValue *retValue = mango_call_mango_function(inter, classScope, method.functionDefinition, args);
 	if (retValue.type.typeKind != MAN_TYPE_VOID) {
 		size_t retLen = [methodSignature methodReturnLength];
 		void *retPtr = malloc(retLen);
@@ -547,7 +591,7 @@ static void mango_forward_invocation(__unsafe_unretained id assignSlf, SEL sel, 
 
 static void replace_method(MANInterpreter *interpreter,Class clazz, MANMethodDefinition *method){
 	if (method.annotationIfConditionExpr) {
-		ANEValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, method.annotationIfConditionExpr);
+		MANValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, method.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
 			return;
 		}
@@ -604,7 +648,7 @@ static void fix_class(MANInterpreter *interpreter,MANClassDefinition *classDefin
 
 void add_struct_declare(MANInterpreter *interpreter, MANStructDeclare *structDeclaer){
 	if (structDeclaer.annotationIfConditionExpr) {
-		ANEValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, structDeclaer.annotationIfConditionExpr);
+		MANValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, structDeclaer.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
 			return;
 		}

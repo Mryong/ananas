@@ -1,18 +1,18 @@
 //
-//  ANEValue.m
+//  MANValue .m
 //  ananasExample
 //
 //  Created by jerry.yong on 2018/2/28.
 //  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
-#import "ANEValue.h"
+#import "MANValue.h"
 #import "MANTypeSpecifier.h"
 #import "ANANASStructDeclareTable.h"
 #import "create.h"
 #import "util.h"
 
-@implementation ANEValue
+@implementation MANValue
 
 - (instancetype)init{
 	if (self = [super init]) {
@@ -78,7 +78,7 @@
 	return ![self isObject];
 }
 
-- (void)assignFrom:(ANEValue *)src{
+- (void)assignFrom:(MANValue *)src{
 	
 	_type = src.type;
 	_uintValue = src.uintValue;
@@ -170,7 +170,7 @@
 		case MAN_TYPE_BLOCK:
 			return (__bridge void*)_objectValue;
 		default:
-			return nil;
+			return NULL;
 	}
 }
 
@@ -236,7 +236,7 @@ break;\
 
 - (instancetype)initWithCValuePointer:(void *)cValuePointer typeEncoding:(const char *)typeEncoding{
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
-	ANEValue *retValue = [[ANEValue alloc] init];
+	MANValue *retValue = [[MANValue alloc] init];
 	
 #define ANANASA_C_VALUE_CONVER_TO_mango_VALUE_CASE(_code,_kind, _type,_sel)\
 case _code:{\
@@ -287,7 +287,7 @@ break;\
 
 + (instancetype)defaultValueWithTypeEncoding:(const char *)typeEncoding{
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	switch (*typeEncoding) {
 		case 'c':
 			value.type = anc_create_type_specifier(MAN_TYPE_INT);
@@ -357,76 +357,76 @@ break;\
 }
 
 + (instancetype)voidValueInstance{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_VOID);
 	return value;
 }
 
 
 + (instancetype)valueInstanceWithBOOL:(BOOL)boolValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_BOOL);
 	value.uintValue = boolValue;
 	return value;
 }
 + (instancetype)valueInstanceWithUint:(unsigned long long int)uintValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_U_INT);
 	value.uintValue = uintValue;
 	return value;
 }
 + (instancetype)valueInstanceWithInt:(long long int)intValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_INT);
 	value.integerValue = intValue;
 	return value;
 }
 + (instancetype)valueInstanceWithDouble:(double)doubleValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_DOUBLE);
 	value.doubleValue = doubleValue;
 	return value;
 }
 + (instancetype)valueInstanceWithObject:(id)objValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_OBJECT);
 	value.objectValue = objValue;
 	return value;
 }
 + (instancetype)valueInstanceWithBlock:(id)blockValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_BLOCK);
 	value.objectValue = blockValue;
 	return value;
 }
 + (instancetype)valueInstanceWithClass:(Class)clazzValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_CLASS);
 	value.classValue = clazzValue;
 	return value;
 }
 + (instancetype)valueInstanceWithSEL:(SEL)selValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_SEL);
 	value.selValue = selValue;
 	return value;
 }
 + (instancetype)valueInstanceWithCstring:(const char *)cstringValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_C_STRING);
 	value.cstringValue = cstringValue;
 	return value;
 }
 
 + (instancetype)valueInstanceWithPointer:(void *)pointerValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_POINTER);
 	value.pointerValue = pointerValue;
 	return value;
 }
 
 + (instancetype)valueInstanceWithStruct:(void *)structValue typeEncoding:(const char *)typeEncoding{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_SEL);
 	value.type.structName = mango_struct_name_with_encoding(typeEncoding);
 	size_t size = mango_struct_size_with_encoding(typeEncoding);
@@ -436,7 +436,7 @@ break;\
 }
 
 - (instancetype)nsStringValue{
-	ANEValue *value = [[ANEValue alloc] init];
+	MANValue *value = [[MANValue alloc] init];
 	value.type = anc_create_type_specifier(MAN_TYPE_OBJECT);
 	switch (_type.typeKind) {
 		case MAN_TYPE_BOOL:

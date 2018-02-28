@@ -6,16 +6,16 @@
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 #import <Foundation/Foundation.h>
-#import "ANEValue.h"
+#import "MANValue.h"
 @interface MMANontext : NSObject
 - (void)evalAnanasScriptWithURL:(NSURL *)url;
 - (void)evalAnanasScriptWithSourceString:(NSString *)sourceString;
 /*!
  @method
  @abstract Get a particular property on the global object.
- @result The ANEValue for the global object's property.
+ @result The MANValue  for the global object's property.
  */
-- (ANEValue *)objectForKeyedSubscript:(id)key;
+- (MANValue *)objectForKeyedSubscript:(id)key;
 
 /*!
  @method

@@ -11,7 +11,7 @@
 		41175CCE2046D1B800E75108 /* built-in.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC62046D1B800E75108 /* built-in.m */; };
 		41175CD02046D1B800E75108 /* execute.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC82046D1B800E75108 /* execute.m */; };
 		41175CD12046D1B800E75108 /* MANBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CC92046D1B800E75108 /* MANBlock.m */; };
-		41175CD62046DD1B00E75108 /* ANEValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CD52046DD1B00E75108 /* ANEValue.m */; };
+		41175CD62046DD1B00E75108 /* MANValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CD52046DD1B00E75108 /* MANValue.m */; };
 		41175CD92046DD8F00E75108 /* MANScopeChain.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CD82046DD8F00E75108 /* MANScopeChain.m */; };
 		41175CDC2046DDD300E75108 /* MANStatementResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CDB2046DDD300E75108 /* MANStatementResult.m */; };
 		41175CDF2046DDFD00E75108 /* MANStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 41175CDE2046DDFD00E75108 /* MANStack.m */; };
@@ -71,8 +71,8 @@
 		41175CCA2046D1B800E75108 /* MANBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MANBlock.h; sourceTree = "<group>"; };
 		41175CCB2046D1B800E75108 /* execute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = execute.h; sourceTree = "<group>"; };
 		41175CD22046D24E00E75108 /* create.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = create.h; sourceTree = "<group>"; };
-		41175CD42046DD1B00E75108 /* ANEValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ANEValue.h; sourceTree = "<group>"; };
-		41175CD52046DD1B00E75108 /* ANEValue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ANEValue.m; sourceTree = "<group>"; };
+		41175CD42046DD1B00E75108 /* MANValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MANValue.h; sourceTree = "<group>"; };
+		41175CD52046DD1B00E75108 /* MANValue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MANValue.m; sourceTree = "<group>"; };
 		41175CD72046DD8F00E75108 /* MANScopeChain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MANScopeChain.h; sourceTree = "<group>"; };
 		41175CD82046DD8F00E75108 /* MANScopeChain.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MANScopeChain.m; sourceTree = "<group>"; };
 		41175CDA2046DDD300E75108 /* MANStatementResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MANStatementResult.h; sourceTree = "<group>"; };
@@ -193,8 +193,8 @@
 				4179D0A920412CBD009CB6D3 /* ANANASStructDeclareTable.m */,
 				41175CC92046D1B800E75108 /* MANBlock.m */,
 				41175CCA2046D1B800E75108 /* MANBlock.h */,
-				41175CD42046DD1B00E75108 /* ANEValue.h */,
-				41175CD52046DD1B00E75108 /* ANEValue.m */,
+				41175CD42046DD1B00E75108 /* MANValue.h */,
+				41175CD52046DD1B00E75108 /* MANValue.m */,
 				41175CD72046DD8F00E75108 /* MANScopeChain.h */,
 				41175CD82046DD8F00E75108 /* MANScopeChain.m */,
 				41175CDA2046DDD300E75108 /* MANStatementResult.h */,
@@ -517,7 +517,7 @@
 				4179D0AA20412CBD009CB6D3 /* ANANASStructDeclareTable.m in Sources */,
 				41E83EB21FBD6F6600A48592 /* MANStatement.m in Sources */,
 				41D02D1F1FA8A09400E1829A /* ViewController.m in Sources */,
-				41175CD62046DD1B00E75108 /* ANEValue.m in Sources */,
+				41175CD62046DD1B00E75108 /* MANValue.m in Sources */,
 				41E83EB51FBD8C9E00A48592 /* MANStructDeclare.m in Sources */,
 				41E83EA91FB992C200A48592 /* MANTypeSpecifier.m in Sources */,
 				41E83EA61FB9671200A48592 /* MANExpression.m in Sources */,

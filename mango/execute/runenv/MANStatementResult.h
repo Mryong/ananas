@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-@class ANEValue;
+@class MANValue;
 
 
 typedef NS_ENUM(NSInteger, MANStatementResultType) {
@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, MANStatementResultType) {
 
 @interface MANStatementResult : NSObject
 @property (assign, nonatomic) MANStatementResultType type;
-@property (strong, nonatomic) ANEValue *reutrnValue;
+@property (strong, nonatomic) MANValue *reutrnValue;
 + (instancetype)normalResult;
 + (instancetype)returnResult;
 + (instancetype)breakResult;

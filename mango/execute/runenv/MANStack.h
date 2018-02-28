@@ -10,13 +10,13 @@
 
 
 
-@class ANEValue;
+@class MANValue;
 
 @interface MANStack : NSObject
 
-- (void)push:(ANEValue *)value;
-- (ANEValue *)pop;
-- (ANEValue *)peekStack:(NSUInteger)index;
+- (void)push:(MANValue *)value;
+- (MANValue *)pop;
+- (MANValue *)peekStack:(NSUInteger)index;
 - (void)shrinkStack:(NSUInteger)shrinkSize;
 - (NSUInteger)size;
 @end
