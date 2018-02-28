@@ -1,14 +1,14 @@
+
+
 class ViewController:UIViewController {
 
-
-
 - (void)sequentialStatementExample{
-NSLog(@"hello world");
 	int a = 1;
 	uint b = 2;
 	double c = 3;
 	double d = a + b * c;
-	self.resultView.text =  @"执行结果: " + d;
+	double e = d ? 1 : 0;
+	self.resultView.text =  @"执行结果: " + e;
 }
 
 - (void)ifStatementExample{
@@ -95,7 +95,7 @@ NSLog(@"hello world");
 }
 
 - (void)blockStatementExample{
-	block catStringBlock = ^NSString *(NSString *str1, NSString *str2){
+	Block catStringBlock = ^NSString *(NSString *str1, NSString *str2){
 								NSString *result = str1.stringByAppendingString:(str2);
 								return result;
 							};
@@ -104,14 +104,58 @@ NSLog(@"hello world");
 }
 
 
-- (void)testReplaceMethod:(NSString *)param{
-	struct CGRect rect = CGRectMake(0, 0, 100, 100);
-	UIView *view = UIView.alloc().initWithFrame:(rect);
-	view.backgroundColor = UIColor.colorWithRed:green:blue:alpha:(1,0.5,0.5,1);// [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
-	self.view.addSubview:(view);
-	NSLog(view.backgroundColor);
+- (void)paramPassingExampleWithBOOLArg:(BOOL)BOOLArg intArg:(int) intArg uintArg:(uint)uintArg structArg:(struct CGRect)structArg blockArg:(Block)blockArg objArg:(id)objArg {
+	NSString *text = @"";
+	text += @"BOOLArg:" + BOOLArg + @",\n";
+	text += @"intArg:" + intArg + @",\n";
+	text += @"uintArg:" + uintArg + @",\n";
+	text += @"structArg:" + structArg + @",\n";
+	text += @"Block执行结果:" + blockArg(@"hello", @"mango") + @"\n";
+	text += @"objArg:" + objArg;
+	self.resultView.text = text;
 }
 
 
+- (Block)returnBlockExample{
+	NSString *prefix = @"mango: ";
+	Block catStringBlock = ^NSString *(NSString *str1, NSString *str2){
+		NSString *result = str1.stringByAppendingString:(str2);
+		return prefix + result;
+	};
+	return catStringBlock;
+}
+
+
+- (void)createAndOpenNewViewControllerExample{
+	SubRotateAnimationExampleController *vc = SubRotateAnimationExampleController.alloc().init();
+	self.navigationController.pushViewController:animated:(vc,YES);
+
+}
+
+}
+
+
+class SubRotateAnimationExampleController:UIViewController {
+@property (strong, nonatomic) UIView *rotateView;
+- (void)viewDidLoad {
+	super.viewDidLoad();
+	self.title = @"Magno 创建自定义ViewController";
+	self.view.backgroundColor = UIColor.whiteColor();
+	double width = 100;
+	double height = 100;
+	double x = self.view.frame.size.width/2 - width/2;
+	double y = self.view.frame.size.height/2 - height/2;
+	UIView *view = UIView.alloc().initWithFrame:(CGRectMake(x, y, width, height));
+	self.view.addSubview:(view);
+	view.backgroundColor = UIColor.redColor();
+	self.rotateView = view;
+	Block block= ^(NSTimer *timer) {
+		UIView.animateWithDuration:animations:(0.25,^(){
+			self.rotateView.transform = CGAffineTransformRotate(self.rotateView.transform, M_PI);
+		});
+	};
+	NSTimer *timer = NSTimer.timerWithTimeInterval:repeats:block:(0.25, YES, block);
+	NSRunLoop.currentRunLoop().addTimer:forMode:(timer,NSRunLoopCommonModes);
+}
 
 }

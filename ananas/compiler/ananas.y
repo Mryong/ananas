@@ -896,6 +896,15 @@ block_body:  POWER type_specifier LP  RP block_statement
 				$$ = (__bridge_retained void *)expr;
 				
 			}
+			|POWER type_specifier block_statement
+			{
+				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$3;
+				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				anc_build_block_expr(expr,returnTypeSpecifier,nil,block);
+				$$ = (__bridge_retained void *)expr;
+				
+			}
 			| POWER type_specifier LP function_param_list RP block_statement
 			{
 				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
@@ -909,6 +918,13 @@ block_body:  POWER type_specifier LP  RP block_statement
 			| POWER  LP  RP block_statement
 			{
 				ANCBlock *block = (__bridge_transfer ANCBlock *)$4;
+				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				anc_build_block_expr(expr,nil,nil,block);
+				$$ = (__bridge_retained void *)expr;
+			}
+			| POWER block_statement
+			{
+				ANCBlock *block = (__bridge_transfer ANCBlock *)$2;
 				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,nil,nil,block);
 				$$ = (__bridge_retained void *)expr;

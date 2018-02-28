@@ -134,12 +134,12 @@ static void increment_line_number(){
 <INITIAL>"int" {return INT; }
 <INITIAL>"uint" {return U_INT; }
 <INITIAL>"double" {return DOUBLE; }
-<INITIAL>"cstring" {return C_STRING; }
+<INITIAL>"CString" {return C_STRING; }
 <INITIAL>"id" {return ID; }
 <INITIAL>"Class" {return CLASS_; }
 <INITIAL>"SEL" {return SEL_; }
-<INITIAL>"block" {return BLOCK; }
-<INITIAL>"pointer" {return POINTER; }
+<INITIAL>"Block" {return BLOCK; }
+<INITIAL>"Pointer" {return POINTER; }
 
 <INITIAL>"self" {
 	ANCExpression *expression = anc_create_expression(ANC_SELF_EXPRESSION);
@@ -175,7 +175,7 @@ static void increment_line_number(){
 
 
 
-<INITIAL>[A-Za-z_][A-Za-z_0-9]* {
+<INITIAL>[A-Za-z_$][A-Za-z_$0-9]* {
 	NSString *identifier = anc_create_identifier(yytext);
 	yylval.identifier = (__bridge_retained void *)identifier;
 	return IDENTIFIER;
@@ -241,7 +241,7 @@ static void increment_line_number(){
 
 
 <STRING_LITERAL_STATE>\\\"  { anc_append_string_literal('\"'); }
-<STRING_LITERAL_STATE>\\n	{ anc_append_string_literal('\"'); }
+<STRING_LITERAL_STATE>\\n	{ anc_append_string_literal('\n'); }
 <STRING_LITERAL_STATE>\\t	{ anc_append_string_literal('\t'); }
 <STRING_LITERAL_STATE>\\\\	{ anc_append_string_literal('\\'); }
 <STRING_LITERAL_STATE>[\x81-\x9f\xe0-\xef][\x40-\x7e\x80-\xfc] {

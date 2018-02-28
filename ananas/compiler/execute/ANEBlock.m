@@ -24,16 +24,16 @@ enum {
 	BLOCK_HAS_SIGNATURE  =    (1 << 30)
 };
 
-struct JPSimulateBlock {
+struct ANANASSimulateBlock {
 	void *isa;
 	int flags;
 	int reserved;
 	void *invoke;
-	struct JPSimulateBlockDescriptor *descriptor;
+	struct ANANASSimulateBlockDescriptor *descriptor;
 	void *wrapper;
 };
 
-struct JPSimulateBlockDescriptor {
+struct ANANASSimulateBlockDescriptor {
 	//Block_descriptor_1
 	struct {
 		unsigned long int reserved;
@@ -54,13 +54,13 @@ struct JPSimulateBlockDescriptor {
 	};
 };
 
-void copy_helper(struct JPSimulateBlock *dst, struct JPSimulateBlock *src)
+void copy_helper(struct ANANASSimulateBlock *dst, struct ANANASSimulateBlock *src)
 {
 	// do not copy anything is this funcion! just retain if need.
 		CFRetain(dst->wrapper);
 }
 
-void dispose_helper(struct JPSimulateBlock *src)
+void dispose_helper(struct ANANASSimulateBlock *src)
 {
 		CFRelease(src->wrapper);
 }
@@ -77,7 +77,6 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	NSMutableArray *argValues = [NSMutableArray array];
 	for (NSUInteger i = 1; i < numberOfArguments ; i++) {
 		void *arg = args[i];
-		NSString *str = (__bridge NSString *)(*(void **)arg);
 		ANEValue *argValue = [[ANEValue alloc] initWithCValuePointer:arg typeEncoding:[sig getArgumentTypeAtIndex:i]];
 		[argValues addObject:argValue];
 		
@@ -92,7 +91,7 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	ffi_closure *_closure;
 	BOOL _generatedPtr;
 	void *_blockPtr;
-	struct JPSimulateBlockDescriptor *_descriptor;
+	struct ANANASSimulateBlockDescriptor *_descriptor;
 }
 
 - (id)ocBlock{
@@ -124,17 +123,17 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	ffi_prep_closure_loc(_closure, _cifPtr, blockInter, (__bridge void *)self, blockImp);
 	
 	
-	struct JPSimulateBlockDescriptor descriptor = {
+	struct ANANASSimulateBlockDescriptor descriptor = {
 		0,
-		sizeof(struct JPSimulateBlock),
+		sizeof(struct ANANASSimulateBlock),
 		(void (*)(void *dst, const void *src))copy_helper,
 		(void (*)(const void *src))dispose_helper,
 		typeEncoding
 	};
-	struct JPSimulateBlockDescriptor *descriptorPtr = malloc(sizeof(struct JPSimulateBlockDescriptor));
-	memcpy(descriptorPtr, &descriptor, sizeof(struct JPSimulateBlockDescriptor));
+	struct ANANASSimulateBlockDescriptor *descriptorPtr = malloc(sizeof(struct ANANASSimulateBlockDescriptor));
+	memcpy(descriptorPtr, &descriptor, sizeof(struct ANANASSimulateBlockDescriptor));
 	
-	struct JPSimulateBlock simulateBlock = {
+	struct ANANASSimulateBlock simulateBlock = {
 		&_NSConcreteStackBlock,
 		(BLOCK_HAS_COPY_DISPOSE | BLOCK_HAS_SIGNATURE),
 		0,

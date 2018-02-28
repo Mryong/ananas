@@ -14,7 +14,7 @@
 /*!
  @method
  @abstract Get a particular property on the global object.
- @result The JSValue for the global object's property.
+ @result The ANEValue for the global object's property.
  */
 - (ANEValue *)objectForKeyedSubscript:(id)key;
 

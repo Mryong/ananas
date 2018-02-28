@@ -23,6 +23,7 @@
 @property (strong, nonatomic) ANCBlock *currentBlock;
 
 @property (strong, nonatomic) ANEScopeChain *topScope;
+@property (strong, nonatomic) ANEScopeChain *commonScope;
 
 
 

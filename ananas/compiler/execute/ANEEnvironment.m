@@ -438,18 +438,6 @@ break;\
 - (instancetype)nsStringValue{
 	ANEValue *value = [[ANEValue alloc] init];
 	value.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
-//	ANC_TYPE_BOOL,
-//	ANC_TYPE_INT,
-//	ANC_TYPE_U_INT,
-//	ANC_TYPE_DOUBLE,
-//	ANC_TYPE_C_STRING,
-//	ANC_TYPE_CLASS,
-//	ANC_TYPE_SEL,
-//	ANC_TYPE_OBJECT,
-//	ANC_TYPE_BLOCK,
-//	ANC_TYPE_STRUCT,
-//	ANC_TYPE_STRUCT_LITERAL,
-//	ANC_TYPE_POINTER
 	switch (_type.typeKind) {
 		case ANC_TYPE_BOOL:
 		case ANC_TYPE_U_INT:

@@ -7,7 +7,6 @@
 //
 
 #import "ViewController.h"
-#import <objc/runtime.h>
 
 static NSString * const cellIdentifier = @"cell";
 
@@ -21,6 +20,7 @@ static NSString * const cellIdentifier = @"cell";
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	self.title = @"Mango示例";
 	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellIdentifier];
 }
 
@@ -65,12 +65,18 @@ static NSString * const cellIdentifier = @"cell";
 			[self blockStatementExample];
 			break;
 		case 8://参数传递示例
-			[self paramPassingExampleWithBOOLArg:YES intArg:1 uintArg:2 structArg:CGRectMake(100, 200, 300, 400) blockArg:^id(id arg) {
-				return @"oc block return value";
+			[self paramPassingExampleWithBOOLArg:YES intArg:1 uintArg:2 structArg:CGRectMake(100, 200, 300, 400) blockArg:^id(NSString *str1, NSString *str2) {
+				return [NSString stringWithFormat:@"%@-%@",str1,str2];
 			} objArg:@"string object"];
 			break;
-		case 9://返回值示例
-			[self returnBlockExample];
+		case 9:{//返回值示例
+			NSString * (^retBlcok)(NSString *str1,NSString *str2) = [self returnBlockExample];
+			NSString *result = retBlcok(@"hello ",@"jerry!");
+			self.resultView.text = result;
+			break;
+		}
+		case 10://创建自定义ViewController
+			[self createAndOpenNewViewControllerExample];
 			break;
 			
 		default:
@@ -85,7 +91,7 @@ static NSString * const cellIdentifier = @"cell";
 - (NSArray *)titles{
 	if (_titles == nil) {
 		_titles = @[@"顺序语句示例",@"if语句示例",@"switch语句示例",@"for语句示例",@"forEach语句示例",@"while语句示例",
-					@"do while语句示例",@"block语句示例",@"参数传递示例",@"返回值示例"];
+					@"do while语句示例",@"block语句示例",@"参数传递示例",@"返回值示例",@"创建自定义ViewController"];
 	}
 	return _titles;
 }
@@ -122,13 +128,16 @@ static NSString * const cellIdentifier = @"cell";
 	
 }
 
-- (void)paramPassingExampleWithBOOLArg:(BOOL)BOOLArg intArg:(NSInteger) intArg uintArg:(NSUInteger)uintArg structArg:(CGRect)structArg blockArg:(id (^)(id arg))blockArg objArg:(id)objArg {
+- (void)paramPassingExampleWithBOOLArg:(BOOL)BOOLArg intArg:(NSInteger) intArg uintArg:(NSUInteger)uintArg structArg:(CGRect)structArg blockArg:(id (^)(NSString *str1, NSString *str2))blockArg objArg:(id)objArg {
 	
 }
+
 - (NSString *(^)(NSString *,NSString *))returnBlockExample{
 	return nil;
 }
 
+- (void)createAndOpenNewViewControllerExample{
+}
 
 
 

@@ -10,8 +10,8 @@
 #define execute_h
 
 #import "ANEEnvironment.h"
-
-
+/*built-in.m*/
+void ananas_add_built_in(ANCInterpreter *inter);
 /* eval.m */
 BOOL ananas_equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2);
 ANEValue *ane_eval_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr);

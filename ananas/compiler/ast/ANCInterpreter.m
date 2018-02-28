@@ -12,16 +12,22 @@
 static NSMutableDictionary<NSString *, ANEStack *> *_stacksDic;
 static NSLock *_lock;
 
-
+static ANEScopeChain *commonScope_;
 
 @implementation ANCInterpreter
 
 - (instancetype)init{
 	if (self = [super init]) {
+		static dispatch_once_t onceToken;
+		dispatch_once(&onceToken, ^{
+			commonScope_ = [[ANEScopeChain alloc] init];
+		});
 		_stacksDic = [NSMutableDictionary dictionary];
 		_lock = [[NSLock alloc] init];
 		_currentLineNumber = 1;
-		_topScope = [[ANEScopeChain alloc] init];
+		
+		_topScope = [ANEScopeChain scopeChainWithNext:commonScope_];
+		_commonScope = commonScope_;
 	}
 	return self;
 }

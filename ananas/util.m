@@ -284,7 +284,6 @@ break;\
 				size_t size = ananas_struct_size_with_encoding(subTypeEncoding.UTF8String);
 				NSString *subStructName = ananas_struct_name_with_encoding(subTypeEncoding.UTF8String);
 				ANCStructDeclare *subStructDeclare = [[ANANASStructDeclareTable shareInstance] getStructDeclareWithName:subStructName];
-				//todo
 				id subStruct = dic[key];
 				if ([subStruct isKindOfClass:[NSDictionary class]]) {
 					ananas_struct_data_with_dic(structData + postion, dic[key],subStructDeclare);

@@ -175,18 +175,23 @@ static void eval_assign_expression(ANCInterpreter *inter, ANEScopeChain *scope, 
 				switch (assignKind) {
 					case ANC_ADD_ASSIGN:{
 						binExpr.expressionKind = ANC_ADD_EXPRESSION;
+						break;
 					}
 					case ANC_SUB_ASSIGN:{
 						binExpr.expressionKind = ANC_SUB_EXPRESSION;
+						break;
 					}
 					case ANC_MUL_ASSIGN:{
-						binExpr.expressionKind = ANC_MUL_ASSIGN;
+						binExpr.expressionKind = ANC_MUL_EXPRESSION;
+						break;
 					}
 					case ANC_DIV_ASSIGN:{
-						binExpr.expressionKind = ANC_DIV_ASSIGN;
+						binExpr.expressionKind = ANC_DIV_EXPRESSION;
+						break;
 					}
 					case ANC_MOD_ASSIGN:{
-						binExpr.expressionKind = ANC_MOD_ASSIGN;
+						binExpr.expressionKind = ANC_MOD_EXPRESSION;
+						break;
 					}
 						
 					default:
@@ -223,18 +228,23 @@ static void eval_assign_expression(ANCInterpreter *inter, ANEScopeChain *scope, 
 				switch (assignKind) {
 					case ANC_ADD_ASSIGN:{
 						binExpr.expressionKind = ANC_ADD_EXPRESSION;
+						break;
 					}
 					case ANC_SUB_ASSIGN:{
 						binExpr.expressionKind = ANC_SUB_EXPRESSION;
+						break;
 					}
 					case ANC_MUL_ASSIGN:{
-						binExpr.expressionKind = ANC_MUL_ASSIGN;
+						binExpr.expressionKind = ANC_MUL_EXPRESSION;
+						break;
 					}
 					case ANC_DIV_ASSIGN:{
-						binExpr.expressionKind = ANC_DIV_ASSIGN;
+						binExpr.expressionKind = ANC_DIV_EXPRESSION;
+						break;
 					}
 					case ANC_MOD_ASSIGN:{
-						binExpr.expressionKind = ANC_MOD_ASSIGN;
+						binExpr.expressionKind = ANC_MOD_EXPRESSION;
+						break;
 					}
 						
 					default:
@@ -994,7 +1004,7 @@ break;\
 		
 			case '{':{
 				size_t stackSize = 1;
-				size_t end = index + 1;
+				size_t end = i + 1;
 				for (char c = encoding[end]; c ; end++, c = encoding[end]) {
 					if (c == '{') {
 						stackSize++;
@@ -1006,7 +1016,7 @@ break;\
 					}
 				}
 				
-				NSString *subTypeEncoding = [types substringWithRange:NSMakeRange(index, end - index + 1)];
+				NSString *subTypeEncoding = [types substringWithRange:NSMakeRange(i, end - i + 1)];
 				size_t size = ananas_struct_size_with_encoding(subTypeEncoding.UTF8String);
 				if(j == index){
 					void *value = structData + postion;
@@ -1020,7 +1030,7 @@ break;\
 				
 				
 				postion += size;
-				i += end - index;
+				i = end;
 				break;
 			}
 			default:
@@ -1142,7 +1152,7 @@ static void eval_function_call_expression(ANCInterpreter *inter, ANEScopeChain *
 				case ANC_SUPER_EXPRESSION:{
 					id _self = [[scope getValueWithIdentifier:@"self"] objectValue];
 					Class superClass = class_getSuperclass([_self class]);
-					struct objc_super *superPtr = &(struct objc_super){superClass};
+					struct objc_super *superPtr = &(struct objc_super){_self,superClass};
 					NSMethodSignature *sig = [_self methodSignatureForSelector:sel];
 					NSUInteger argCount = sig.numberOfArguments;
 					
@@ -1250,8 +1260,12 @@ break;\
 					ffi_cif cif;
 					ffi_prep_cif(&cif, FFI_DEFAULT_ABI, (unsigned int)argCount, rtype, argTypes);
 					ffi_call(&cif, objc_msgSendSuper, rvalue, args);
-					
-					ANEValue *retValue =  [[ANEValue alloc] initWithCValuePointer:rvalue typeEncoding:returnTypeEncoding];
+					ANEValue *retValue;
+					if (*returnTypeEncoding != 'v') {
+						 retValue = [[ANEValue alloc] initWithCValuePointer:rvalue typeEncoding:returnTypeEncoding];
+					}else{
+						retValue = [ANEValue voidValueInstance];
+					}
 					[inter.stack push:retValue];
 					break;
 				}
@@ -1289,7 +1303,7 @@ break;\
 				const char *typeEncoding = [sig getArgumentTypeAtIndex:i];
 				void *ptr = malloc(ananas_size_with_encoding(typeEncoding));
 				eval_expression(inter, scope, expr.args[i -1]);
-				ANEValue *argValue = [inter.stack peekStack:0];
+				ANEValue *argValue = [inter.stack pop];
 				[argValue assign2CValuePointer:ptr typeEncoding:typeEncoding];
 				[invocation setArgument:ptr atIndex:i];
 			}
