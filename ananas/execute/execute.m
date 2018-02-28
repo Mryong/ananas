@@ -27,11 +27,11 @@ static const void *propKey(NSString *propName) {
 }
 
 
-static ANEValue *default_value_with_type_specifier(ANCInterpreter *inter, ANCTypeSpecifier *typeSpecifier){
+static ANEValue *default_value_with_type_specifier(MANInterpreter *inter, MANTypeSpecifier *typeSpecifier){
 	ANEValue *value = [[ANEValue alloc] init];
 	value.type = typeSpecifier;
-	if (typeSpecifier.typeKind == ANC_TYPE_STRUCT) {
-		 size_t size = ananas_struct_size_with_encoding([typeSpecifier typeEncoding]);
+	if (typeSpecifier.typeKind == MAN_TYPE_STRUCT) {
+		 size_t size = mango_struct_size_with_encoding([typeSpecifier typeEncoding]);
 		value.pointerValue = malloc(size);
 	}
 	return value;
@@ -39,7 +39,7 @@ static ANEValue *default_value_with_type_specifier(ANCInterpreter *inter, ANCTyp
 
 
 
-static void execute_declaration(ANCInterpreter *inter, ANEScopeChain *scope, ANCDeclaration *declaration){
+static void execute_declaration(MANInterpreter *inter, MANScopeChain *scope, MANDeclaration *declaration){
 	ANEValue *value;
 	if (declaration.initializer) {
 		value = ane_eval_expression(inter, scope, declaration.initializer);
@@ -53,68 +53,68 @@ static void execute_declaration(ANCInterpreter *inter, ANEScopeChain *scope, ANC
 
 
 
-static ANEStatementResult *execute_else_if_list(ANCInterpreter *inter, ANEScopeChain *scope,NSArray<ANCElseIf *> *elseIfList,BOOL *executed){
-	ANEStatementResult *res;
+static MANStatementResult *execute_else_if_list(MANInterpreter *inter, MANScopeChain *scope,NSArray<MANElseIf *> *elseIfList,BOOL *executed){
+	MANStatementResult *res;
 	*executed = NO;
-	for (ANCElseIf *elseIf in elseIfList) {
+	for (MANElseIf *elseIf in elseIfList) {
 		ANEValue *conValue = ane_eval_expression(inter, scope, elseIf.condition);
 		if ([conValue isSubtantial]) {
-			ANEScopeChain *conScope = [ANEScopeChain scopeChainWithNext:scope];
+			MANScopeChain *conScope = [MANScopeChain scopeChainWithNext:scope];
 			res = ane_execute_statement_list(inter, conScope, elseIf.thenBlock.statementList);
 			*executed = YES;
 			break;
 		}
 	}
-	return res ?: [ANEStatementResult normalResult];
+	return res ?: [MANStatementResult normalResult];
 }
 
-static ANEStatementResult *execute_if_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCIfStatement *statement){
-	ANEStatementResult *res;
+static MANStatementResult *execute_if_statement(MANInterpreter *inter, MANScopeChain *scope, MANIfStatement *statement){
+	MANStatementResult *res;
 	ANEValue *conValue = ane_eval_expression(inter, scope, statement.condition);
 	if ([conValue isSubtantial]) {
-		ANEScopeChain *conScope = [ANEScopeChain scopeChainWithNext:scope];
+		MANScopeChain *conScope = [MANScopeChain scopeChainWithNext:scope];
 		res = ane_execute_statement_list(inter, conScope, statement.thenBlock.statementList);
 	}else{
 		BOOL executed;
 		res = execute_else_if_list(inter, scope, statement.elseIfList, &executed);
 		if (!executed && statement.elseBlocl) {
-			ANEScopeChain *elseScope = [ANEScopeChain scopeChainWithNext:scope];
+			MANScopeChain *elseScope = [MANScopeChain scopeChainWithNext:scope];
 			res = ane_execute_statement_list(inter, elseScope, statement.elseBlocl.statementList);
 		}
 	}
-	return res ?: [ANEStatementResult normalResult];
+	return res ?: [MANStatementResult normalResult];
 	
 }
 
 
-static ANEStatementResult *execute_switch_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCSwitchStatement *statement){
-	ANEStatementResult *res;
+static MANStatementResult *execute_switch_statement(MANInterpreter *inter, MANScopeChain *scope, MANSwitchStatement *statement){
+	MANStatementResult *res;
 	ANEValue *value = ane_eval_expression(inter, scope, statement.expr);
 	BOOL hasMatch = NO;
-	for (ANCCase *case_ in statement.caseList) {
+	for (MANCase *case_ in statement.caseList) {
 		if (!hasMatch) {
 			ANEValue *caseValue = ane_eval_expression(inter, scope, case_.expr);
-			BOOL equal = ananas_equal_value(case_.expr.lineNumber, value, caseValue);
+			BOOL equal = mango_equal_value(case_.expr.lineNumber, value, caseValue);
 			if (equal) {
 				hasMatch = YES;
 			}else{
 				continue;
 			}
 		}
-		ANEScopeChain *caseScope = [ANEScopeChain scopeChainWithNext:scope];
+		MANScopeChain *caseScope = [MANScopeChain scopeChainWithNext:scope];
 		res = ane_execute_statement_list(inter, caseScope, case_.block.statementList);
-		if (res.type != ANEStatementResultTypeNormal) {
+		if (res.type != MANStatementResultTypeNormal) {
 			break;
 		}
 	}
-	res = res ?: [ANEStatementResult normalResult];
-	if (res.type == ANEStatementResultTypeNormal) {
-		ANEScopeChain *defaultCaseScope = [ANEScopeChain scopeChainWithNext:scope];
+	res = res ?: [MANStatementResult normalResult];
+	if (res.type == MANStatementResultTypeNormal) {
+		MANScopeChain *defaultCaseScope = [MANScopeChain scopeChainWithNext:scope];
 		res = ane_execute_statement_list(inter, defaultCaseScope, statement.defaultBlock.statementList);
 	}
 	
-	if (res.type == ANEStatementResultTypeBreak) {
-		res.type = ANEStatementResultTypeNormal;
+	if (res.type == MANStatementResultTypeBreak) {
+		res.type = MANStatementResultTypeNormal;
 	}
 	
 	return res;
@@ -122,9 +122,9 @@ static ANEStatementResult *execute_switch_statement(ANCInterpreter *inter, ANESc
 
 
 
-static ANEStatementResult *execute_for_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCForStatement *statement){
-	ANEStatementResult *res;
-	ANEScopeChain *forScope = [ANEScopeChain scopeChainWithNext:scope];
+static MANStatementResult *execute_for_statement(MANInterpreter *inter, MANScopeChain *scope, MANForStatement *statement){
+	MANStatementResult *res;
+	MANScopeChain *forScope = [MANScopeChain scopeChainWithNext:scope];
 	if (statement.initializerExpr) {
 		ane_eval_expression(inter, forScope, statement.initializerExpr);
 	}else if (statement.declaration){
@@ -137,13 +137,13 @@ static ANEStatementResult *execute_for_statement(ANCInterpreter *inter, ANEScope
 			break;
 		}
 		res = ane_execute_statement_list(inter, forScope, statement.block.statementList);
-		if (res.type == ANEStatementResultTypeReturn) {
+		if (res.type == MANStatementResultTypeReturn) {
 			break;
-		}else if (res.type == ANEStatementResultTypeBreak) {
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeBreak) {
+			res.type = MANStatementResultTypeNormal;
 			break;
-		}else if (res.type == ANEStatementResultTypeContinue){
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeContinue){
+			res.type = MANStatementResultTypeNormal;
 		}
 		if (statement.post) {
 			ane_eval_expression(inter, forScope, statement.post);
@@ -151,19 +151,19 @@ static ANEStatementResult *execute_for_statement(ANCInterpreter *inter, ANEScope
 		
 	}
 	
-	return res ?: [ANEStatementResult normalResult];
+	return res ?: [MANStatementResult normalResult];
 	
 }
 
 
-static ANEStatementResult *execute_for_each_statement(ANCInterpreter *inter, ANEScopeChain *scope, ANCForEachStatement *statement){
-	ANEStatementResult *res;
-	ANEScopeChain *forScope = [ANEScopeChain scopeChainWithNext:scope];
+static MANStatementResult *execute_for_each_statement(MANInterpreter *inter, MANScopeChain *scope, MANForEachStatement *statement){
+	MANStatementResult *res;
+	MANScopeChain *forScope = [MANScopeChain scopeChainWithNext:scope];
 
 	if (statement.declaration) {
 		execute_declaration(inter, forScope, statement.declaration);
-		ANCIdentifierExpression *identifierExpr = [[ANCIdentifierExpression alloc] init];
-		identifierExpr.expressionKind = ANC_IDENTIFIER_EXPRESSION;
+		MANIdentifierExpression *identifierExpr = [[MANIdentifierExpression alloc] init];
+		identifierExpr.expressionKind = MAN_IDENTIFIER_EXPRESSION;
 		identifierExpr.identifier = statement.declaration.name;
 		statement.identifierExpr = identifierExpr;
 	}
@@ -171,76 +171,76 @@ static ANEStatementResult *execute_for_each_statement(ANCInterpreter *inter, ANE
 	
 	
 	ANEValue *arrValue = ane_eval_expression(inter, scope, statement.arrayExpr);
-	if (arrValue.type.typeKind != ANC_TYPE_OBJECT) {
+	if (arrValue.type.typeKind != MAN_TYPE_OBJECT) {
 		NSCAssert(0, @"");
 	}
 	
 	for (id var in arrValue.objectValue) {
 		ANEValue *operValue = [[ANEValue alloc] init];
-		operValue.type = anc_create_type_specifier(ANC_TYPE_OBJECT);
+		operValue.type = anc_create_type_specifier(MAN_TYPE_OBJECT);
 		operValue.objectValue = var;
-		ananas_assign_value_to_identifer_expr(inter, forScope, statement.identifierExpr.identifier, operValue);
+		mango_assign_value_to_identifer_expr(inter, forScope, statement.identifierExpr.identifier, operValue);
 		
 		res = ane_execute_statement_list(inter, forScope, statement.block.statementList);
-		if (res.type == ANEStatementResultTypeReturn) {
+		if (res.type == MANStatementResultTypeReturn) {
 			break;
-		}else if (res.type == ANEStatementResultTypeBreak) {
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeBreak) {
+			res.type = MANStatementResultTypeNormal;
 			break;
-		}else if (res.type == ANEStatementResultTypeContinue){
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeContinue){
+			res.type = MANStatementResultTypeNormal;
 		}
 	}
-	return res ?: [ANEStatementResult normalResult];
+	return res ?: [MANStatementResult normalResult];
 	
 }
 
-static ANEStatementResult *execute_while_statement(ANCInterpreter *inter, ANEScopeChain *scope,  ANCWhileStatement *statement){
-	ANEStatementResult *res;
-	ANEScopeChain *whileScope = [ANEScopeChain scopeChainWithNext:scope];
+static MANStatementResult *execute_while_statement(MANInterpreter *inter, MANScopeChain *scope,  MANWhileStatement *statement){
+	MANStatementResult *res;
+	MANScopeChain *whileScope = [MANScopeChain scopeChainWithNext:scope];
 	for (;;) {
 		ANEValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
 		res = ane_execute_statement_list(inter, whileScope, statement.block.statementList);
-		if (res.type == ANEStatementResultTypeReturn) {
+		if (res.type == MANStatementResultTypeReturn) {
 			break;
-		}else if (res.type == ANEStatementResultTypeBreak) {
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeBreak) {
+			res.type = MANStatementResultTypeNormal;
 			break;
-		}else if (res.type == ANEStatementResultTypeContinue){
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeContinue){
+			res.type = MANStatementResultTypeNormal;
 		}
 	}
-	return res ?: [ANEStatementResult normalResult];
+	return res ?: [MANStatementResult normalResult];
 }
 
-static ANEStatementResult *execute_do_while_statement(ANCInterpreter *inter, ANEScopeChain *scope,  ANCDoWhileStatement *statement){
-	ANEStatementResult *res;
-	ANEScopeChain *whileScope = [ANEScopeChain scopeChainWithNext:scope];
+static MANStatementResult *execute_do_while_statement(MANInterpreter *inter, MANScopeChain *scope,  MANDoWhileStatement *statement){
+	MANStatementResult *res;
+	MANScopeChain *whileScope = [MANScopeChain scopeChainWithNext:scope];
 	for (;;) {
 		res = ane_execute_statement_list(inter, whileScope, statement.block.statementList);
-		if (res.type == ANEStatementResultTypeReturn) {
+		if (res.type == MANStatementResultTypeReturn) {
 			break;
-		}else if (res.type == ANEStatementResultTypeBreak) {
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeBreak) {
+			res.type = MANStatementResultTypeNormal;
 			break;
-		}else if (res.type == ANEStatementResultTypeContinue){
-			res.type = ANEStatementResultTypeNormal;
+		}else if (res.type == MANStatementResultTypeContinue){
+			res.type = MANStatementResultTypeNormal;
 		}
 		ANEValue *conValue = ane_eval_expression(inter, whileScope, statement.condition);
 		if (![conValue isSubtantial]) {
 			break;
 		}
 	}
-	return res ?: [ANEStatementResult normalResult];
+	return res ?: [MANStatementResult normalResult];
 }
 
 
 
-static ANEStatementResult *execute_return_statement(ANCInterpreter *inter, ANEScopeChain *scope,  ANCReturnStatement *statement){
-	ANEStatementResult *res = [ANEStatementResult returnResult];
+static MANStatementResult *execute_return_statement(MANInterpreter *inter, MANScopeChain *scope,  MANReturnStatement *statement){
+	MANStatementResult *res = [MANStatementResult returnResult];
 	if (statement.retValExpr) {
 		res.reutrnValue = ane_eval_expression(inter, scope, statement.retValExpr);
 	}else{
@@ -250,62 +250,62 @@ static ANEStatementResult *execute_return_statement(ANCInterpreter *inter, ANESc
 }
 
 
-static ANEStatementResult *execute_break_statement(){
-	return [ANEStatementResult breakResult];
+static MANStatementResult *execute_break_statement(){
+	return [MANStatementResult breakResult];
 }
 
 
-static ANEStatementResult *execute_continue_statement(){
-	return [ANEStatementResult continueResult];
+static MANStatementResult *execute_continue_statement(){
+	return [MANStatementResult continueResult];
 }
 
 
 
-static  ANEStatementResult *execute_statement(ANCInterpreter *inter, ANEScopeChain *scope, __kindof ANCStatement *statement){
-	ANEStatementResult *res;
+static  MANStatementResult *execute_statement(MANInterpreter *inter, MANScopeChain *scope, __kindof MANStatement *statement){
+	MANStatementResult *res;
 	switch (statement.kind) {
-		case ANCStatementKindExpression:
-			ane_eval_expression(inter, scope, [(ANCExpressionStatement *)statement expr]);
-			res = [ANEStatementResult normalResult];
+		case MANStatementKindExpression:
+			ane_eval_expression(inter, scope, [(MANExpressionStatement *)statement expr]);
+			res = [MANStatementResult normalResult];
 			break;
-		case ANCStatementKindDeclaration:{
-			execute_declaration(inter, scope, [(ANCDeclarationStatement *)statement declaration]);
-			res = [ANEStatementResult normalResult];
+		case MANStatementKindDeclaration:{
+			execute_declaration(inter, scope, [(MANDeclarationStatement *)statement declaration]);
+			res = [MANStatementResult normalResult];
 			break;
 		}
-		case ANCStatementKindIf:{
+		case MANStatementKindIf:{
 			res = execute_if_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindSwitch:{
+		case MANStatementKindSwitch:{
 			res = execute_switch_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindFor:{
+		case MANStatementKindFor:{
 			res = execute_for_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindForEach:{
+		case MANStatementKindForEach:{
 			res = execute_for_each_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindWhile:{
+		case MANStatementKindWhile:{
 			res = execute_while_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindDoWhile:{
+		case MANStatementKindDoWhile:{
 			res = execute_do_while_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindReturn:{
+		case MANStatementKindReturn:{
 			res = execute_return_statement(inter, scope, statement);
 			break;
 		}
-		case ANCStatementKindBreak:{
+		case MANStatementKindBreak:{
 			res = execute_break_statement();
 			break;
 		}
-		case ANCStatementKindContinue:{
+		case MANStatementKindContinue:{
 			res = execute_continue_statement();
 			break;
 		}
@@ -317,36 +317,36 @@ static  ANEStatementResult *execute_statement(ANCInterpreter *inter, ANEScopeCha
 }
 
 
-ANEStatementResult *ane_execute_statement_list(ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList){
-	ANEStatementResult *result;
+MANStatementResult *ane_execute_statement_list(MANInterpreter *inter, MANScopeChain *scope, NSArray<MANStatement *> *statementList){
+	MANStatementResult *result;
 	if (statementList.count) {
-		for (ANCStatement *statement in statementList) {
+		for (MANStatement *statement in statementList) {
 			result = execute_statement(inter, scope, statement);
-			if (result.type != ANEStatementResultTypeNormal) {
+			if (result.type != MANStatementResultTypeNormal) {
 				break;
 			}
 		}
 	}else{
-		result = [ANEStatementResult normalResult];
+		result = [MANStatementResult normalResult];
 	}
 	return result;
 }
 
 
-ANEValue * ananas_call_ananas_function(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args){
-	NSArray<ANCParameter *> *params = func.params;
+ANEValue * mango_call_mango_function(MANInterpreter *inter, MANScopeChain *scope, MANFunctionDefinition *func, NSArray<ANEValue *> *args){
+	NSArray<MANParameter *> *params = func.params;
 	if (params.count != args.count) {
 		NSCAssert(0, @"");
 	}
-	ANEScopeChain *funScope = [ANEScopeChain scopeChainWithNext:scope];
+	MANScopeChain *funScope = [MANScopeChain scopeChainWithNext:scope];
 	NSUInteger i = 0;
-	for (ANCParameter *param in params) {
+	for (MANParameter *param in params) {
 		funScope.vars[param.name] = args[i];
 		i++;
 	}
 	
-	ANEStatementResult *res = ane_execute_statement_list(inter, funScope, func.block.statementList);
-	if (res.type == ANEStatementResultTypeReturn) {
+	MANStatementResult *res = ane_execute_statement_list(inter, funScope, func.block.statementList);
+	if (res.type == MANStatementResultTypeReturn) {
 		return res.reutrnValue;
 	}else{
 		return [ANEValue voidValueInstance];
@@ -354,9 +354,9 @@ ANEValue * ananas_call_ananas_function(ANCInterpreter *inter, ANEScopeChain *sco
 }
 
 
-static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
+static void define_class(MANInterpreter *interpreter,MANClassDefinition *classDefinition){
 	if (classDefinition.annotationIfExprResult == AnnotationIfExprResultNoComputed) {
-		ANCExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
+		MANExpression *annotationIfConditionExpr = classDefinition.annotationIfConditionExpr;
 		if (annotationIfConditionExpr) {
 			ANEValue *value = ane_eval_expression(interpreter, interpreter.topScope, annotationIfConditionExpr);
 			classDefinition.annotationIfExprResult = value.isSubtantial ? AnnotationIfExprResultTrue : AnnotationIfExprResultFalse;
@@ -391,7 +391,7 @@ static void define_class(ANCInterpreter *interpreter,ANCClassDefinition *classDe
 		Class superClass = class_getSuperclass(clazz);
 		char const *superClassName = class_getName(superClass);
 		if (strcmp(classDefinition.superNmae.UTF8String, superClassName)) {
-			NSCAssert(0, @"类 %@ 在ananas中与OC中父类名称不一致,ananas:%@ OC:%s ",classDefinition.name,classDefinition.superNmae, superClassName);
+			NSCAssert(0, @"类 %@ 在Mango中与OC中父类名称不一致,Mango:%@ OC:%s ",classDefinition.name,classDefinition.superNmae, superClassName);
 			return;
 		}
 	}
@@ -410,7 +410,7 @@ void setterInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	
 	
 }
-static void replace_getter_method(ANCInterpreter *inter ,Class clazz, ANCPropertyDefinition *prop){
+static void replace_getter_method(MANInterpreter *inter ,Class clazz, MANPropertyDefinition *prop){
 	SEL getterSEL = NSSelectorFromString(prop.name);
 	const char *prtTypeEncoding  = [prop.typeSpecifier typeEncoding];
 	ffi_type *returnType = &ffi_type_void;
@@ -425,12 +425,12 @@ static void replace_getter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 	void *imp = NULL;
 	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &imp);
 	ffi_prep_closure_loc(closure, &cif, getterInter, (__bridge_retained void *)prop, getterInter);
-	class_replaceMethod(clazz, getterSEL, (IMP)imp, ananas_str_append(prtTypeEncoding, "@:"));
+	class_replaceMethod(clazz, getterSEL, (IMP)imp, mango_str_append(prtTypeEncoding, "@:"));
 
 	
 }
 
-static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropertyDefinition *prop){
+static void replace_setter_method(MANInterpreter *inter ,Class clazz, MANPropertyDefinition *prop){
 	NSString *str1 = [[prop.name substringWithRange:NSMakeRange(0, 1)] uppercaseString];
 	NSString *str2 = prop.name.length > 1 ? [prop.name substringFromIndex:1] : nil;
 	SEL setterSEL = NSSelectorFromString([NSString stringWithFormat:@"set%@%@:",str1,str2]);
@@ -440,7 +440,7 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 	ffi_type **argTypes = malloc(sizeof(ffi_type *) * argCount);
 	argTypes[0] = &ffi_type_pointer;
 	argTypes[1] = &ffi_type_pointer;
-	argTypes[2] = ananas_ffi_type_with_type_encoding([prop.typeSpecifier typeEncoding]);
+	argTypes[2] = mango_ffi_type_with_type_encoding([prop.typeSpecifier typeEncoding]);
 	if (argTypes[2] == NULL) {
 		NSCAssert(0, @"");
 	}
@@ -451,7 +451,7 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 	void *imp = NULL;
 	ffi_closure *closure = ffi_closure_alloc(sizeof(ffi_closure), &imp);
 	ffi_prep_closure_loc(closure, &cif, getterInter, (__bridge_retained void *)prop, setterInter);
-	class_replaceMethod(clazz, setterSEL, (IMP)imp, ananas_str_append("v@:", prtTypeEncoding));
+	class_replaceMethod(clazz, setterSEL, (IMP)imp, mango_str_append("v@:", prtTypeEncoding));
 	
 	
 	
@@ -461,7 +461,7 @@ static void replace_setter_method(ANCInterpreter *inter ,Class clazz, ANCPropert
 
 
 
-static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefinition *prop){
+static void replace_prop(MANInterpreter *inter ,Class clazz, MANPropertyDefinition *prop){
 	if (prop.annotationIfConditionExpr) {
 		ANEValue *conValue = ane_eval_expression(inter, inter.topScope, prop.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
@@ -471,14 +471,14 @@ static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefiniti
 	
 	objc_property_attribute_t type = {"T", [prop.typeSpecifier typeEncoding]};
 	objc_property_attribute_t memAttr = {"",""};
-	switch (prop.modifier & ANCPropertyModifierMemMask) {
-		case ANCPropertyModifierMemStrong:
+	switch (prop.modifier & MANPropertyModifierMemMask) {
+		case MANPropertyModifierMemStrong:
 			memAttr.name = "&";
 			break;
-		case ANCPropertyModifierMemWeak:
+		case MANPropertyModifierMemWeak:
 			memAttr.name = "W";
 			break;
-		case ANCPropertyModifierMemCopy:
+		case MANPropertyModifierMemCopy:
 			memAttr.name = "C";
 			break;
 		default:
@@ -486,10 +486,10 @@ static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefiniti
 	}
 	
 	objc_property_attribute_t atomicAttr = {"",""};
-	switch (prop.modifier & ANCPropertyModifierAtomicMask) {
-		case ANCPropertyModifierAtomic:
+	switch (prop.modifier & MANPropertyModifierAtomicMask) {
+		case MANPropertyModifierAtomic:
 			break;
-		case ANCPropertyModifierNonatomic:
+		case MANPropertyModifierNonatomic:
 			atomicAttr.name = "N";
 			break;
 		default:
@@ -509,15 +509,15 @@ static void replace_prop(ANCInterpreter *inter ,Class clazz, ANCPropertyDefiniti
 
 
 
-static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sel, NSInvocation *invocation)
+static void mango_forward_invocation(__unsafe_unretained id assignSlf, SEL sel, NSInvocation *invocation)
 {
 	
 	BOOL classMethod = object_isClass(assignSlf);
-	ANANASMethodMapTableItem *map = [[ANANASMethodMapTable shareInstance] getMethodMapTableItemWith:classMethod ? assignSlf : [assignSlf class] classMethod:classMethod sel:invocation.selector];
-	ANCMethodDefinition *method = map.method;
-	ANCInterpreter *inter = map.inter;
+	MANMethodMapTableItem *map = [[ANANASMethodMapTable shareInstance] getMethodMapTableItemWith:classMethod ? assignSlf : [assignSlf class] classMethod:classMethod sel:invocation.selector];
+	MANMethodDefinition *method = map.method;
+	MANInterpreter *inter = map.inter;
 	
-	ANEScopeChain *classScope = [ANEScopeChain scopeChainWithNext:inter.topScope];
+	MANScopeChain *classScope = [MANScopeChain scopeChainWithNext:inter.topScope];
 	classScope.instance = assignSlf;
 	
 	NSMutableArray<ANEValue *> *args = [NSMutableArray array];
@@ -527,15 +527,15 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sel,
 	NSUInteger numberOfArguments = [methodSignature numberOfArguments];
 	for (NSUInteger i = 2; i < numberOfArguments; i++) {
 		const char *typeEncoding = [methodSignature getArgumentTypeAtIndex:i];
-		size_t size = ananas_size_with_encoding(typeEncoding);
+		size_t size = mango_size_with_encoding(typeEncoding);
 		void *ptr = malloc(size);
 		[invocation getArgument:ptr atIndex:i];
 		ANEValue *argValue = [[ANEValue alloc] initWithCValuePointer:ptr typeEncoding:typeEncoding];
 		[args addObject:argValue];
 	}
 	
-	ANEValue *retValue = ananas_call_ananas_function(inter, classScope, method.functionDefinition, args);
-	if (retValue.type.typeKind != ANC_TYPE_VOID) {
+	ANEValue *retValue = mango_call_mango_function(inter, classScope, method.functionDefinition, args);
+	if (retValue.type.typeKind != MAN_TYPE_VOID) {
 		size_t retLen = [methodSignature methodReturnLength];
 		void *retPtr = malloc(retLen);
 		const char *retTypeEncoding = [methodSignature methodReturnType];
@@ -545,17 +545,17 @@ static void ananas_forward_invocation(__unsafe_unretained id assignSlf, SEL sel,
 	
 }
 
-static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDefinition *method){
+static void replace_method(MANInterpreter *interpreter,Class clazz, MANMethodDefinition *method){
 	if (method.annotationIfConditionExpr) {
 		ANEValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, method.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
 			return;
 		}
 	}
-	ANCFunctionDefinition *func = method.functionDefinition;
+	MANFunctionDefinition *func = method.functionDefinition;
 	SEL sel = NSSelectorFromString(func.name);
 	
-	ANANASMethodMapTableItem *item = [[ANANASMethodMapTableItem alloc] initWithClass:clazz inter:interpreter method:method];
+	MANMethodMapTableItem *item = [[MANMethodMapTableItem alloc] initWithClass:clazz inter:interpreter method:method];
 	[[ANANASMethodMapTable shareInstance] addMethodMapTableItem:item];
 	
 	
@@ -573,36 +573,36 @@ static void replace_method(ANCInterpreter *interpreter,Class clazz, ANCMethodDef
 	}else{
 		typeEncoding =[func.returnTypeSpecifier typeEncoding];
 		
-		for (ANCParameter *param in func.params) {
+		for (MANParameter *param in func.params) {
 			const char *paramTypeEncoding = [param.type typeEncoding];
-			typeEncoding = ananas_str_append(typeEncoding, paramTypeEncoding);
+			typeEncoding = mango_str_append(typeEncoding, paramTypeEncoding);
 		}
 	}
 	Class c2 = method.classMethod ? objc_getMetaClass(class_getName(clazz)) : clazz;
-	class_replaceMethod(c2, @selector(forwardInvocation:), (IMP)ananas_forward_invocation,"v@:@");
+	class_replaceMethod(c2, @selector(forwardInvocation:), (IMP)mango_forward_invocation,"v@:@");
 	class_replaceMethod(c2, sel, _objc_msgForward, typeEncoding);
 }
 
 
-static void fix_class(ANCInterpreter *interpreter,ANCClassDefinition *classDefinition){
+static void fix_class(MANInterpreter *interpreter,MANClassDefinition *classDefinition){
 	Class clazz = NSClassFromString(classDefinition.name);
-	for (ANCPropertyDefinition *prop in classDefinition.properties) {
+	for (MANPropertyDefinition *prop in classDefinition.properties) {
 		
 		replace_prop(interpreter,clazz, prop);
 	}
 	
-	for (ANCMethodDefinition *classMethod in classDefinition.classMethods) {
+	for (MANMethodDefinition *classMethod in classDefinition.classMethods) {
 		replace_method(interpreter, clazz, classMethod);
 	}
 	
-	for (ANCMethodDefinition *instanceMethod in classDefinition.instanceMethods) {
+	for (MANMethodDefinition *instanceMethod in classDefinition.instanceMethods) {
 		replace_method(interpreter, clazz, instanceMethod);
 	}
 	
 }
 
 
-void add_struct_declare(ANCInterpreter *interpreter, ANCStructDeclare *structDeclaer){
+void add_struct_declare(MANInterpreter *interpreter, MANStructDeclare *structDeclaer){
 	if (structDeclaer.annotationIfConditionExpr) {
 		ANEValue *conValue = ane_eval_expression(interpreter, interpreter.topScope, structDeclaer.annotationIfConditionExpr);
 		if (![conValue isSubtantial]) {
@@ -616,14 +616,14 @@ void add_struct_declare(ANCInterpreter *interpreter, ANCStructDeclare *structDec
 
 
 
-void ane_interpret(ANCInterpreter *interpreter){
-	ananas_add_built_in(interpreter);
+void ane_interpret(MANInterpreter *interpreter){
+	mango_add_built_in(interpreter);
 	for (__kindof NSObject *top in interpreter.topList) {
-		if ([top isKindOfClass:[ANCStatement class]]) {
+		if ([top isKindOfClass:[MANStatement class]]) {
 			execute_statement(interpreter, interpreter.topScope, top);
-		}else if ([top isKindOfClass:[ANCStructDeclare class]]){
+		}else if ([top isKindOfClass:[MANStructDeclare class]]){
 			add_struct_declare(interpreter,top);
-		}else if ([top isKindOfClass:[ANCClassDefinition class]]){
+		}else if ([top isKindOfClass:[MANClassDefinition class]]){
 			define_class(interpreter, top);
 			fix_class(interpreter,top);
 		}

@@ -7,14 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-@class ANCTypeSpecifier;
+@class MANTypeSpecifier;
 
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ANEValue : NSObject
 
-@property (strong, nonatomic) ANCTypeSpecifier *type;
+@property (strong, nonatomic) MANTypeSpecifier *type;
 @property (assign, nonatomic) unsigned long long uintValue;
 @property (assign, nonatomic) long long integerValue;
 @property (assign, nonatomic) double doubleValue;

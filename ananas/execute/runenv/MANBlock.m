@@ -1,12 +1,12 @@
 //
-//  ANEBlock.m
+//  MANBlock.m
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/12/26.
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "ANEBlock.h"
+#import "MANBlock.h"
 #import "ffi.h"
 #import "util.h"
 #import "execute.h"
@@ -23,7 +23,7 @@ enum {
 	BLOCK_HAS_SIGNATURE  =    (1 << 30)
 };
 
-struct ANANASSimulateBlock {
+struct MANSimulateBlock {
 	void *isa;
 	int flags;
 	int reserved;
@@ -53,13 +53,13 @@ struct ANANASSimulateBlockDescriptor {
 	};
 };
 
-void copy_helper(struct ANANASSimulateBlock *dst, struct ANANASSimulateBlock *src)
+void copy_helper(struct MANSimulateBlock *dst, struct MANSimulateBlock *src)
 {
 	// do not copy anything is this funcion! just retain if need.
 		CFRetain(dst->wrapper);
 }
 
-void dispose_helper(struct ANANASSimulateBlock *src)
+void dispose_helper(struct MANSimulateBlock *src)
 {
 		CFRelease(src->wrapper);
 }
@@ -67,10 +67,10 @@ void dispose_helper(struct ANANASSimulateBlock *src)
 
 
 static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
-	ANEBlock *anananBlock = (__bridge ANEBlock *)userdata;
-	ANCInterpreter *inter = anananBlock.inter;
-	ANEScopeChain *scope = anananBlock.scope;
-	ANCFunctionDefinition *func = anananBlock.func;
+	MANBlock *anananBlock = (__bridge MANBlock *)userdata;
+	MANInterpreter *inter = anananBlock.inter;
+	MANScopeChain *scope = anananBlock.scope;
+	MANFunctionDefinition *func = anananBlock.func;
 	NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:anananBlock.typeEncoding];
 	NSUInteger numberOfArguments = [sig numberOfArguments];
 	NSMutableArray *argValues = [NSMutableArray array];
@@ -80,11 +80,11 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 		[argValues addObject:argValue];
 		
 	}
-	ANEValue *retValue = ananas_call_ananas_function(inter, scope, func, argValues);
+	ANEValue *retValue = mango_call_mango_function(inter, scope, func, argValues);
 	[retValue assign2CValuePointer:ret typeEncoding:[sig methodReturnType]];
 }
 
-@implementation ANEBlock{
+@implementation MANBlock{
 	ffi_cif *_cifPtr;
 	ffi_type **_args;
 	ffi_closure *_closure;
@@ -109,11 +109,11 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:typeEncoding];
 	unsigned int argCount = (unsigned int)[sig numberOfArguments];
 	
-	ffi_type *returnType = ananas_ffi_type_with_type_encoding(sig.methodReturnType);
+	ffi_type *returnType = mango_ffi_type_with_type_encoding(sig.methodReturnType);
 	
 	_args = malloc(sizeof(ffi_type *) * argCount);
 	for (int  i = 0 ; i < argCount; i++) {
-		_args[i] = ananas_ffi_type_with_type_encoding([sig getArgumentTypeAtIndex:i]);
+		_args[i] = mango_ffi_type_with_type_encoding([sig getArgumentTypeAtIndex:i]);
 	}
 	
 	_cifPtr = malloc(sizeof(ffi_cif));
@@ -124,7 +124,7 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	
 	struct ANANASSimulateBlockDescriptor descriptor = {
 		0,
-		sizeof(struct ANANASSimulateBlock),
+		sizeof(struct MANSimulateBlock),
 		(void (*)(void *dst, const void *src))copy_helper,
 		(void (*)(const void *src))dispose_helper,
 		typeEncoding
@@ -132,7 +132,7 @@ static void blockInter(ffi_cif *cif, void *ret, void **args, void *userdata){
 	struct ANANASSimulateBlockDescriptor *descriptorPtr = malloc(sizeof(struct ANANASSimulateBlockDescriptor));
 	memcpy(descriptorPtr, &descriptor, sizeof(struct ANANASSimulateBlockDescriptor));
 	
-	struct ANANASSimulateBlock simulateBlock = {
+	struct MANSimulateBlock simulateBlock = {
 		&_NSConcreteStackBlock,
 		(BLOCK_HAS_COPY_DISPOSE | BLOCK_HAS_SIGNATURE),
 		0,

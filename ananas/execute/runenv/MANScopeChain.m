@@ -6,12 +6,12 @@
 //  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
-#import "ANEScopeChain.h"
+#import "MANScopeChain.h"
 #import "ANEValue.h"
 #import <objc/runtime.h>
 
 
-@implementation ANEScopeChain
+@implementation MANScopeChain
 - (NSMutableDictionary<NSString *,ANEValue *> *)vars{
 	if (_vars == nil) {
 		_vars = [NSMutableDictionary dictionary];
@@ -19,14 +19,14 @@
 	return _vars;
 }
 
-+ (instancetype)scopeChainWithNext:(ANEScopeChain *)next{
-	ANEScopeChain *scope = [ANEScopeChain new];
++ (instancetype)scopeChainWithNext:(MANScopeChain *)next{
+	MANScopeChain *scope = [MANScopeChain new];
 	scope.next = next;
 	return scope;
 }
 
 - (ANEValue *)getValueWithIdentifier:(NSString *)identifier{
-	for (ANEScopeChain *pos = self; pos; pos = pos.next) {
+	for (MANScopeChain *pos = self; pos; pos = pos.next) {
 		if (pos.instance) {
 			Ivar ivar = class_getInstanceVariable([pos.instance class], identifier.UTF8String);
 			if (ivar) {

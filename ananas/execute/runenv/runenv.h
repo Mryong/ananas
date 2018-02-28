@@ -11,11 +11,11 @@
 
 #import "ANANASMethodMapTable.h"
 #import "ANANASStructDeclareTable.h"
-#import "ANEBlock.h"
+#import "MANBlock.h"
 #import "ANEValue.h"
-#import "ANEStack.h"
-#import "ANEScopeChain.h"
-#import "ANEStatementResult.h"
+#import "MANStack.h"
+#import "MANScopeChain.h"
+#import "MANStatementResult.h"
 
 
 #endif /* runenv_h */

@@ -7,15 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "anc_ast.h"
+#import "man_ast.h"
 
-@interface ANANASMethodMapTableItem:NSObject
+@interface MANMethodMapTableItem:NSObject
 
 @property (strong, nonatomic) Class clazz;
-@property (strong, nonatomic) ANCInterpreter *inter;
-@property (strong, nonatomic) ANCMethodDefinition *method;
+@property (strong, nonatomic) MANInterpreter *inter;
+@property (strong, nonatomic) MANMethodDefinition *method;
 
-- (instancetype)initWithClass:(Class)clazz inter:(ANCInterpreter *)inter method:(ANCMethodDefinition *)method;
+- (instancetype)initWithClass:(Class)clazz inter:(MANInterpreter *)inter method:(MANMethodDefinition *)method;
 
 @end
 
@@ -23,7 +23,7 @@
 
 + (instancetype)shareInstance;
 
-- (void)addMethodMapTableItem:(ANANASMethodMapTableItem *)methodMapTableItem;
-- (ANANASMethodMapTableItem *)getMethodMapTableItemWith:(Class)clazz classMethod:(BOOL)classMethod sel:(SEL)sel;
+- (void)addMethodMapTableItem:(MANMethodMapTableItem *)methodMapTableItem;
+- (MANMethodMapTableItem *)getMethodMapTableItemWith:(Class)clazz classMethod:(BOOL)classMethod sel:(SEL)sel;
 
 @end

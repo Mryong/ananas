@@ -7,24 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
-@class ANCInterpreter;
+@class MANInterpreter;
 typedef NS_ENUM(NSUInteger, ANATypeSpecifierKind) {
-	ANC_TYPE_VOID,
-	ANC_TYPE_BOOL,
-	ANC_TYPE_INT,
-	ANC_TYPE_U_INT,
-	ANC_TYPE_DOUBLE,
-	ANC_TYPE_C_STRING,
-	ANC_TYPE_CLASS,
-	ANC_TYPE_SEL,
-	ANC_TYPE_OBJECT,
-	ANC_TYPE_BLOCK,
-	ANC_TYPE_ANANAS_BLOCK,
-	ANC_TYPE_STRUCT,
-	ANC_TYPE_STRUCT_LITERAL,
-	ANC_TYPE_POINTER
+	MAN_TYPE_VOID,
+	MAN_TYPE_BOOL,
+	MAN_TYPE_INT,
+	MAN_TYPE_U_INT,
+	MAN_TYPE_DOUBLE,
+	MAN_TYPE_C_STRING,
+	MAN_TYPE_CLASS,
+	MAN_TYPE_SEL,
+	MAN_TYPE_OBJECT,
+	MAN_TYPE_BLOCK,
+	MAN_TYPE_mango_BLOCK,
+	MAN_TYPE_STRUCT,
+	MAN_TYPE_STRUCT_LITERAL,
+	MAN_TYPE_POINTER
 };
-@interface ANCTypeSpecifier : NSObject
+@interface MANTypeSpecifier : NSObject
 @property (copy, nonatomic) NSString *structName;
 @property (copy, nonatomic) NSString *typeName;
 @property (assign, nonatomic) ANATypeSpecifierKind typeKind;

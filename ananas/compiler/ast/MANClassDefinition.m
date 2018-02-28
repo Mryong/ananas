@@ -1,14 +1,14 @@
 //
-//  ANCClassDefinition.m
+//  MANClassDefinition.m
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/11/16.
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "ANCClassDefinition.h"
+#import "MANClassDefinition.h"
 
-@implementation ANCClassDefinition
+@implementation MANClassDefinition
 
 - (instancetype)init{
 	if (self = [super init]) {
@@ -19,19 +19,19 @@
 
 @end
 
-@implementation ANCMemberDefinition
+@implementation MANMemberDefinition
 
 @end
 
-@implementation ANCPropertyDefinition
+@implementation MANPropertyDefinition
 
 @end
 
-@implementation ANCMethodNameItem
+@implementation MANMethodNameItem
 
 @end
 
 
-@implementation ANCMethodDefinition
+@implementation MANMethodDefinition
 
 @end

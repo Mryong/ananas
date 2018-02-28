@@ -1,48 +1,48 @@
 //
-//  ANCTranslationUtil.m
+//  MANTranslationUtil.m
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/11/23.
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "ANCInterpreter.h"
+#import "MANInterpreter.h"
 #import "runenv.h"
 
-static NSMutableDictionary<NSString *, ANEStack *> *_stacksDic;
+static NSMutableDictionary<NSString *, MANStack *> *_stacksDic;
 static NSLock *_lock;
 
-static ANEScopeChain *commonScope_;
+static MANScopeChain *commonScope_;
 
-@implementation ANCInterpreter
+@implementation MANInterpreter
 
 - (instancetype)init{
 	if (self = [super init]) {
 		static dispatch_once_t onceToken;
 		dispatch_once(&onceToken, ^{
-			commonScope_ = [[ANEScopeChain alloc] init];
+			commonScope_ = [[MANScopeChain alloc] init];
 		});
 		_stacksDic = [NSMutableDictionary dictionary];
 		_lock = [[NSLock alloc] init];
 		_currentLineNumber = 1;
 		
-		_topScope = [ANEScopeChain scopeChainWithNext:commonScope_];
+		_topScope = [MANScopeChain scopeChainWithNext:commonScope_];
 		_commonScope = commonScope_;
 	}
 	return self;
 }
 
-- (ANEStack *)stack{
+- (MANStack *)stack{
 	NSString *currentThread = [[NSThread currentThread] description];
 	[_lock lock];
 	if (!_stacksDic[currentThread]) {
-		_stacksDic[(id)currentThread] = [[ANEStack alloc] init];
+		_stacksDic[(id)currentThread] = [[MANStack alloc] init];
 	}
 	[_lock unlock];
 	return _stacksDic[currentThread];
 }
 
-- (NSMutableDictionary<NSString *,ANCClassDefinition *> *)classDefinitionDic{
+- (NSMutableDictionary<NSString *,MANClassDefinition *> *)classDefinitionDic{
 	if (_classDefinitionDic == nil) {
 		_classDefinitionDic = [NSMutableDictionary dictionary];
 	}
@@ -50,7 +50,7 @@ static ANEScopeChain *commonScope_;
 }
 
 
-- (NSMutableDictionary<NSString *,ANCStructDeclare *> *)structDeclareDic{
+- (NSMutableDictionary<NSString *,MANStructDeclare *> *)structDeclareDic{
 	if (_structDeclareDic == nil) {
 		_structDeclareDic = [NSMutableDictionary dictionary];
 	}
@@ -59,7 +59,7 @@ static ANEScopeChain *commonScope_;
 
 
 
-- (NSMutableArray<ANCStatement *> *)topList{
+- (NSMutableArray<MANStatement *> *)topList{
 	if (_topList == nil) {
 		_topList = [NSMutableArray array];
 	}

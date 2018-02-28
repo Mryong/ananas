@@ -8,11 +8,11 @@
 
 
 #import "util.h"
-#import "anc_ast.h"
+#import "man_ast.h"
 #import "runenv.h"
 
 
-const char * ananas_str_append(const char *str1, const char *str2){
+const char * mango_str_append(const char *str1, const char *str2){
 	size_t len = strlen(str1) + strlen(str2);
 	char *ret = malloc(sizeof(char) * (len + 1));
 	strcpy(ret, str1);
@@ -175,7 +175,7 @@ break;
 	return size;
 }
 
-size_t ananas_size_with_encoding(const char *typeEncoding){
+size_t mango_size_with_encoding(const char *typeEncoding){
 	typeEncoding = removeTypeEncodingPrefix((char *)typeEncoding);
 	switch (*typeEncoding) {
 		case 'v':
@@ -229,7 +229,7 @@ size_t ananas_size_with_encoding(const char *typeEncoding){
 
 
 
-void ananas_struct_data_with_dic(void *structData,NSDictionary *dic, ANCStructDeclare *declare){
+void mango_struct_data_with_dic(void *structData,NSDictionary *dic, MANStructDeclare *declare){
 	NSCAssert(declare, @"");
 	NSArray<NSString *> *keys = declare.keys;
 	NSString *typeEncoding = [NSString stringWithUTF8String:declare.typeEncoding];
@@ -280,12 +280,12 @@ break;\
 				}
 				
 				NSString *subTypeEncoding = [types substringWithRange:NSMakeRange(index, end - index + 1)];
-				size_t size = ananas_struct_size_with_encoding(subTypeEncoding.UTF8String);
-				NSString *subStructName = ananas_struct_name_with_encoding(subTypeEncoding.UTF8String);
-				ANCStructDeclare *subStructDeclare = [[ANANASStructDeclareTable shareInstance] getStructDeclareWithName:subStructName];
+				size_t size = mango_struct_size_with_encoding(subTypeEncoding.UTF8String);
+				NSString *subStructName = mango_struct_name_with_encoding(subTypeEncoding.UTF8String);
+				MANStructDeclare *subStructDeclare = [[ANANASStructDeclareTable shareInstance] getStructDeclareWithName:subStructName];
 				id subStruct = dic[key];
 				if ([subStruct isKindOfClass:[NSDictionary class]]) {
-					ananas_struct_data_with_dic(structData + postion, dic[key],subStructDeclare);
+					mango_struct_data_with_dic(structData + postion, dic[key],subStructDeclare);
 				}else{
 					memcpy(structData+postion, [(ANEValue *)subStruct pointerValue], size);
 				}
@@ -311,17 +311,17 @@ static NSString *_struct_name_with_encoding(NSString *typeEncoding){
 	return [typeEncoding substringWithRange:NSMakeRange(1, end -1)];
 }
 
-ffi_type *ananas_ffi_type_with_type_encoding(const char *typeEncoding){
+ffi_type *mango_ffi_type_with_type_encoding(const char *typeEncoding){
 	return _ffi_type_with_type_encoding([NSString stringWithUTF8String:typeEncoding]);
 }
 
-size_t ananas_struct_size_with_encoding(const char *typeEncoding){
+size_t mango_struct_size_with_encoding(const char *typeEncoding){
 	return _struct_size_with_encoding([NSString stringWithUTF8String:typeEncoding]);
 	
 }
 
 
-NSString *ananas_struct_name_with_encoding(const char *typeEncoding){
+NSString *mango_struct_name_with_encoding(const char *typeEncoding){
 	return _struct_name_with_encoding([NSString stringWithUTF8String:typeEncoding]);
 	
 }

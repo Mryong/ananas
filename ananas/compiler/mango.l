@@ -4,7 +4,7 @@
 	#include <Foundation/Foundation.h>
 	#include "create.h"
 	#include "y.tab.h"
-	#import "ANCExpression.h"
+	#import "MANExpression.h"
 #define smaller(a, b) ((a) < (b) ? (a) : (b))
 #define larger(a, b) ((a) > (b) ? (a) : (b))
 
@@ -40,7 +40,7 @@ int yywrap(){
 }
 
 static void increment_line_number(){
-	ANCInterpreter *interpreter = anc_get_current_compile_util();
+	MANInterpreter *interpreter = anc_get_current_compile_util();
 	interpreter.currentLineNumber++;
 }
 %}
@@ -144,31 +144,31 @@ static void increment_line_number(){
 <INITIAL>"Pointer" {return POINTER; }
 
 <INITIAL>"self" {
-	ANCExpression *expression = anc_create_expression(ANC_SELF_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_SELF_EXPRESSION);
 	yylval.expression = (__bridge_retained void *)expression;
 	return SELF;
 }
 <INITIAL>"super" {
-	ANCExpression *expression = anc_create_expression(ANC_SUPER_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_SUPER_EXPRESSION);
 	yylval.expression = (__bridge_retained void *)expression;
 	return SUPER;
 	
 }
 <INITIAL>"nil" {
-	ANCExpression *expression = anc_create_expression(ANC_NIL_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_NIL_EXPRESSION);
 	yylval.expression = (__bridge_retained void *)expression;
 	return NIL;
 	
 }
 <INITIAL>"YES" {
-	ANCExpression *expression = anc_create_expression(ANC_BOOLEAN_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_BOOLEAN_EXPRESSION);
 	expression.boolValue = YES;
 	yylval.expression = (__bridge_retained void *)expression;
 	return YES_;
 	
 }
 <INITIAL>"NO" {
-	ANCExpression *expression = anc_create_expression(ANC_BOOLEAN_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_BOOLEAN_EXPRESSION);
 	expression.boolValue = NO;
 	yylval.expression = (__bridge_retained void *)expression;
 	return NO_;
@@ -186,7 +186,7 @@ static void increment_line_number(){
 
 
 <INITIAL>[1-9][0-9]* {
-	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_INT_EXPRESSION);
 	NSInteger val;
 	sscanf(yytext,"%ld",&val);
 	expression.integerValue = val;
@@ -197,7 +197,7 @@ static void increment_line_number(){
 
 
 <INITIAL>"0"[xX][0-9a-fA-F]+ {
-	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_INT_EXPRESSION);
 	NSInteger val;
 	sscanf(yytext,"%lx",&val);
 	expression.integerValue = val;
@@ -207,7 +207,7 @@ static void increment_line_number(){
 
 
 <INITIAL>"0" {
-	ANCExpression *expression = anc_create_expression(ANC_INT_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_INT_EXPRESSION);
 	expression.integerValue = 0;
 	yylval.expression = (__bridge_retained void *)expression;
 	return INTETER_LITERAL;
@@ -215,7 +215,7 @@ static void increment_line_number(){
 
 
 <INITIAL>[0-9]\.[0-9]+ {
-	ANCExpression *expression = anc_create_expression(ANC_DOUBLE_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_DOUBLE_EXPRESSION);
 	double val;
 	sscanf(yytext,"%lf",&val);
 	expression.doubleValue = val;
@@ -230,7 +230,7 @@ static void increment_line_number(){
 
 
 <STRING_LITERAL_STATE>\" {
-	ANCExpression *expression = anc_create_expression(ANC_STRING_EXPRESSION);
+	MANExpression *expression = anc_create_expression(MAN_STRING_EXPRESSION);
 	expression.cstringValue = anc_end_string_literal();
 	yylval.expression = (__bridge_retained void *)expression;
 	BEGIN  INITIAL;

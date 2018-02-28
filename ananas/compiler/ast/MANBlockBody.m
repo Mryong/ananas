@@ -1,16 +1,16 @@
 //
-//  ANCBlock.m
+//  MANBlock.m
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/11/28.
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "ANCBlock.h"
+#import "MANBlockBody.h"
 
-@implementation ANCBlock
+@implementation MANBlockBody
 //
-- (NSMutableArray<ANCDeclaration *> *)declarations{
+- (NSMutableArray<MANDeclaration *> *)declarations{
 	if (_declarations == nil) {
 		_declarations = [NSMutableArray array];
 	}

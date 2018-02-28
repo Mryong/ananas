@@ -8,17 +8,17 @@
 
 #ifndef create_h
 #define create_h
-#import "anc_ast.h"
+#import "man_ast.h"
 
 
-typedef NS_ENUM(NSUInteger, ANCCompileError) {
-	ANCCompileErrorStructDeclareRedefinition,
-	ANCCompileErrorStructDeclareLackTypeEncoding,
-	ANCCompileErrorStructDeclareLackTypeKeys,
-	ANCSameClassDefinitionDifferentSuperClass,
-	ANCRedefinitionPropertyInSameClass,
-	ANCRedefinitionPropertyInChildClass,
-	ANCParameterRedefinition,
+typedef NS_ENUM(NSUInteger, MANCompileError) {
+	MANCompileErrorStructDeclareRedefinition,
+	MANCompileErrorStructDeclareLackTypeEncoding,
+	MANCompileErrorStructDeclareLackTypeKeys,
+	MANSameClassDefinitionDifferentSuperClass,
+	MANRedefinitionPropertyInSameClass,
+	MANRedefinitionPropertyInChildClass,
+	MANParameterRedefinition,
 	
 };
 
@@ -26,49 +26,49 @@ void anc_open_string_literal_buf(void);
 void anc_append_string_literal(int letter);
 const char* anc_end_string_literal(void);
 NSString *anc_create_identifier(char *str);
-ANCDicEntry *anc_create_dic_entry(ANCExpression *keyExpr, ANCExpression *valueExpr);
-ANCExpression *anc_create_expression(ANCExpressionKind kind);
-void anc_build_block_expr(ANCBlockExpression *expr, ANCTypeSpecifier *returnTypeSpecifier, NSArray<ANCParameter *> *params, ANCBlock *block);
-ANCStructDeclare *anc_create_struct_declare(ANCExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, const char *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
-ANCTypeSpecifier *anc_create_type_specifier(ANATypeSpecifierKind kind);
-ANCTypeSpecifier *anc_create_struct_type_specifier(NSString *structName);
+MANDicEntry *anc_create_dic_entry(MANExpression *keyExpr, MANExpression *valueExpr);
+MANExpression *anc_create_expression(MANExpressionKind kind);
+void anc_build_block_expr(MANBlockExpression *expr, MANTypeSpecifier *returnTypeSpecifier, NSArray<MANParameter *> *params,  MANBlockBody *block);
+MANStructDeclare *anc_create_struct_declare(MANExpression *annotaionIfConditionExpr, NSString *structName, NSString *typeEncodingKey, const char *typeEncodingValue, NSString *keysKey, NSArray<NSString *> *keysValue);
+MANTypeSpecifier *anc_create_type_specifier(ANATypeSpecifierKind kind);
+MANTypeSpecifier *anc_create_struct_type_specifier(NSString *structName);
 
-ANCParameter *anc_create_parameter(ANCTypeSpecifier *type, NSString *name);
-ANCDeclaration *anc_create_declaration(ANCTypeSpecifier *type, NSString *name, ANCExpression *initializer);
-ANCDeclarationStatement *anc_create_declaration_statement(ANCDeclaration *declaration);
-ANCExpressionStatement *anc_create_expression_statement(ANCExpression *expr);
-ANCElseIf *anc_create_else_if(ANCExpression *condition, ANCBlock *thenBlock);
-ANCIfStatement *anc_create_if_statement(ANCExpression *condition,ANCBlock *thenBlock,NSArray<ANCElseIf *> *elseIfList,ANCBlock *elseBlocl);
-ANCCase *anc_create_case(ANCExpression *expr, ANCBlock *block);
-ANCSwitchStatement *anc_create_switch_statement(ANCExpression *expr, NSArray<ANCCase *> *caseList, ANCBlock *defaultBlock);
-ANCForStatement *anc_create_for_statement(ANCExpression *initializerExpr, ANCDeclaration *declaration,
-										  ANCExpression *condition, ANCExpression *post, ANCBlock *block);
-ANCForEachStatement *anc_create_for_each_statement( ANCTypeSpecifier *typeSpecifier, NSString *varName, ANCExpression *arrayExpr, ANCBlock *block);
-ANCWhileStatement *anc_create_while_statement(ANCExpression *condition, ANCBlock *block);
-ANCDoWhileStatement *anc_create_do_while_statement( ANCBlock *block, ANCExpression *condition);
-ANCContinueStatement *anc_create_continue_statement(void);
-ANCBreakStatement *anc_create_break_statement(void);
-ANCReturnStatement *anc_create_return_statement(ANCExpression *retValExpr);
-ANCBlock *anc_open_block_statement(void);
-ANCBlock *anc_close_block_statement(ANCBlock *block, NSArray<ANCStatement *> *statementList);
-void anc_start_class_definition(ANCExpression *annotaionIfConditionExpr, NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames);
-ANCClassDefinition *anc_end_class_definition(NSArray<ANCMemberDefinition *> *members);
+MANParameter *anc_create_parameter(MANTypeSpecifier *type, NSString *name);
+MANDeclaration *anc_create_declaration(MANTypeSpecifier *type, NSString *name, MANExpression *initializer);
+MANDeclarationStatement *anc_create_declaration_statement(MANDeclaration *declaration);
+MANExpressionStatement *anc_create_expression_statement(MANExpression *expr);
+MANElseIf *anc_create_else_if(MANExpression *condition,  MANBlockBody *thenBlock);
+MANIfStatement *anc_create_if_statement(MANExpression *condition, MANBlockBody *thenBlock,NSArray<MANElseIf *> *elseIfList, MANBlockBody *elseBlocl);
+MANCase *anc_create_case(MANExpression *expr,  MANBlockBody *block);
+MANSwitchStatement *anc_create_switch_statement(MANExpression *expr, NSArray<MANCase *> *caseList,  MANBlockBody *defaultBlock);
+MANForStatement *anc_create_for_statement(MANExpression *initializerExpr, MANDeclaration *declaration,
+										  MANExpression *condition, MANExpression *post,  MANBlockBody *block);
+MANForEachStatement *anc_create_for_each_statement( MANTypeSpecifier *typeSpecifier, NSString *varName, MANExpression *arrayExpr,  MANBlockBody *block);
+MANWhileStatement *anc_create_while_statement(MANExpression *condition,  MANBlockBody *block);
+MANDoWhileStatement *anc_create_do_while_statement(  MANBlockBody *block, MANExpression *condition);
+MANContinueStatement *anc_create_continue_statement(void);
+MANBreakStatement *anc_create_break_statement(void);
+MANReturnStatement *anc_create_return_statement(MANExpression *retValExpr);
+ MANBlockBody *anc_open_block_statement(void);
+ MANBlockBody *anc_close_block_statement( MANBlockBody *block, NSArray<MANStatement *> *statementList);
+void anc_start_class_definition(MANExpression *annotaionIfConditionExpr, NSString *name, NSString *superNmae, NSArray<NSString *> *protocolNames);
+MANClassDefinition *anc_end_class_definition(NSArray<MANMemberDefinition *> *members);
 
-ANCFunctionDefinition *anc_create_function_definition(ANCTypeSpecifier *returnTypeSpecifier,NSString *name ,NSArray<ANCParameter *> *prasms, ANCBlock *block);
-ANCMethodNameItem *anc_create_method_name_item(NSString *name, ANCTypeSpecifier *typeSpecifier, NSString *paramName);
-ANCMethodDefinition *anc_create_method_definition(ANCExpression *annotaionIfConditionExpr, BOOL classMethod, ANCTypeSpecifier *returnTypeSpecifier, NSArray<ANCMethodNameItem *> *items, ANCBlock *block);
-ANCPropertyDefinition *anc_create_property_definition(ANCExpression *annotaionIfConditionExpr, ANCPropertyModifier modifier, ANCTypeSpecifier *typeSpecifier, NSString *name);
-void anc_add_class_definition(ANCClassDefinition *classDefinition);
-void anc_add_struct_declare(ANCStructDeclare *structDeclare);
-void anc_add_statement(ANCStatement *statement);
+MANFunctionDefinition *anc_create_function_definition(MANTypeSpecifier *returnTypeSpecifier,NSString *name ,NSArray<MANParameter *> *prasms,  MANBlockBody *block);
+MANMethodNameItem *anc_create_method_name_item(NSString *name, MANTypeSpecifier *typeSpecifier, NSString *paramName);
+MANMethodDefinition *anc_create_method_definition(MANExpression *annotaionIfConditionExpr, BOOL classMethod, MANTypeSpecifier *returnTypeSpecifier, NSArray<MANMethodNameItem *> *items,  MANBlockBody *block);
+MANPropertyDefinition *anc_create_property_definition(MANExpression *annotaionIfConditionExpr, MANPropertyModifier modifier, MANTypeSpecifier *typeSpecifier, NSString *name);
+void anc_add_class_definition(MANClassDefinition *classDefinition);
+void anc_add_struct_declare(MANStructDeclare *structDeclare);
+void anc_add_statement(MANStatement *statement);
 
 void ane_test(id obj);
 
 
-ANCInterpreter *anc_get_current_compile_util(void);
-void anc_set_current_compile_util(ANCInterpreter *interpreter);
+MANInterpreter *anc_get_current_compile_util(void);
+void anc_set_current_compile_util(MANInterpreter *interpreter);
 
 
-void anc_compile_err(NSUInteger lineNumber,ANCCompileError error,...);
+void anc_compile_err(NSUInteger lineNumber,MANCompileError error,...);
 
 #endif /* create_h */

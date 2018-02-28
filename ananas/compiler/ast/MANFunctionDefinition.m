@@ -1,19 +1,19 @@
 //
-//  ANCFunctionDefinition.m
+//  MANFunctionDefinition.m
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/11/16.
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#import "ANCFunctionDefinition.h"
+#import "MANFunctionDefinition.h"
 
 
-@implementation ANCParameter
+@implementation MANParameter
 
 @end
 
 
-@implementation ANCFunctionDefinition
+@implementation MANFunctionDefinition
 
 @end

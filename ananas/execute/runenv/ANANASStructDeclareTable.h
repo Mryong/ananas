@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ANCStructDeclare.h"
+#import "MANStructDeclare.h"
 
 @interface ANANASStructDeclareTable : NSObject
 + (instancetype)shareInstance;
 
-- (void)addStructDeclare:(ANCStructDeclare *)structDeclare;
-- (ANCStructDeclare *)getStructDeclareWithName:(NSString *)name;
+- (void)addStructDeclare:(MANStructDeclare *)structDeclare;
+- (MANStructDeclare *)getStructDeclareWithName:(NSString *)name;
 
 @end

@@ -6,9 +6,9 @@
 //  Copyright © 2018年 yongpengliang. All rights reserved.
 //
 
-#import "ANEStack.h"
+#import "MANStack.h"
 
-@implementation ANEStack{
+@implementation MANStack{
 	NSMutableArray<ANEValue *> *_arr;
 }
 

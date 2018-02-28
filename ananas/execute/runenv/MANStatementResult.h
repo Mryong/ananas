@@ -10,15 +10,15 @@
 @class ANEValue;
 
 
-typedef NS_ENUM(NSInteger, ANEStatementResultType) {
-	ANEStatementResultTypeNormal,
-	ANEStatementResultTypeReturn,
-	ANEStatementResultTypeBreak,
-	ANEStatementResultTypeContinue,
+typedef NS_ENUM(NSInteger, MANStatementResultType) {
+	MANStatementResultTypeNormal,
+	MANStatementResultTypeReturn,
+	MANStatementResultTypeBreak,
+	MANStatementResultTypeContinue,
 };
 
-@interface ANEStatementResult : NSObject
-@property (assign, nonatomic) ANEStatementResultType type;
+@interface MANStatementResult : NSObject
+@property (assign, nonatomic) MANStatementResultType type;
 @property (strong, nonatomic) ANEValue *reutrnValue;
 + (instancetype)normalResult;
 + (instancetype)returnResult;

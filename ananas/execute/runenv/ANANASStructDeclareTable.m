@@ -9,7 +9,7 @@
 #import "ANANASStructDeclareTable.h"
 
 @implementation ANANASStructDeclareTable{
-	NSMutableDictionary<NSString *, ANCStructDeclare *> *_dic;
+	NSMutableDictionary<NSString *, MANStructDeclare *> *_dic;
 }
 
 - (instancetype)init{
@@ -27,11 +27,11 @@
 	return _instance;
 }
 
-- (void)addStructDeclare:(ANCStructDeclare *)structDeclare{
+- (void)addStructDeclare:(MANStructDeclare *)structDeclare{
 	_dic[structDeclare.name] = structDeclare;
 }
 
-- (ANCStructDeclare *)getStructDeclareWithName:(NSString *)name{
+- (MANStructDeclare *)getStructDeclareWithName:(NSString *)name{
 	return _dic[name];
 }
 @end

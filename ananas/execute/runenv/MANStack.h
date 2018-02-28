@@ -12,7 +12,7 @@
 
 @class ANEValue;
 
-@interface ANEStack : NSObject
+@interface MANStack : NSObject
 
 - (void)push:(ANEValue *)value;
 - (ANEValue *)pop;

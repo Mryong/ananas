@@ -1,5 +1,5 @@
 //
-//  ANCContext.h
+//  MANContext.h
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/12/25.
@@ -7,7 +7,7 @@
 //
 #import <Foundation/Foundation.h>
 #import "ANEValue.h"
-@interface ANCContext : NSObject
+@interface MMANontext : NSObject
 - (void)evalAnanasScriptWithURL:(NSURL *)url;
 - (void)evalAnanasScriptWithSourceString:(NSString *)sourceString;
 /*!

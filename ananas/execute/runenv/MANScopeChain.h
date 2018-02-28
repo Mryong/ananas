@@ -10,12 +10,12 @@
 @class ANEValue;
 
 NS_ASSUME_NONNULL_BEGIN
-@interface ANEScopeChain: NSObject
+@interface MANScopeChain: NSObject
 @property (strong, nonatomic) id instance;
 @property (strong, nonatomic) NSMutableDictionary<NSString *,ANEValue *> *vars;
-@property (strong, nonatomic) ANEScopeChain *next;
+@property (strong, nonatomic) MANScopeChain *next;
 
-+ (instancetype)scopeChainWithNext:(ANEScopeChain *)next;
++ (instancetype)scopeChainWithNext:(MANScopeChain *)next;
 - (ANEValue *)getValueWithIdentifier:(NSString *)identifier;
 
 @end

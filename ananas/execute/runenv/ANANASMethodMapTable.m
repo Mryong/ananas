@@ -8,8 +8,8 @@
 
 #import "ANANASMethodMapTable.h"
 
-@implementation ANANASMethodMapTableItem
-- (instancetype)initWithClass:(Class)clazz inter:(ANCInterpreter *)inter method:(ANCMethodDefinition *)method; {
+@implementation MANMethodMapTableItem
+- (instancetype)initWithClass:(Class)clazz inter:(MANInterpreter *)inter method:(MANMethodDefinition *)method; {
 	if (self = [super init]) {
 		_clazz = clazz;
 		_inter = inter;
@@ -20,7 +20,7 @@
 @end
 
 @implementation ANANASMethodMapTable{
-	NSMutableDictionary<NSString *, ANANASMethodMapTableItem *> *_dic;
+	NSMutableDictionary<NSString *, MANMethodMapTableItem *> *_dic;
 }
 
 + (instancetype)shareInstance{
@@ -39,12 +39,12 @@
 	return self;
 }
 
-- (void)addMethodMapTableItem:(ANANASMethodMapTableItem *)methodMapTableItem{
+- (void)addMethodMapTableItem:(MANMethodMapTableItem *)methodMapTableItem{
 	NSString *index = [NSString stringWithFormat:@"%d_%@_%@,",methodMapTableItem.method.classMethod,NSStringFromClass(methodMapTableItem.clazz),methodMapTableItem.method.functionDefinition.name];
 	_dic[index] = methodMapTableItem;
 }
 
-- (ANANASMethodMapTableItem *)getMethodMapTableItemWith:(Class)clazz classMethod:(BOOL)classMethod sel:(SEL)sel{
+- (MANMethodMapTableItem *)getMethodMapTableItemWith:(Class)clazz classMethod:(BOOL)classMethod sel:(SEL)sel{
 	NSString *index = [NSString stringWithFormat:@"%d_%@_%@,",classMethod,NSStringFromClass(clazz),NSStringFromSelector(sel)];
 	return _dic[index];
 }

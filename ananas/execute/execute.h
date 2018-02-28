@@ -11,13 +11,13 @@
 #import "runenv.h"
 
 /*built-in.m*/
-void ananas_add_built_in(ANCInterpreter *inter);
+void mango_add_built_in(MANInterpreter *inter);
 /* eval.m */
-BOOL ananas_equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2);
-ANEValue *ane_eval_expression(ANCInterpreter *inter, ANEScopeChain *scope,ANCExpression *expr);
-void ane_interpret(ANCInterpreter *inter);
-void ananas_assign_value_to_identifer_expr(ANCInterpreter *inter, ANEScopeChain *scope, NSString *identifer,ANEValue *operValue);
+BOOL mango_equal_value(NSUInteger lineNumber,ANEValue *value1, ANEValue *value2);
+ANEValue *ane_eval_expression(MANInterpreter *inter, MANScopeChain *scope,MANExpression *expr);
+void ane_interpret(MANInterpreter *inter);
+void mango_assign_value_to_identifer_expr(MANInterpreter *inter, MANScopeChain *scope, NSString *identifer,ANEValue *operValue);
 /*execute.m*/
-ANEStatementResult *ane_execute_statement_list(ANCInterpreter *inter, ANEScopeChain *scope, NSArray<ANCStatement *> *statementList);
-ANEValue * ananas_call_ananas_function(ANCInterpreter *inter, ANEScopeChain *scope, ANCFunctionDefinition *func, NSArray<ANEValue *> *args);
+MANStatementResult *ane_execute_statement_list(MANInterpreter *inter, MANScopeChain *scope, NSArray<MANStatement *> *statementList);
+ANEValue * mango_call_mango_function(MANInterpreter *inter, MANScopeChain *scope, MANFunctionDefinition *func, NSArray<ANEValue *> *args);
 #endif /* execute_h */

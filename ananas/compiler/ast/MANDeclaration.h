@@ -1,5 +1,5 @@
 //
-//  ANCDeclaration.h
+//  MANDeclaration.h
 //  ananasExample
 //
 //  Created by jerry.yong on 2017/11/20.
@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-@class ANCTypeSpecifier;
-@class ANCExpression;
+@class MANTypeSpecifier;
+@class MANExpression;
 
-@interface ANCDeclaration: NSObject
+@interface MANDeclaration: NSObject
 @property (assign, nonatomic) NSUInteger lineNumber;
-@property (strong, nonatomic) ANCTypeSpecifier *type;
+@property (strong, nonatomic) MANTypeSpecifier *type;
 @property (copy, nonatomic) NSString *name;
-@property (strong, nonatomic) ANCExpression *initializer;
+@property (strong, nonatomic) MANExpression *initializer;
 //@property (assign, nonatomic,getter=isParam) BOOL param;
 @end

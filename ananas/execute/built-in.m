@@ -7,42 +7,42 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "anc_ast.h"
+#import "man_ast.h"
 #import "runenv.h"
 
 static void add_built_in_struct_declare(){
 	ANANASStructDeclareTable *table = [ANANASStructDeclareTable shareInstance];
 	
-	ANCStructDeclare *cgPoinerStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGPoint" typeEncoding:"{CGPoint=dd}" keys:@[@"x",@"y"]];
+	MANStructDeclare *cgPoinerStructDeclare = [[MANStructDeclare alloc] initWithName:@"CGPoint" typeEncoding:"{CGPoint=dd}" keys:@[@"x",@"y"]];
 	[table addStructDeclare:cgPoinerStructDeclare];
 	
-	ANCStructDeclare *cgSizeStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGSize" typeEncoding:"{CGSize=dd}" keys:@[@"width",@"height"]];
+	MANStructDeclare *cgSizeStructDeclare = [[MANStructDeclare alloc] initWithName:@"CGSize" typeEncoding:"{CGSize=dd}" keys:@[@"width",@"height"]];
 	[table addStructDeclare:cgSizeStructDeclare];
 	
-	ANCStructDeclare *cgRectStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGRect" typeEncoding:"{CGRect={CGPoint=dd}{CGSize=dd}}" keys:@[@"origin",@"size"]];
+	MANStructDeclare *cgRectStructDeclare = [[MANStructDeclare alloc] initWithName:@"CGRect" typeEncoding:"{CGRect={CGPoint=dd}{CGSize=dd}}" keys:@[@"origin",@"size"]];
 	[table addStructDeclare:cgRectStructDeclare];
 	
-	ANCStructDeclare *cgAffineTransformStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGAffineTransform" typeEncoding:"{CGAffineTransform=dddddd}" keys:@[@"a",@"b",@"c", @"d", @"tx", @"ty"]];
+	MANStructDeclare *cgAffineTransformStructDeclare = [[MANStructDeclare alloc] initWithName:@"CGAffineTransform" typeEncoding:"{CGAffineTransform=dddddd}" keys:@[@"a",@"b",@"c", @"d", @"tx", @"ty"]];
 	[table addStructDeclare:cgAffineTransformStructDeclare];
 	
-	ANCStructDeclare *cgVectorStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CGVector" typeEncoding:"{CGVector=dd}" keys:@[@"dx",@"dy"]];
+	MANStructDeclare *cgVectorStructDeclare = [[MANStructDeclare alloc] initWithName:@"CGVector" typeEncoding:"{CGVector=dd}" keys:@[@"dx",@"dy"]];
 	[table addStructDeclare:cgVectorStructDeclare];
 	//todo _NSRange
-	ANCStructDeclare *nsRangeStructDeclare = [[ANCStructDeclare alloc] initWithName:@"NSRange" typeEncoding:"{_NSRange=QQ}" keys:@[@"location",@"length"]];
+	MANStructDeclare *nsRangeStructDeclare = [[MANStructDeclare alloc] initWithName:@"NSRange" typeEncoding:"{_NSRange=QQ}" keys:@[@"location",@"length"]];
 	[table addStructDeclare:nsRangeStructDeclare];
 	
-	ANCStructDeclare *uiOffsetStructDeclare = [[ANCStructDeclare alloc] initWithName:@"UIOffset" typeEncoding:"{UIOffset=dd}" keys:@[@"horizontal",@"vertical"]];
+	MANStructDeclare *uiOffsetStructDeclare = [[MANStructDeclare alloc] initWithName:@"UIOffset" typeEncoding:"{UIOffset=dd}" keys:@[@"horizontal",@"vertical"]];
 	[table addStructDeclare:uiOffsetStructDeclare];
 	
-	ANCStructDeclare *uiEdgeInsetsStructDeclare = [[ANCStructDeclare alloc] initWithName:@"UIEdgeInsets" typeEncoding:"{UIEdgeInsets=dddd}" keys:@[@"top",@"left",@"bottom",@"right"]];
+	MANStructDeclare *uiEdgeInsetsStructDeclare = [[MANStructDeclare alloc] initWithName:@"UIEdgeInsets" typeEncoding:"{UIEdgeInsets=dddd}" keys:@[@"top",@"left",@"bottom",@"right"]];
 	[table addStructDeclare:uiEdgeInsetsStructDeclare];
 	
-	ANCStructDeclare *caTransform3DStructDeclare = [[ANCStructDeclare alloc] initWithName:@"CATransform3D" typeEncoding:"" keys:@[@"m11",@"m12",@"m13",@"m14",@"m21",@"m22",@"m23",@"m24",@"m31",@"m32",@"m33",@"m34",@"41",@"m42",@"m43",@"m44",]];
+	MANStructDeclare *caTransform3DStructDeclare = [[MANStructDeclare alloc] initWithName:@"CATransform3D" typeEncoding:"" keys:@[@"m11",@"m12",@"m13",@"m14",@"m21",@"m22",@"m23",@"m24",@"m31",@"m32",@"m33",@"m34",@"41",@"m42",@"m43",@"m44",]];
 	[table addStructDeclare:caTransform3DStructDeclare];
 	
 }
 
-static void add_build_in_function(ANCInterpreter *interpreter){
+static void add_build_in_function(MANInterpreter *interpreter){
 	
 	interpreter.commonScope.vars[@"CGPointMake"] = [ANEValue valueInstanceWithBlock:^CGPoint(CGFloat x, CGFloat y){
 		return CGPointMake(x, y);
@@ -119,7 +119,7 @@ static void add_build_in_function(ANCInterpreter *interpreter){
 	}];
 	
 }
-static void add_build_in_var(ANCInterpreter *inter){
+static void add_build_in_var(MANInterpreter *inter){
 	inter.commonScope.vars[@"NSRunLoopCommonModes"] = [ANEValue valueInstanceWithObject:NSRunLoopCommonModes];
 	inter.commonScope.vars[@"NSDefaultRunLoopMode"] = [ANEValue valueInstanceWithObject:NSDefaultRunLoopMode];
 	
@@ -137,7 +137,7 @@ static void add_build_in_var(ANCInterpreter *inter){
 	
 }
 
-void ananas_add_built_in(ANCInterpreter *inter){
+void mango_add_built_in(MANInterpreter *inter){
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		add_built_in_struct_declare();

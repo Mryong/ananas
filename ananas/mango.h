@@ -6,9 +6,9 @@
 //  Copyright © 2017年 yongpengliang. All rights reserved.
 //
 
-#ifndef ananasc_h
-#define ananasc_h
+#ifndef mango_h
+#define mango_h
 
-#import "ANCContext.h"
+#import "MANContext.h"
 
-#endif /* ananasc_h */
+#endif /* mango_h */

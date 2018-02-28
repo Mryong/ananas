@@ -21,7 +21,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	NSURL *scriptUrl = [NSURL URLWithString:@"file:///Users/yongpengliang/Documents/ananas/ananas/demo.ana"];
-	ANCContext *context = [[ANCContext alloc] init];
+	MMANontext *context = [[MMANontext alloc] init];
 	[context evalAnanasScriptWithURL:scriptUrl];
 	return YES;
 }

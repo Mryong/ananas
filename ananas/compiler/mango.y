@@ -3,7 +3,7 @@
 	#define YYERROR_VERBOSE
 	#import <Foundation/Foundation.h>
 	#import "create.h"
-	#import "anc_ast.h"
+	#import "man_ast.h"
 	
 
 int yyerror(char const *str);
@@ -28,8 +28,8 @@ int yylex(void);
 	void	*method_name_item;
 	void	*function_param;
 	void	*declaration;
-	ANCAssignKind assignment_operator;
-	ANCPropertyModifier property_modifier_list;
+	MANAssignKind assignment_operator;
+	MANPropertyModifier property_modifier_list;
 
 
 
@@ -91,17 +91,17 @@ definition_list: definition
 
 definition:  class_definition
 			{
-				ANCClassDefinition *classDefinition = (__bridge_transfer ANCClassDefinition *)$1;
+				MANClassDefinition *classDefinition = (__bridge_transfer MANClassDefinition *)$1;
 				anc_add_class_definition(classDefinition);
 			}
 			| declare_struct
 			{
-				ANCStructDeclare *structDeclare = (__bridge_transfer ANCStructDeclare *)$1;
+				MANStructDeclare *structDeclare = (__bridge_transfer MANStructDeclare *)$1;
 				anc_add_struct_declare(structDeclare);
 			}
 			| top_statement
 			{
-				ANCStatement *statement = (__bridge_transfer ANCStatement *)$1;
+				MANStatement *statement = (__bridge_transfer MANStatement *)$1;
 				anc_add_statement(statement);
 			}
 			;
@@ -123,13 +123,13 @@ declare_struct: annotation_if DECLARE STRUCT IDENTIFIER LC
 			IDENTIFIER COLON identifier_list
 			RC
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
 				NSString *structName = (__bridge_transfer NSString *)$4;
 				NSString *typeEncodingKey = (__bridge_transfer NSString *)$6;
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$8;
 				NSString *keysKey = (__bridge_transfer NSString *)$10;
 				NSArray *keysValue = (__bridge_transfer NSArray *)$12;
-				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue.UTF8String, keysKey, keysValue);
+				MANStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue.UTF8String, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -138,13 +138,13 @@ declare_struct: annotation_if DECLARE STRUCT IDENTIFIER LC
 			IDENTIFIER COLON STRING_LITERAL
 			RC
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
 				NSString *structName = (__bridge_transfer NSString *)$4;
 				NSString *keysKey = (__bridge_transfer NSString *)$6;
 				NSArray *keysValue = (__bridge_transfer NSArray *)$8;
 				NSString *typeEncodingKey = (__bridge_transfer NSString *)$10;
 				NSString *typeEncodingValue = (__bridge_transfer NSString *)$12;
-				ANCStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue.UTF8String, keysKey, keysValue);
+				MANStructDeclare *structDeclare = anc_create_struct_declare(annotaionIfConditionExpr, structName, typeEncodingKey, typeEncodingValue.UTF8String, keysKey, keysValue);
 				$$ = (__bridge_retained void *)structDeclare;
 				
 			}
@@ -172,19 +172,19 @@ identifier_list: IDENTIFIER
 
 class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
 				anc_start_class_definition(annotaionIfConditionExpr, name, superNmae,nil);
 			}
 			RC
 			{
-				ANCClassDefinition *classDefinition = anc_end_class_definition(nil);
+				MANClassDefinition *classDefinition = anc_end_class_definition(nil);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
 			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
 				anc_start_class_definition(annotaionIfConditionExpr, name, superNmae,nil);
@@ -192,12 +192,12 @@ class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			member_definition_list RC
 			{
 				NSArray *members = (__bridge_transfer NSArray *)$8;
-				ANCClassDefinition *classDefinition = anc_end_class_definition(members);
+				MANClassDefinition *classDefinition = anc_end_class_definition(members);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
 			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LT protocol_list GT LC
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
 				NSArray *protocolNames = (__bridge_transfer NSArray *)$7;
@@ -205,12 +205,12 @@ class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			}
 			RC
 			{
-				ANCClassDefinition *classDefinition = anc_end_class_definition(nil);
+				MANClassDefinition *classDefinition = anc_end_class_definition(nil);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
 			| annotation_if CLASS IDENTIFIER COLON IDENTIFIER LT protocol_list GT LC
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
 				NSString *name = (__bridge_transfer NSString *)$3;
 				NSString *superNmae = (__bridge_transfer NSString *)$5;
 				NSArray *protocolNames = (__bridge_transfer NSArray *)$7;
@@ -219,7 +219,7 @@ class_definition: annotation_if CLASS IDENTIFIER COLON IDENTIFIER LC
 			member_definition_list RC
 			{
 				NSArray *members = (__bridge_transfer NSArray *)$11;
-				ANCClassDefinition *classDefinition = anc_end_class_definition(members);
+				MANClassDefinition *classDefinition = anc_end_class_definition(members);
 				$$ = (__bridge_retained void *)classDefinition;
 			}
 			;
@@ -243,19 +243,19 @@ protocol_list: IDENTIFIER
 
 property_definition: annotation_if PROPERTY LP property_modifier_list RP type_specifier IDENTIFIER  SEMICOLON
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
-				ANCPropertyModifier modifier = $4;
-				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$6;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
+				MANPropertyModifier modifier = $4;
+				MANTypeSpecifier *typeSpecifier = (__bridge_transfer MANTypeSpecifier *)$6;
 				NSString *name = (__bridge_transfer NSString *)$7;
-				ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(annotaionIfConditionExpr, modifier, typeSpecifier, name);
+				MANPropertyDefinition *propertyDefinition = anc_create_property_definition(annotaionIfConditionExpr, modifier, typeSpecifier, name);
 				$$ = (__bridge_retained void *)propertyDefinition;
 			}
 			| annotation_if PROPERTY LP  RP type_specifier IDENTIFIER SEMICOLON
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
-				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$5;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
+				MANTypeSpecifier *typeSpecifier = (__bridge_transfer MANTypeSpecifier *)$5;
 				NSString *name = (__bridge_transfer NSString *)$6;
-				ANCPropertyDefinition *propertyDefinition = anc_create_property_definition(annotaionIfConditionExpr, 0x00, typeSpecifier, name);
+				MANPropertyDefinition *propertyDefinition = anc_create_property_definition(annotaionIfConditionExpr, 0x00, typeSpecifier, name);
 				$$ = (__bridge_retained void *)propertyDefinition;
 			}
 			;
@@ -276,79 +276,79 @@ property_modifier: property_rc_modifier
 
 property_rc_modifier: WEAK
 			{
-				$$ = ANCPropertyModifierMemWeak;
+				$$ = MANPropertyModifierMemWeak;
 			}
 			| STRONG
 			{
-				$$ = ANCPropertyModifierMemStrong;
+				$$ = MANPropertyModifierMemStrong;
 			}
 			| COPY
 			{
-				$$ = ANCPropertyModifierMemCopy;
+				$$ = MANPropertyModifierMemCopy;
 			}
 			| ASSIGN_MEM
 			{
-				$$ = ANCPropertyModifierMemAssign;
+				$$ = MANPropertyModifierMemAssign;
 			}
 			;
 
 property_atomic_modifier: NONATOMIC
 			{
-				$$ = ANCPropertyModifierNonatomic;
+				$$ = MANPropertyModifierNonatomic;
 			}
 			| ATOMIC
 			{
-				$$ = ANCPropertyModifierAtomic;
+				$$ = MANPropertyModifierAtomic;
 			}
 			;
 
 type_specifier: VOID
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_VOID);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_VOID);
 			}
 			| BOOL_
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_BOOL);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_BOOL);
 			}
 			| INT
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_INT);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_INT);
 			}
 			| U_INT
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_U_INT);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_U_INT);
 			}
 			| DOUBLE
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_DOUBLE);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_DOUBLE);
 			}
 			| C_STRING
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_C_STRING);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_C_STRING);
 			}
 			|ID
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OBJECT);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_OBJECT);
 			}
 			|CLASS_
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_CLASS);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_CLASS);
 			}
 			|SEL_
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_SEL);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_SEL);
 			}
 			| BLOCK
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_BLOCK);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_BLOCK);
 			}
 			| POINTER
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_POINTER);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_POINTER);
 			}
 			| IDENTIFIER ASTERISK
 			{
-				$$ =  (__bridge_retained void *)anc_create_type_specifier(ANC_TYPE_OBJECT);
+				$$ =  (__bridge_retained void *)anc_create_type_specifier(MAN_TYPE_OBJECT);
 			}
 			| STRUCT IDENTIFIER
 			{
@@ -363,22 +363,22 @@ method_definition: instance_method_definition
 
 instance_method_definition: annotation_if SUB LP type_specifier RP method_name block_statement
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
-				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
+				MANTypeSpecifier *returnTypeSpecifier = (__bridge_transfer MANTypeSpecifier *)$4;
 				NSArray *items = (__bridge_transfer NSArray *)$6;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$7;
-				ANCMethodDefinition *methodDefinition = anc_create_method_definition(annotaionIfConditionExpr, NO, returnTypeSpecifier, items, block);
+				MANBlock *block = (__bridge_transfer MANBlock *)$7;
+				MANMethodDefinition *methodDefinition = anc_create_method_definition(annotaionIfConditionExpr, NO, returnTypeSpecifier, items, block);
 				$$ = (__bridge_retained void *)methodDefinition;
 			}
 			;
 
 class_method_definition: annotation_if ADD LP type_specifier RP method_name  block_statement
 			{
-				ANCExpression *annotaionIfConditionExpr = (__bridge_transfer ANCExpression *)$1;
-				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
+				MANExpression *annotaionIfConditionExpr = (__bridge_transfer MANExpression *)$1;
+				MANTypeSpecifier *returnTypeSpecifier = (__bridge_transfer MANTypeSpecifier *)$4;
 				NSArray *items = (__bridge_transfer NSArray *)$6;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$7;
-				ANCMethodDefinition *methodDefinition = anc_create_method_definition(annotaionIfConditionExpr, YES, returnTypeSpecifier, items, block);
+				MANBlock *block = (__bridge_transfer MANBlock *)$7;
+				MANMethodDefinition *methodDefinition = anc_create_method_definition(annotaionIfConditionExpr, YES, returnTypeSpecifier, items, block);
 				$$ = (__bridge_retained void *)methodDefinition;
 			}
 			;	
@@ -390,7 +390,7 @@ method_name: method_name_1
 method_name_1: IDENTIFIER
 			{
 				NSString *name = (__bridge_transfer NSString *)$1;
-				ANCMethodNameItem *item = anc_create_method_name_item(name, nil, nil);
+				MANMethodNameItem *item = anc_create_method_name_item(name, nil, nil);
 				NSMutableArray *list = [NSMutableArray array];
 				[list addObject:item];
 				$$ = (__bridge_retained void *)list;
@@ -400,14 +400,14 @@ method_name_1: IDENTIFIER
 method_name_2: method_name_item
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCMethodNameItem *item = (__bridge_transfer ANCMethodNameItem *)$1;
+				MANMethodNameItem *item = (__bridge_transfer MANMethodNameItem *)$1;
 				[list addObject:item];
 				$$ = (__bridge_retained void *)list;
 			}
 			| method_name_2 method_name_item
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCMethodNameItem *item = (__bridge_transfer ANCMethodNameItem *)$2;
+				MANMethodNameItem *item = (__bridge_transfer MANMethodNameItem *)$2;
 				[list addObject:item];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -417,9 +417,9 @@ method_name_item: IDENTIFIER COLON LP type_specifier RP IDENTIFIER
 			{
 				NSString *name = (__bridge_transfer NSString *)$1;
 				name = [NSString stringWithFormat:@"%@:",name];
-				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$4;
+				MANTypeSpecifier *typeSpecifier = (__bridge_transfer MANTypeSpecifier *)$4;
 				NSString *paramName = (__bridge_transfer NSString *)$6;
-				ANCMethodNameItem *item = anc_create_method_name_item(name, typeSpecifier, paramName);
+				MANMethodNameItem *item = anc_create_method_name_item(name, typeSpecifier, paramName);
 				$$ = (__bridge_retained void *)item;
 			}
 		;
@@ -431,14 +431,14 @@ member_definition: property_definition
 member_definition_list: member_definition
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCMemberDefinition *memberDefinition = (__bridge_transfer ANCMemberDefinition *)$1;
+				MANMemberDefinition *memberDefinition = (__bridge_transfer MANMemberDefinition *)$1;
 				[list addObject:memberDefinition];
 				$$ = (__bridge_retained void *)list;
 			}
 			| member_definition_list member_definition
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCMemberDefinition *memberDefinition = (__bridge_transfer ANCMemberDefinition *)$2;
+				MANMemberDefinition *memberDefinition = (__bridge_transfer MANMemberDefinition *)$2;
 				[list addObject:memberDefinition];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -472,55 +472,55 @@ expression: assign_expression
 assign_expression:  ternary_operator_expression
 			| primary_expression assignment_operator ternary_operator_expression
 			{
-				ANCAssignExpression *expr = (ANCAssignExpression *)anc_create_expression(ANC_ASSIGN_EXPRESSION);
+				MANAssignExpression *expr = (MANAssignExpression *)anc_create_expression(MAN_ASSIGN_EXPRESSION);
 				expr.assignKind = $2;
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
 
 assignment_operator: ASSIGN
 				{
-					$$ = ANC_NORMAL_ASSIGN;
+					$$ = MAN_NORMAL_ASSIGN;
 					
 				}
                 | SUB_ASSIGN
 				{
-					$$ = ANC_SUB_ASSIGN;
+					$$ = MAN_SUB_ASSIGN;
 				}
                 | ADD_ASSIGN
 				{
-					$$ = ANC_ADD_ASSIGN;
+					$$ = MAN_ADD_ASSIGN;
 				}
                 | MUL_ASSIGN
 				{
-					$$ = ANC_MUL_ASSIGN;
+					$$ = MAN_MUL_ASSIGN;
 				}
                 | DIV_ASSIGN
 				{
-					$$ = ANC_DIV_ASSIGN;
+					$$ = MAN_DIV_ASSIGN;
 				}
                 | MOD_ASSIGN
 				{
-					$$ = ANC_MOD_ASSIGN;
+					$$ = MAN_MOD_ASSIGN;
 				}
                 ;
 
 ternary_operator_expression: logic_or_expression
  			| logic_or_expression  QUESTION ternary_operator_expression  COLON ternary_operator_expression
 			{
-				ANCTernaryExpression *expr = (ANCTernaryExpression *)anc_create_expression(ANC_TERNARY_EXPRESSION);
-				expr.condition = (__bridge_transfer ANCExpression *)$1;
-				expr.trueExpr = (__bridge_transfer ANCExpression *)$3;
-				expr.falseExpr = (__bridge_transfer ANCExpression *)$5;
+				MANTernaryExpression *expr = (MANTernaryExpression *)anc_create_expression(MAN_TERNARY_EXPRESSION);
+				expr.condition = (__bridge_transfer MANExpression *)$1;
+				expr.trueExpr = (__bridge_transfer MANExpression *)$3;
+				expr.falseExpr = (__bridge_transfer MANExpression *)$5;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| logic_or_expression  QUESTION COLON ternary_operator_expression
 			{
-				ANCTernaryExpression *expr = (ANCTernaryExpression *)anc_create_expression(ANC_TERNARY_EXPRESSION);
-				expr.condition = (__bridge_transfer ANCExpression *)$1;
-				expr.falseExpr = (__bridge_transfer ANCExpression *)$4;
+				MANTernaryExpression *expr = (MANTernaryExpression *)anc_create_expression(MAN_TERNARY_EXPRESSION);
+				expr.condition = (__bridge_transfer MANExpression *)$1;
+				expr.falseExpr = (__bridge_transfer MANExpression *)$4;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -528,9 +528,9 @@ ternary_operator_expression: logic_or_expression
 logic_or_expression: logic_and_expression
 			| logic_or_expression OR logic_and_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_LOGICAL_OR_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_LOGICAL_OR_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -538,9 +538,9 @@ logic_or_expression: logic_and_expression
 logic_and_expression: equality_expression
 			| logic_and_expression AND equality_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_LOGICAL_AND_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_LOGICAL_AND_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -548,16 +548,16 @@ logic_and_expression: equality_expression
 equality_expression: relational_expression
 			| equality_expression EQ relational_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_EQ_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_EQ_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| equality_expression NE relational_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_NE_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_NE_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -565,30 +565,30 @@ equality_expression: relational_expression
 relational_expression: additive_expression
 			| relational_expression LT additive_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_LT_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_LT_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| relational_expression LE additive_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_LE_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_LE_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| relational_expression GT additive_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_GT_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_GT_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| relational_expression GE additive_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_GE_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_GE_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -596,16 +596,16 @@ relational_expression: additive_expression
 additive_expression: multiplication_expression
 			| additive_expression ADD multiplication_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_ADD_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_ADD_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| additive_expression SUB multiplication_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_SUB_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_SUB_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -613,23 +613,23 @@ additive_expression: multiplication_expression
 multiplication_expression: unary_expression
 			| multiplication_expression ASTERISK unary_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_MUL_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_MUL_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| multiplication_expression DIV unary_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_DIV_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_DIV_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| multiplication_expression MOD unary_expression
 			{
-				ANCBinaryExpression *expr = (ANCBinaryExpression *)anc_create_expression(ANC_MOD_EXPRESSION);
-				expr.left = (__bridge_transfer ANCExpression *)$1;
-				expr.right = (__bridge_transfer ANCExpression *)$3;
+				MANBinaryExpression *expr = (MANBinaryExpression *)anc_create_expression(MAN_MOD_EXPRESSION);
+				expr.left = (__bridge_transfer MANExpression *)$1;
+				expr.right = (__bridge_transfer MANExpression *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
@@ -637,15 +637,15 @@ multiplication_expression: unary_expression
 unary_expression: postfix_expression
 			| NOT unary_expression
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_LOGICAL_NOT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_LOGICAL_NOT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| SUB unary_expression
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(NSC_NEGATIVE_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(NSC_NEGATIVE_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
@@ -654,15 +654,15 @@ unary_expression: postfix_expression
 postfix_expression: primary_expression
 			| primary_expression INCREMENT
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_INCREMENT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$1;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_INCREMENT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$1;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| primary_expression DECREMENT
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_DECREMENT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$1;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_DECREMENT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$1;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
@@ -671,14 +671,14 @@ postfix_expression: primary_expression
 expression_list: assign_expression
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *expr = (__bridge_transfer MANExpression *)$1;
 				[list addObject:expr];
 				$$ = (__bridge_retained void *)list;
 			}
 			| expression_list COMMA assign_expression
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$3;
+				MANExpression *expr = (__bridge_transfer MANExpression *)$3;
 				[list addObject:expr];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -686,9 +686,9 @@ expression_list: assign_expression
 
 dic_entry: primary_expression COLON primary_expression
 			{
-				ANCExpression *keyExpr = (__bridge_transfer ANCExpression *)$1;
-				ANCExpression *valueExpr = (__bridge_transfer ANCExpression *)$3;
-				ANCDicEntry *dicEntry = anc_create_dic_entry(keyExpr, valueExpr);
+				MANExpression *keyExpr = (__bridge_transfer MANExpression *)$1;
+				MANExpression *valueExpr = (__bridge_transfer MANExpression *)$3;
+				MANDicEntry *dicEntry = anc_create_dic_entry(keyExpr, valueExpr);
 				$$ = (__bridge_retained void *)dicEntry;
 			}
 			;
@@ -696,14 +696,14 @@ dic_entry: primary_expression COLON primary_expression
 dic_entry_list: dic_entry
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCDicEntry *dicEntry = (__bridge_transfer ANCDicEntry *)$1;
+				MANDicEntry *dicEntry = (__bridge_transfer MANDicEntry *)$1;
 				[list addObject:dicEntry];
 				$$ = (__bridge_retained void *)list;
 			} 
 			| dic_entry_list COMMA dic_entry
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCDicEntry *dicEntry = (__bridge_transfer ANCDicEntry *)$3;
+				MANDicEntry *dicEntry = (__bridge_transfer MANDicEntry *)$3;
 				[list addObject:dicEntry];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -711,76 +711,76 @@ dic_entry_list: dic_entry
 
 dic: AT LC  dic_entry_list RC
 			{
-				ANCDictionaryExpression *expr = (ANCDictionaryExpression *)anc_create_expression(ANC_DIC_LITERAL_EXPRESSION);
+				MANDictionaryExpression *expr = (MANDictionaryExpression *)anc_create_expression(MAN_DIC_LITERAL_EXPRESSION);
 				NSArray *entriesExpr = (__bridge_transfer NSArray *)$3;
 				expr.entriesExpr = entriesExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT LC  RC
 			{
-				ANCDictionaryExpression *expr = (ANCDictionaryExpression *)anc_create_expression(ANC_DIC_LITERAL_EXPRESSION);
+				MANDictionaryExpression *expr = (MANDictionaryExpression *)anc_create_expression(MAN_DIC_LITERAL_EXPRESSION);
 				$$ = (__bridge_retained void *)expr;
 			}
 			;
 
 primary_expression: IDENTIFIER
 			{
-				ANCIdentifierExpression *expr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
+				MANIdentifierExpression *expr = (MANIdentifierExpression *)anc_create_expression(MAN_IDENTIFIER_EXPRESSION);
 				NSString *identifier = (__bridge_transfer NSString *)$1;;
 				expr.identifier = identifier;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| primary_expression DOT IDENTIFIER
 			{
-				ANCMemberExpression *expr = (ANCMemberExpression *)anc_create_expression(ANC_MEMBER_EXPRESSION);
-				expr.expr = (__bridge_transfer ANCExpression *)$1;
+				MANMemberExpression *expr = (MANMemberExpression *)anc_create_expression(MAN_MEMBER_EXPRESSION);
+				expr.expr = (__bridge_transfer MANExpression *)$1;
 				expr.memberName = (__bridge_transfer NSString *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| primary_expression DOT selector LP RP
 			{
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *expr = (__bridge_transfer MANExpression *)$1;
 				NSString *selector = (__bridge_transfer NSString *)$3;
-				ANCMemberExpression *memberExpr = (ANCMemberExpression *)anc_create_expression(ANC_MEMBER_EXPRESSION);
+				MANMemberExpression *memberExpr = (MANMemberExpression *)anc_create_expression(MAN_MEMBER_EXPRESSION);
 				memberExpr.expr = expr;
 				memberExpr.memberName = selector;
 				
-				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				MANFunctonCallExpression *funcCallExpr = (MANFunctonCallExpression *)anc_create_expression(MAN_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = memberExpr;
 				
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 			| primary_expression DOT selector LP expression_list RP
 			{
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$1;
+				MANExpression *expr = (__bridge_transfer MANExpression *)$1;
 				NSString *selector = (__bridge_transfer NSString *)$3;
-				ANCMemberExpression *memberExpr = (ANCMemberExpression *)anc_create_expression(ANC_MEMBER_EXPRESSION);
+				MANMemberExpression *memberExpr = (MANMemberExpression *)anc_create_expression(MAN_MEMBER_EXPRESSION);
 				memberExpr.expr = expr;
 				memberExpr.memberName = selector;
 				
-				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				MANFunctonCallExpression *funcCallExpr = (MANFunctonCallExpression *)anc_create_expression(MAN_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = memberExpr;
-				funcCallExpr.args = (__bridge_transfer NSArray<ANCExpression *> *)$5;
+				funcCallExpr.args = (__bridge_transfer NSArray<MANExpression *> *)$5;
 				
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 			| IDENTIFIER LP RP
 			{
-				ANCIdentifierExpression *identifierExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
+				MANIdentifierExpression *identifierExpr = (MANIdentifierExpression *)anc_create_expression(MAN_IDENTIFIER_EXPRESSION);
 				NSString *identifier = (__bridge_transfer NSString *)$1;
 				identifierExpr.identifier = identifier;
-				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				MANFunctonCallExpression *funcCallExpr = (MANFunctonCallExpression *)anc_create_expression(MAN_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = identifierExpr;
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 		    | IDENTIFIER LP expression_list RP
 			{
-				ANCIdentifierExpression *identifierExpr = (ANCIdentifierExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
+				MANIdentifierExpression *identifierExpr = (MANIdentifierExpression *)anc_create_expression(MAN_IDENTIFIER_EXPRESSION);
 				NSString *identifier = (__bridge_transfer NSString *)$1;
 				identifierExpr.identifier = identifier;
-				ANCFunctonCallExpression *funcCallExpr = (ANCFunctonCallExpression *)anc_create_expression(ANC_FUNCTION_CALL_EXPRESSION);
+				MANFunctonCallExpression *funcCallExpr = (MANFunctonCallExpression *)anc_create_expression(MAN_FUNCTION_CALL_EXPRESSION);
 				funcCallExpr.expr = identifierExpr;
-				funcCallExpr.args = (__bridge_transfer NSArray<ANCExpression *> *)$3;
+				funcCallExpr.args = (__bridge_transfer NSArray<MANExpression *> *)$3;
 				$$ = (__bridge_retained void *)funcCallExpr;
 			}
 			| LP expression RP
@@ -789,10 +789,10 @@ primary_expression: IDENTIFIER
 			}
 			| primary_expression LB expression RB
 			{
-				ANCExpression *arrExpr = (__bridge_transfer ANCExpression *)$1;
-				ANCExpression *indexExpr = (__bridge_transfer ANCExpression *)$3;
+				MANExpression *arrExpr = (__bridge_transfer MANExpression *)$1;
+				MANExpression *indexExpr = (__bridge_transfer MANExpression *)$3;
 				
-				ANCIndexExpression *expr = (ANCIndexExpression *)anc_create_expression(ANC_IDENTIFIER_EXPRESSION);
+				MANIndexExpression *expr = (MANIndexExpression *)anc_create_expression(MAN_IDENTIFIER_EXPRESSION);
 				expr.arrayExpression = arrExpr;
 				expr.indexExpression = indexExpr;
 				$$ = (__bridge_retained void *)expr;
@@ -805,79 +805,79 @@ primary_expression: IDENTIFIER
 			| STRING_LITERAL
 			| NIL
 			{
-				ANCExpression *expr = anc_create_expression(ANC_NIL_EXPRESSION);
+				MANExpression *expr = anc_create_expression(MAN_NIL_EXPRESSION);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| SELECTOR LP selector RP
 			{
-				ANCExpression *expr = anc_create_expression(ANC_SELECTOR_EXPRESSION);
+				MANExpression *expr = anc_create_expression(MAN_SELECTOR_EXPRESSION);
 				expr.selectorName = (__bridge_transfer NSString *)$3;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT INTETER_LITERAL
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_AT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_AT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT DOUBLE_LITERAL
 			{
 				
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_AT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_AT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT STRING_LITERAL
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_AT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_AT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				ane_test(subExpr);
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT YES_
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_AT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_AT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT NO_
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_AT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$2;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_AT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$2;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| SELF
 			{
-				ANCExpression *expr = anc_create_expression(ANC_SELF_EXPRESSION);
+				MANExpression *expr = anc_create_expression(MAN_SELF_EXPRESSION);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| SUPER
 			{
-				ANCExpression *expr = anc_create_expression(ANC_SUPER_EXPRESSION);
+				MANExpression *expr = anc_create_expression(MAN_SUPER_EXPRESSION);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT LP expression RP
 			{
-				ANCUnaryExpression *expr = (ANCUnaryExpression *)anc_create_expression(ANC_AT_EXPRESSION);
-				ANCExpression *subExpr = (__bridge_transfer ANCExpression *)$3;
+				MANUnaryExpression *expr = (MANUnaryExpression *)anc_create_expression(MAN_AT_EXPRESSION);
+				MANExpression *subExpr = (__bridge_transfer MANExpression *)$3;
 				expr.expr = subExpr;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT LB expression_list RB
 			{
-				ANCArrayExpression *expr = (ANCArrayExpression *)anc_create_expression(ANC_ARRAY_LITERAL_EXPRESSION);
+				MANArrayExpression *expr = (MANArrayExpression *)anc_create_expression(MAN_ARRAY_LITERAL_EXPRESSION);
 				NSArray *itemExpressions = (__bridge_transfer NSArray *)$3;
 				expr.itemExpressions = itemExpressions;
 				$$ = (__bridge_retained void *)expr;
 			}
 			| AT LB  RB
 			{
-				ANCArrayExpression *expr = (ANCArrayExpression *)anc_create_expression(ANC_ARRAY_LITERAL_EXPRESSION);
+				MANArrayExpression *expr = (MANArrayExpression *)anc_create_expression(MAN_ARRAY_LITERAL_EXPRESSION);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| dic
@@ -889,51 +889,51 @@ primary_expression: IDENTIFIER
 
 block_body:  POWER type_specifier LP  RP block_statement
 			{
-				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
-				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				MANTypeSpecifier *returnTypeSpecifier = (__bridge_transfer MANTypeSpecifier *)$2;
+				MANBlock *block = (__bridge_transfer MANBlock *)$5;
+				MANBlockExpression *expr = (MANBlockExpression *)anc_create_expression(MAN_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,returnTypeSpecifier,nil,block);
 				$$ = (__bridge_retained void *)expr;
 				
 			}
 			|POWER type_specifier block_statement
 			{
-				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$3;
-				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				MANTypeSpecifier *returnTypeSpecifier = (__bridge_transfer MANTypeSpecifier *)$2;
+				MANBlock *block = (__bridge_transfer MANBlock *)$3;
+				MANBlockExpression *expr = (MANBlockExpression *)anc_create_expression(MAN_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,returnTypeSpecifier,nil,block);
 				$$ = (__bridge_retained void *)expr;
 				
 			}
 			| POWER type_specifier LP function_param_list RP block_statement
 			{
-				ANCTypeSpecifier *returnTypeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$2;
-				NSArray<ANCParameter *> *parameter = (__bridge_transfer NSArray<ANCParameter *> *)$4;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$6;
-				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				MANTypeSpecifier *returnTypeSpecifier = (__bridge_transfer MANTypeSpecifier *)$2;
+				NSArray<MANParameter *> *parameter = (__bridge_transfer NSArray<MANParameter *> *)$4;
+				MANBlock *block = (__bridge_transfer MANBlock *)$6;
+				MANBlockExpression *expr = (MANBlockExpression *)anc_create_expression(MAN_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,returnTypeSpecifier,parameter,block);
 				$$ = (__bridge_retained void *)expr;
 				
 			}
 			| POWER  LP  RP block_statement
 			{
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$4;
-				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				MANBlock *block = (__bridge_transfer MANBlock *)$4;
+				MANBlockExpression *expr = (MANBlockExpression *)anc_create_expression(MAN_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,nil,nil,block);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| POWER block_statement
 			{
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$2;
-				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				MANBlock *block = (__bridge_transfer MANBlock *)$2;
+				MANBlockExpression *expr = (MANBlockExpression *)anc_create_expression(MAN_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,nil,nil,block);
 				$$ = (__bridge_retained void *)expr;
 			}
 			| POWER  LP function_param_list RP block_statement
 			{
-				NSArray<ANCParameter *> *parameter = (__bridge_transfer NSArray<ANCParameter *> *)$3;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
-				ANCBlockExpression *expr = (ANCBlockExpression *)anc_create_expression(ANC_BLOCK_EXPRESSION);
+				NSArray<MANParameter *> *parameter = (__bridge_transfer NSArray<MANParameter *> *)$3;
+				MANBlock *block = (__bridge_transfer MANBlock *)$5;
+				MANBlockExpression *expr = (MANBlockExpression *)anc_create_expression(MAN_BLOCK_EXPRESSION);
 				anc_build_block_expr(expr,nil,parameter,block);
 				$$ = (__bridge_retained void *)expr;
 			}
@@ -943,14 +943,14 @@ block_body:  POWER type_specifier LP  RP block_statement
 function_param_list: function_param
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCParameter *parameter = (__bridge_transfer ANCParameter *)$1;
+				MANParameter *parameter = (__bridge_transfer MANParameter *)$1;
 				[list addObject:parameter];
 				$$ = (__bridge_retained void *)list;
 			}
 			| function_param_list COMMA function_param
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCParameter *parameter = (__bridge_transfer ANCParameter *)$3;
+				MANParameter *parameter = (__bridge_transfer MANParameter *)$3;
 				[list addObject:parameter];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -958,34 +958,34 @@ function_param_list: function_param
 
 function_param: type_specifier IDENTIFIER
 			{
-				ANCTypeSpecifier *type = (__bridge_transfer ANCTypeSpecifier *)$1;
+				MANTypeSpecifier *type = (__bridge_transfer MANTypeSpecifier *)$1;
 				NSString *name = (__bridge_transfer NSString *)$2;
-				ANCParameter *parameter = anc_create_parameter(type, name);
+				MANParameter *parameter = anc_create_parameter(type, name);
 				$$ = (__bridge_retained void *)parameter;
 			}
 			;
 
 declaration_statement: declaration SEMICOLON
 			{
-				ANCDeclaration *declaration = (__bridge_transfer ANCDeclaration *)$1;
-				ANCDeclarationStatement *statement = anc_create_declaration_statement(declaration);
+				MANDeclaration *declaration = (__bridge_transfer MANDeclaration *)$1;
+				MANDeclarationStatement *statement = anc_create_declaration_statement(declaration);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
 
 declaration: type_specifier IDENTIFIER
 			{
-				ANCTypeSpecifier *type = (__bridge_transfer ANCTypeSpecifier *)$1;
+				MANTypeSpecifier *type = (__bridge_transfer MANTypeSpecifier *)$1;
 				NSString *name = (__bridge_transfer NSString *)$2;
-				ANCDeclaration *declaration = anc_create_declaration(type, name, nil);
+				MANDeclaration *declaration = anc_create_declaration(type, name, nil);
 				$$ = (__bridge_retained void *)declaration;
 			}
 			| type_specifier IDENTIFIER ASSIGN expression
 			{
-				ANCTypeSpecifier *type = (__bridge_transfer ANCTypeSpecifier *)$1;
+				MANTypeSpecifier *type = (__bridge_transfer MANTypeSpecifier *)$1;
 				NSString *name = (__bridge_transfer NSString *)$2;
-				ANCExpression *initializer = (__bridge_transfer ANCExpression *)$4;
-				ANCDeclaration *declaration = anc_create_declaration(type, name, initializer);
+				MANExpression *initializer = (__bridge_transfer MANExpression *)$4;
+				MANDeclaration *declaration = anc_create_declaration(type, name, initializer);
 				$$ = (__bridge_retained void *)declaration;
 			}
 			;
@@ -994,34 +994,34 @@ declaration: type_specifier IDENTIFIER
 
 if_statement: IF LP expression RP block_statement
 			{
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
-				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
-				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, nil, nil);
+				MANExpression *condition = (__bridge_transfer MANExpression *)$3;
+				MANBlock *thenBlock = (__bridge_transfer MANBlock *)$5;
+				MANIfStatement *statement = anc_create_if_statement(condition, thenBlock, nil, nil);
 				$$ = (__bridge_retained void *)statement;
 			}
 			| IF LP expression RP block_statement ELSE block_statement
 			{
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
-				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
-				ANCBlock *elseBlocl = (__bridge_transfer ANCBlock *)$7;
-				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, nil, elseBlocl);
+				MANExpression *condition = (__bridge_transfer MANExpression *)$3;
+				MANBlock *thenBlock = (__bridge_transfer MANBlock *)$5;
+				MANBlock *elseBlocl = (__bridge_transfer MANBlock *)$7;
+				MANIfStatement *statement = anc_create_if_statement(condition, thenBlock, nil, elseBlocl);
 				$$ = (__bridge_retained void *)statement;
 			}
 			| IF LP expression RP block_statement else_if_list
 			{
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
-				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
-				NSArray<ANCElseIf *> *elseIfList = (__bridge_transfer NSArray<ANCElseIf *> *)$6;
-				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, elseIfList, nil);
+				MANExpression *condition = (__bridge_transfer MANExpression *)$3;
+				MANBlock *thenBlock = (__bridge_transfer MANBlock *)$5;
+				NSArray<MANElseIf *> *elseIfList = (__bridge_transfer NSArray<MANElseIf *> *)$6;
+				MANIfStatement *statement = anc_create_if_statement(condition, thenBlock, elseIfList, nil);
 				$$ = (__bridge_retained void *)statement;
 			}
 			| IF LP expression RP block_statement else_if_list ELSE block_statement
 			{
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
-				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$5;
-				NSArray<ANCElseIf *> *elseIfList = (__bridge_transfer NSArray<ANCElseIf *> *)$6;
-				ANCBlock *elseBlocl = (__bridge_transfer ANCBlock *)$8;
-				ANCIfStatement *statement = anc_create_if_statement(condition, thenBlock, elseIfList, elseBlocl);
+				MANExpression *condition = (__bridge_transfer MANExpression *)$3;
+				MANBlock *thenBlock = (__bridge_transfer MANBlock *)$5;
+				NSArray<MANElseIf *> *elseIfList = (__bridge_transfer NSArray<MANElseIf *> *)$6;
+				MANBlock *elseBlocl = (__bridge_transfer MANBlock *)$8;
+				MANIfStatement *statement = anc_create_if_statement(condition, thenBlock, elseIfList, elseBlocl);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1029,14 +1029,14 @@ if_statement: IF LP expression RP block_statement
 else_if_list: else_if
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCElseIf *elseIf = (__bridge_transfer ANCElseIf *)$1;
+				MANElseIf *elseIf = (__bridge_transfer MANElseIf *)$1;
 				[list addObject:elseIf];
 				$$ = (__bridge_retained void *)list;
 			}
 			| else_if_list else_if
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCElseIf *elseIf = (__bridge_transfer ANCElseIf *)$2;
+				MANElseIf *elseIf = (__bridge_transfer MANElseIf *)$2;
 				[list addObject:elseIf];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -1044,19 +1044,19 @@ else_if_list: else_if
 
 else_if: ELSE IF  LP expression RP  block_statement
 			{
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$4;
-				ANCBlock *thenBlock = (__bridge_transfer ANCBlock *)$6;
-				ANCElseIf *elseIf = anc_create_else_if(condition, thenBlock);
+				MANExpression *condition = (__bridge_transfer MANExpression *)$4;
+				MANBlock *thenBlock = (__bridge_transfer MANBlock *)$6;
+				MANElseIf *elseIf = anc_create_else_if(condition, thenBlock);
 				$$ = (__bridge_retained void *)elseIf;
 			}
 			;
 
 switch_statement: SWITCH LP expression RP LC case_list default_opt RC
 			{
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$3;
-				NSArray<ANCCase *> *caseList = (__bridge_transfer NSArray *)$6;
-				ANCBlock *defaultBlock = (__bridge_transfer ANCBlock *)$7;
-				ANCSwitchStatement *statement = anc_create_switch_statement(expr,caseList, defaultBlock);
+				MANExpression *expr = (__bridge_transfer MANExpression *)$3;
+				NSArray<MANCase *> *caseList = (__bridge_transfer NSArray *)$6;
+				MANBlock *defaultBlock = (__bridge_transfer MANBlock *)$7;
+				MANSwitchStatement *statement = anc_create_switch_statement(expr,caseList, defaultBlock);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1064,14 +1064,14 @@ switch_statement: SWITCH LP expression RP LC case_list default_opt RC
 case_list: one_case
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCCase *case_ = (__bridge_transfer ANCCase *)$1;
+				MANCase *case_ = (__bridge_transfer MANCase *)$1;
 				[list addObject:case_];
 				$$ = (__bridge_retained void *)list;
 			}
 			| case_list one_case
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCCase *case_ = (__bridge_transfer ANCCase *)$2;
+				MANCase *case_ = (__bridge_transfer MANCase *)$2;
 				[list addObject:case_];
 				$$ = (__bridge_retained void *)list;
 			}
@@ -1079,9 +1079,9 @@ case_list: one_case
 
 one_case: CASE expression COLON block_statement
 			{
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$2;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$4;
-				ANCCase *case_ = anc_create_case(expr, block);
+				MANExpression *expr = (__bridge_transfer MANExpression *)$2;
+				MANBlock *block = (__bridge_transfer MANBlock *)$4;
+				MANCase *case_ = anc_create_case(expr, block);
 				$$ = (__bridge_retained void *)case_;
 			}
 			;
@@ -1107,22 +1107,22 @@ expression_opt: /* empty */
 
 for_statement: FOR LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP block_statement
 			{
-				ANCExpression *initializerExpr = (__bridge_transfer ANCExpression *)$3;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$5;
-				ANCExpression *post = (__bridge_transfer ANCExpression *)$7;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$9;
-				ANCForStatement *statement = anc_create_for_statement(initializerExpr, nil,
+				MANExpression *initializerExpr = (__bridge_transfer MANExpression *)$3;
+				MANExpression *condition = (__bridge_transfer MANExpression *)$5;
+				MANExpression *post = (__bridge_transfer MANExpression *)$7;
+				MANBlock *block = (__bridge_transfer MANBlock *)$9;
+				MANForStatement *statement = anc_create_for_statement(initializerExpr, nil,
 				condition, post, block);
 				$$ = (__bridge_retained void *)statement;
 			}
 
 			| FOR LP declaration SEMICOLON  expression_opt SEMICOLON expression_opt RP block_statement
 			{
-				ANCDeclaration *declaration = (__bridge_transfer ANCDeclaration *)$3;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$5;
-				ANCExpression *post = (__bridge_transfer ANCExpression *)$7;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$9;
-				ANCForStatement *statement = anc_create_for_statement(nil, declaration,
+				MANDeclaration *declaration = (__bridge_transfer MANDeclaration *)$3;
+				MANExpression *condition = (__bridge_transfer MANExpression *)$5;
+				MANExpression *post = (__bridge_transfer MANExpression *)$7;
+				MANBlock *block = (__bridge_transfer MANBlock *)$9;
+				MANForStatement *statement = anc_create_for_statement(nil, declaration,
 				condition, post, block);
 				$$ = (__bridge_retained void *)statement;
 			}
@@ -1130,37 +1130,37 @@ for_statement: FOR LP expression_opt SEMICOLON expression_opt SEMICOLON expressi
 
 while_statement: WHILE LP expression RP block_statement
 			{
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$3;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$5;
-				ANCWhileStatement *statement = anc_create_while_statement( condition, block);
+				MANExpression *condition = (__bridge_transfer MANExpression *)$3;
+				MANBlock *block = (__bridge_transfer MANBlock *)$5;
+				MANWhileStatement *statement = anc_create_while_statement( condition, block);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
 
 do_while_statement: DO block_statement WHILE LP expression RP SEMICOLON
 			{
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$2;
-				ANCExpression *condition = (__bridge_transfer ANCExpression *)$5;
-				ANCDoWhileStatement *statement = anc_create_do_while_statement(block, condition);
+				MANBlock *block = (__bridge_transfer MANBlock *)$2;
+				MANExpression *condition = (__bridge_transfer MANExpression *)$5;
+				MANDoWhileStatement *statement = anc_create_do_while_statement(block, condition);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
 
 foreach_statement: FOR LP type_specifier IDENTIFIER IN expression RP block_statement
 			{
-				ANCTypeSpecifier *typeSpecifier = (__bridge_transfer ANCTypeSpecifier *)$3;
+				MANTypeSpecifier *typeSpecifier = (__bridge_transfer MANTypeSpecifier *)$3;
 				NSString *varName = (__bridge_transfer NSString *)$4;
-				ANCExpression *arrayExpr = (__bridge_transfer ANCExpression *)$6;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$8;
-				ANCForEachStatement *statement = anc_create_for_each_statement(typeSpecifier, varName, arrayExpr, block);
+				MANExpression *arrayExpr = (__bridge_transfer MANExpression *)$6;
+				MANBlock *block = (__bridge_transfer MANBlock *)$8;
+				MANForEachStatement *statement = anc_create_for_each_statement(typeSpecifier, varName, arrayExpr, block);
 				$$ = (__bridge_retained void *)statement;
 			}
 			| FOR  LP IDENTIFIER IN expression RP block_statement
 			{
 				NSString *varName = (__bridge_transfer NSString *)$3;
-				ANCExpression *arrayExpr = (__bridge_transfer ANCExpression *)$5;
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$7;
-				ANCForEachStatement *statement = anc_create_for_each_statement(nil, varName, arrayExpr, block);
+				MANExpression *arrayExpr = (__bridge_transfer MANExpression *)$5;
+				MANBlock *block = (__bridge_transfer MANBlock *)$7;
+				MANForEachStatement *statement = anc_create_for_each_statement(nil, varName, arrayExpr, block);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1168,7 +1168,7 @@ foreach_statement: FOR LP type_specifier IDENTIFIER IN expression RP block_state
 
 continue_statement: CONTINUE SEMICOLON
 			{
-				ANCContinueStatement *statement = anc_create_continue_statement();
+				MANContinueStatement *statement = anc_create_continue_statement();
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1176,7 +1176,7 @@ continue_statement: CONTINUE SEMICOLON
 
 break_statement: BREAK SEMICOLON
 			{
-				ANCBreakStatement *statement = anc_create_break_statement();
+				MANBreakStatement *statement = anc_create_break_statement();
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1184,16 +1184,16 @@ break_statement: BREAK SEMICOLON
 
 return_statement: RETURN expression_opt SEMICOLON
 			{
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$2;
-				ANCReturnStatement *statement = anc_create_return_statement(expr);
+				MANExpression *expr = (__bridge_transfer MANExpression *)$2;
+				MANReturnStatement *statement = anc_create_return_statement(expr);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
 
 expression_statement:expression SEMICOLON
 			{
-				ANCExpression *expr = (__bridge_transfer ANCExpression *)$1;
-				ANCExpressionStatement *statement  = anc_create_expression_statement(expr);
+				MANExpression *expr = (__bridge_transfer MANExpression *)$1;
+				MANExpressionStatement *statement  = anc_create_expression_statement(expr);
 				$$ = (__bridge_retained void *)statement;
 			}
 			;
@@ -1201,23 +1201,23 @@ expression_statement:expression SEMICOLON
 
 block_statement: LC
 			{
-				ANCBlock *block = anc_open_block_statement();
+				MANBlock *block = anc_open_block_statement();
 				$<block_statement>$ = (__bridge_retained void *)block;
 			}
 			RC
 			{
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$<block_statement>2;
+				MANBlock *block = (__bridge_transfer MANBlock *)$<block_statement>2;
 				block = anc_close_block_statement(block,nil);
 				$$ = (__bridge_retained void *)block;
 			}
 			| LC
 			{
-				ANCBlock *block = anc_open_block_statement();
+				MANBlock *block = anc_open_block_statement();
 				$<block_statement>$ = (__bridge_retained void *)block;
 			}
 			statement_list RC
 			{
-				ANCBlock *block = (__bridge_transfer ANCBlock *)$<block_statement>2;
+				MANBlock *block = (__bridge_transfer MANBlock *)$<block_statement>2;
 				NSArray *list = (__bridge_transfer NSArray *)$3;
 				block = anc_close_block_statement(block,list);
 				$$ = (__bridge_retained void *)block;
@@ -1228,14 +1228,14 @@ block_statement: LC
 statement_list: statement
 			{
 				NSMutableArray *list = [NSMutableArray array];
-				ANCStatement *statement = (__bridge_transfer ANCStatement *)$1;
+				MANStatement *statement = (__bridge_transfer MANStatement *)$1;
 				[list addObject:statement];
 				$$ = (__bridge_retained void *)list;
 			}
 			| statement_list statement
 			{
 				NSMutableArray *list = (__bridge_transfer NSMutableArray *)$1;
-				ANCStatement *statement = (__bridge_transfer ANCStatement *)$2;
+				MANStatement *statement = (__bridge_transfer MANStatement *)$2;
 				[list addObject:statement];
 				$$ = (__bridge_retained void *)list;
 			}
