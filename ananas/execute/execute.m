@@ -617,9 +617,7 @@ void add_struct_declare(ANCInterpreter *interpreter, ANCStructDeclare *structDec
 
 
 void ane_interpret(ANCInterpreter *interpreter){
-	
 	ananas_add_built_in(interpreter);
-	
 	for (__kindof NSObject *top in interpreter.topList) {
 		if ([top isKindOfClass:[ANCStatement class]]) {
 			execute_statement(interpreter, interpreter.topScope, top);
@@ -630,6 +628,4 @@ void ane_interpret(ANCInterpreter *interpreter){
 			fix_class(interpreter,top);
 		}
 	}
-	
-	
 }

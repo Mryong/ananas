@@ -114,7 +114,6 @@ static void add_build_in_function(ANCInterpreter *interpreter){
 	}];
 	
 	
-	
 	interpreter.commonScope.vars[@"NSLog"] = [ANEValue valueInstanceWithBlock:^void (id obj){
 		NSLog(@"%@",obj);
 	}];

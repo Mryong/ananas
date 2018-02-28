@@ -24,14 +24,14 @@
 	
 	static int string_input(char *buf, int max_size)
 	{
-		unsigned int len = st_source_len - st_current_char_index;
+		unsigned long len = st_source_len - st_current_char_index;
 		if(len <= 0){
 			return 0;
 		}
 		len = smaller(len, max_size);
 		strncpy(buf, &st_source_string[st_current_char_index], len);
 		st_current_char_index += len;
-		return len;
+		return (int)len;
 	}
 	
 
